@@ -5,4 +5,14 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="DSharpPlus" Version="3.2.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Commands" />
+      <Folder Include="Data" />
+      <Folder Include="XP" />
+    </ItemGroup>
+
 </Project>
