@@ -4,7 +4,7 @@ using DSharpPlus;
 
 namespace GarbageCan
 {
-    class GarbageCan
+    static class GarbageCan
     {
         private static DiscordClient _client;
         static void Main(string[] args)
