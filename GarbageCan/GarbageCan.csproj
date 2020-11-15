@@ -6,6 +6,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Config.Net" Version="4.15.0" />
+      <PackageReference Include="Config.Net.Yaml" Version="4.13.7" />
       <PackageReference Include="DSharpPlus" Version="3.2.3" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.0" />
     </ItemGroup>
