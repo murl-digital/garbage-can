@@ -72,7 +72,7 @@ namespace GarbageCan
 				feature.init(_client);
 			}
 
-			_client.Ready += (eventArgs) => _client.UpdateStatusAsync(new DiscordGame("dang"));
+			_client.Ready += (sender, eventArgs) => sender.UpdateStatusAsync(new DiscordActivity("dang"));
 			
 			_handler += Handler;
 			SetConsoleCtrlHandler(_handler, true);
