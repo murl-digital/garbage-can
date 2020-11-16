@@ -20,7 +20,6 @@
 
     <ItemGroup>
       <Folder Include="Commands" />
-      <Folder Include="Data\Models" />
       <Folder Include="XP" />
     </ItemGroup>
 

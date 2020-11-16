@@ -1,15 +1,23 @@
 ﻿using System.Threading.Tasks;
 using GarbageCan.Data.Entities;
+using GarbageCan.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace GarbageCan.Data
 {
     public class XPManager
     {
-        public static async Task<EntityUser> RetrieveUser(string id)
+        public static async Task<User> RetrieveUser(string id)
         {
             await using var context = new XPContext();
-            return await context.xp_users.SingleOrDefaultAsync(u => u.id.Equals(id));
+            var entity = await context.xp_users.SingleOrDefaultAsync(u => u.id.Equals(id));
+            if (entity == null) return null;
+            return new User
+            {
+                id = entity.id,
+                lvl = entity.lvl,
+                xp = entity.xp
+            };
         }
 
         public static void SaveUser(string id, int lvl, double xp)
