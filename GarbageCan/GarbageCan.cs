@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 using Config.Net;
 using DSharpPlus;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Core;
 
 namespace GarbageCan
 {
@@ -15,7 +18,7 @@ namespace GarbageCan
 	{
 		private static DiscordClient _client;
 		public static IBotConfig config;
-		
+
 		#region Trap application termination
 		[DllImport("Kernel32")]
 		private static extern bool SetConsoleCtrlHandler(EventHandler handler, bool add);
@@ -32,15 +35,13 @@ namespace GarbageCan
 		}
 
 		private static bool Handler(CtrlType sig) {
-			Console.WriteLine("Exiting system due to external CTRL-C, or process kill, or shutdown");
+			Log.Information("Shutting down...");
 			
 			_client.UpdateStatusAsync(null, UserStatus.Offline).GetAwaiter().GetResult();
 			_client.Dispose();
 
-			Console.WriteLine("Cleanup complete");
-
 			//shutdown right away so there are no lingering threads
-			Environment.Exit(-1);
+			Environment.Exit(0);
 
 			return true;
 		}
@@ -53,12 +54,19 @@ namespace GarbageCan
 
 		private static async Task MainAsync(string[] args)
 		{
+			Log.Logger = new LoggerConfiguration()
+				.WriteTo.Console()
+				.CreateLogger();
+			
+			var logFactory = new LoggerFactory().AddSerilog();
+
 			BuildConfig();
 
 			_client = new DiscordClient(new DiscordConfiguration
 			{
-				Token = config.token, //implement this later
-				TokenType = TokenType.Bot
+				Token = config.token,
+				TokenType = TokenType.Bot,
+				LoggerFactory = logFactory
 			});
 
 			List<Type> botFeatures = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes())
