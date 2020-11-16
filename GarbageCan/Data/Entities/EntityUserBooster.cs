@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace GarbageCan.Data
+namespace GarbageCan.Data.Entities
 {
-    public class XPUserBooster
+    public class EntityUserBooster
     {
         [Key] public string id { get; set; }
         [MaxLength(18)] public string user_id { get; set; }

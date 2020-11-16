@@ -2,11 +2,11 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace GarbageCan.Data
+namespace GarbageCan.Data.Entities
 {
-    public class XPActiveBooster
+    public class EntityActiveBooster
     {
-        [ForeignKey("id")] [Key] public XPAvailableSlot slot { get; set; } = new XPAvailableSlot();
+        [ForeignKey("id")] [Key] public virtual EntityAvailableSlot slot { get; set; } = new EntityAvailableSlot();
         [Column(TypeName = "datetime")] public DateTime expiration_date { get; set; }
         public float multipler { get; set; }
     }

@@ -1,11 +1,12 @@
 ﻿using System.Threading.Tasks;
+using GarbageCan.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace GarbageCan.Data
 {
     public class XPManager
     {
-        public static async Task<XPUser> RetrieveUser(string id)
+        public static async Task<EntityUser> RetrieveUser(string id)
         {
             await using var context = new XPContext();
             return await context.xp_users.SingleOrDefaultAsync(u => u.id.Equals(id));
@@ -18,7 +19,7 @@ namespace GarbageCan.Data
 
             if (entity == null)
             {
-                entity = new XPUser();
+                entity = new EntityUser();
                 context.xp_users.Add(entity);
             }
 

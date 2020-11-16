@@ -1,16 +1,17 @@
 ﻿using System;
 using Config.Net;
+using GarbageCan.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace GarbageCan.Data
 {
     public class XPContext : DbContext
     {
-        public DbSet<XPUser> xp_users { get; set; }
-        public DbSet<XPQueuedBooster> xp_queued_boosters { get; set; }
-        public DbSet<XPAvailableSlot> xp_available_slots { get; set; }
-        public DbSet<XPActiveBooster> xp_active_boosters { get; set; }
-        public DbSet<XPUserBooster> xp_user_boosters { get; set; }
+        public DbSet<EntityUser> xp_users { get; set; }
+        public DbSet<EntityQueuedBooster> xp_queued_boosters { get; set; }
+        public DbSet<EntityAvailableSlot> xp_available_slots { get; set; }
+        public DbSet<EntityActiveBooster> xp_active_boosters { get; set; }
+        public DbSet<EntityUserBooster> xp_user_boosters { get; set; }
 
         private string connectionString;
 

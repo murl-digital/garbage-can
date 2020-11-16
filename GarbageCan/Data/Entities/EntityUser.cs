@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace GarbageCan.Data
+namespace GarbageCan.Data.Entities
 {
-    public class XPUser
+    public class EntityUser
     {
         [Key] [MaxLength(18)] public string id { get; set; }
         public int lvl { get; set; }

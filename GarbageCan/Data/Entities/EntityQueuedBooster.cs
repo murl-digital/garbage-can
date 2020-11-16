@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace GarbageCan.Data
+namespace GarbageCan.Data.Entities
 {
-    public class XPQueuedBooster
+    public class EntityQueuedBooster
     {
         [Key] [DatabaseGenerated(DatabaseGeneratedOption.None)] public int position { get; set; }
         public float multiplier { get; set; }
