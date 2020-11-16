@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Config.Net;
 using DSharpPlus;
 
@@ -6,7 +9,7 @@ namespace GarbageCan
 {
 	internal static class GarbageCan
 	{
-		private static DiscordClient client;
+		private static DiscordClient _client;
 		public static IBotConfig config;
 
 		private static void Main(string[] args)
@@ -18,15 +21,24 @@ namespace GarbageCan
 		{
 			BuildConfig();
 
-			client = new DiscordClient(new DiscordConfiguration
+			_client = new DiscordClient(new DiscordConfiguration
 			{
 				Token = config.token, //implement this later
 				TokenType = TokenType.Bot
 			});
 
-			//... fun init logic to be done later
+			List<Type> botFeatures = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes())
+				.Where(x => typeof(IFeature).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
+				.Select(x => x)
+				.ToList();
 
-			await client.ConnectAsync();
+			foreach (Type t in botFeatures)
+			{
+				IFeature feature = (IFeature) Activator.CreateInstance(t);
+				feature.init(_client);
+			}
+
+			await _client.ConnectAsync();
 			await Task.Delay(-1);
 		}
 
