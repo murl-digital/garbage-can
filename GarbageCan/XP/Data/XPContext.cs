@@ -1,8 +1,7 @@
-﻿using System;
-using GarbageCan.Data.Entities;
+﻿using GarbageCan.XP.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace GarbageCan.Data
+namespace GarbageCan.XP.Data
 {
 	public class XPContext : DbContext
 	{

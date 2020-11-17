@@ -1,4 +1,4 @@
-﻿namespace GarbageCan.Data.Models
+﻿namespace GarbageCan.XP.Data.Models
 {
 	public class QueuedBooster
 	{

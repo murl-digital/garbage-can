@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
-using GarbageCan.Data.Entities;
-using GarbageCan.Data.Models;
+using GarbageCan.XP.Data.Entities;
+using GarbageCan.XP.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace GarbageCan.Data
+namespace GarbageCan.XP.Data
 {
 	public class XPManager
 	{
