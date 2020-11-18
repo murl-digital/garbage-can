@@ -4,6 +4,7 @@ namespace GarbageCan
 {
 	public interface IFeature
 	{
-		public void init(DiscordClient client);
+		public void Init(DiscordClient client);
+		public void Cleanup();
 	}
 }

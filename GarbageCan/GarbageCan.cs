@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -12,8 +13,10 @@ namespace GarbageCan
 {
 	internal static class GarbageCan
 	{
-		private static DiscordClient _client;
+		public static DiscordClient client;
 		public static IBotConfig config;
+		
+		private static List<IFeature> _botFeatures;
 
 		private static void Main(string[] args)
 		{
@@ -30,31 +33,30 @@ namespace GarbageCan
 
 			BuildConfig();
 
-			_client = new DiscordClient(new DiscordConfiguration
+			client = new DiscordClient(new DiscordConfiguration
 			{
 				Token = config.token,
 				TokenType = TokenType.Bot,
 				LoggerFactory = logFactory,
 				MinimumLogLevel = LogLevel.Debug
 			});
-
-			var botFeatures = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes())
+			
+			_botFeatures = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes())
 				.Where(x => typeof(IFeature).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-				.Select(x => x)
+				.Select(x => (IFeature)Activator.CreateInstance(x))
 				.ToList();
 
-			foreach (var t in botFeatures)
+			foreach (var feature in _botFeatures)
 			{
-				var feature = (IFeature) Activator.CreateInstance(t);
-				feature.init(_client);
+				feature.Init(client);
 			}
 
-			_client.Ready += (sender, eventArgs) => sender.UpdateStatusAsync(new DiscordActivity("dang"));
+			client.Ready += (sender, eventArgs) => sender.UpdateStatusAsync(new DiscordActivity("dang"));
 
 			_handler += Handler;
 			SetConsoleCtrlHandler(_handler, true);
 
-			await _client.ConnectAsync();
+			await client.ConnectAsync();
 			await Task.Delay(-1);
 		}
 
@@ -89,8 +91,12 @@ namespace GarbageCan
 		{
 			Log.Information("Shutting down...");
 
-			_client.UpdateStatusAsync(null, UserStatus.Offline).GetAwaiter().GetResult();
-			_client.Dispose();
+			foreach (var feature in _botFeatures)
+			{
+				feature.Cleanup();
+			}
+			client.UpdateStatusAsync(null, UserStatus.Offline).GetAwaiter().GetResult();
+			client.Dispose();
 
 			//shutdown right away so there are no lingering threads
 			Environment.Exit(0);
