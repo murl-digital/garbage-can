@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Config.Net;
 using DSharpPlus;
@@ -17,6 +18,7 @@ namespace GarbageCan
 		public static IBotConfig config;
 		
 		private static List<IFeature> _botFeatures;
+		private static readonly AutoResetEvent _closing = new AutoResetEvent(false);
 
 		private static void Main(string[] args)
 		{
@@ -53,11 +55,19 @@ namespace GarbageCan
 
 			client.Ready += (sender, eventArgs) => sender.UpdateStatusAsync(new DiscordActivity("dang"));
 
-			_handler += Handler;
-			SetConsoleCtrlHandler(_handler, true);
+			_handler += Shutdown;
+			
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				SetConsoleCtrlHandler(_handler, true);
+			}
+			else
+			{
+				Console.CancelKeyPress += ((sender, eventArgs) => Shutdown(CtrlType.CTRL_C_EVENT));
+			}
 
 			await client.ConnectAsync();
-			await Task.Delay(-1);
+			_closing.WaitOne();
 		}
 
 		public static void BuildConfig()
@@ -68,8 +78,24 @@ namespace GarbageCan
 			
 			if (config == null) throw new NullReferenceException("Attempted to build config, but got null");
 		}
+		
+		private static bool Shutdown(CtrlType sig)
+		{
+			Log.Information("Shutting down...");
 
-		#region Trap application termination
+			foreach (var feature in _botFeatures)
+			{
+				feature.Cleanup();
+			}
+			client.UpdateStatusAsync(null, UserStatus.Offline).GetAwaiter().GetResult();
+			client.Dispose();
+
+			_closing.Set();
+
+			return true;
+		}
+
+		#region Windows specific shutdown stuff
 
 		[DllImport("Kernel32")]
 		private static extern bool SetConsoleCtrlHandler(EventHandler handler, bool add);
@@ -86,24 +112,7 @@ namespace GarbageCan
 			CTRL_LOGOFF_EVENT = 5,
 			CTRL_SHUTDOWN_EVENT = 6
 		}
-
-		private static bool Handler(CtrlType sig)
-		{
-			Log.Information("Shutting down...");
-
-			foreach (var feature in _botFeatures)
-			{
-				feature.Cleanup();
-			}
-			client.UpdateStatusAsync(null, UserStatus.Offline).GetAwaiter().GetResult();
-			client.Dispose();
-
-			//shutdown right away so there are no lingering threads
-			Environment.Exit(0);
-
-			return true;
-		}
-
+		
 		#endregion
 	}
 }
