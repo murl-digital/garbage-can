@@ -14,11 +14,11 @@ namespace GarbageCan
 {
 	internal static class GarbageCan
 	{
-		public static DiscordClient client;
-		public static IBotConfig config;
+		public static DiscordClient Client;
+		public static IBotConfig Config;
 		
 		private static List<IFeature> _botFeatures;
-		private static readonly AutoResetEvent _closing = new AutoResetEvent(false);
+		private static readonly AutoResetEvent Closing = new AutoResetEvent(false);
 
 		private static void Main(string[] args)
 		{
@@ -35,9 +35,9 @@ namespace GarbageCan
 
 			BuildConfig();
 
-			client = new DiscordClient(new DiscordConfiguration
+			Client = new DiscordClient(new DiscordConfiguration
 			{
-				Token = config.token,
+				Token = Config.token,
 				TokenType = TokenType.Bot,
 				LoggerFactory = logFactory,
 				MinimumLogLevel = LogLevel.Debug
@@ -50,10 +50,8 @@ namespace GarbageCan
 
 			foreach (var feature in _botFeatures)
 			{
-				feature.Init(client);
+				feature.Init(Client);
 			}
-
-			client.Ready += (sender, eventArgs) => sender.UpdateStatusAsync(new DiscordActivity("dang"));
 
 			_handler += Shutdown;
 			
@@ -66,17 +64,17 @@ namespace GarbageCan
 				Console.CancelKeyPress += ((sender, eventArgs) => Shutdown(CtrlType.CTRL_C_EVENT));
 			}
 
-			await client.ConnectAsync();
-			_closing.WaitOne();
+			await Client.ConnectAsync();
+			Closing.WaitOne();
 		}
 
 		public static void BuildConfig()
 		{
-			config = new ConfigurationBuilder<IBotConfig>()
+			Config = new ConfigurationBuilder<IBotConfig>()
 				.UseJsonFile("dev.json")
 				.Build();
 			
-			if (config == null) throw new NullReferenceException("Attempted to build config, but got null");
+			if (Config == null) throw new NullReferenceException("Attempted to build config, but got null");
 		}
 		
 		private static bool Shutdown(CtrlType sig)
@@ -87,10 +85,10 @@ namespace GarbageCan
 			{
 				feature.Cleanup();
 			}
-			client.UpdateStatusAsync(null, UserStatus.Offline).GetAwaiter().GetResult();
-			client.Dispose();
+			Client.UpdateStatusAsync(null, UserStatus.Offline).GetAwaiter().GetResult();
+			Client.Dispose();
 
-			_closing.Set();
+			Closing.Set();
 
 			return true;
 		}
