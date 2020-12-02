@@ -25,10 +25,10 @@ namespace GarbageCan
 
 		private static void Main(string[] args)
 		{
-			MainAsync(args).ConfigureAwait(false).GetAwaiter().GetResult();
+			MainAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 		}
 
-		private static async Task MainAsync(string[] args)
+		private static async Task MainAsync()
 		{
 			Log.Logger = new LoggerConfiguration()
 				.WriteTo.Console()
@@ -36,6 +36,7 @@ namespace GarbageCan
 
 			var logFactory = new LoggerFactory().AddSerilog();
 
+			Log.Information("Reading config...");
 			BuildConfig();
 
 			Client = new DiscordClient(new DiscordConfiguration
@@ -46,6 +47,7 @@ namespace GarbageCan
 				MinimumLogLevel = LogLevel.Debug
 			});
 			
+			Log.Information("Initializing features...");
 			_botFeatures = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes())
 				.Where(x => typeof(IFeature).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
 				.Select(x => (IFeature)Activator.CreateInstance(x))
@@ -53,7 +55,9 @@ namespace GarbageCan
 
 			foreach (var feature in _botFeatures)
 			{
+				Log.Information("Feature " + feature.GetType().Name + " found, attempting to initialize...");
 				feature.Init(Client);
+				Log.Information("Success!");
 			}
 
 			Commands = Client.UseCommandsNext(new CommandsNextConfiguration
