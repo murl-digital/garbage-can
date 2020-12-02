@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Config.Net;
 using DSharpPlus;
+using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -15,6 +17,7 @@ namespace GarbageCan
 	internal static class GarbageCan
 	{
 		public static DiscordClient Client;
+		public static CommandsNextExtension Commands;
 		public static IBotConfig Config;
 		
 		private static List<IFeature> _botFeatures;
@@ -52,6 +55,13 @@ namespace GarbageCan
 			{
 				feature.Init(Client);
 			}
+
+			Commands = Client.UseCommandsNext(new CommandsNextConfiguration
+			{
+				StringPrefixes = new[] { "!>" }
+			});
+
+			Commands.RegisterCommands(Assembly.GetExecutingAssembly());
 
 			_handler += Shutdown;
 			
