@@ -34,7 +34,7 @@ namespace GarbageCan.XP
         
         private Task HandleMessage(DiscordClient sender, MessageCreateEventArgs e)
         {
-            if (e.Channel.IsPrivate || e.Author.IsBot || (e.Author.IsSystem.HasValue && e.Author.IsSystem.Value))
+            if (e.Channel.IsPrivate || e.Author.IsBot || e.Author.IsSystem.HasValue && e.Author.IsSystem.Value || IsExcluded(e.Channel.Id))
                 return Task.CompletedTask;
 
             Task.Run(async () =>
@@ -91,6 +91,13 @@ namespace GarbageCan.XP
             });
             
             return Task.CompletedTask;
+        }
+
+        private bool IsExcluded(ulong channelId)
+        {
+            using var context = new XpContext();
+            return context.xpExcludedChannels
+                .Any(c => c.channel_id == channelId);
         }
 
         private double XpEarned(string message)

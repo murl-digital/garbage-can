@@ -7,6 +7,7 @@ namespace GarbageCan.XP.Data
 	{
 		private string _connectionString;
 		public DbSet<EntityUser> xpUsers { get; set; }
+		public DbSet<EntityExcludedChannel> xpExcludedChannels { get; set; }
 		public DbSet<EntityQueuedBooster> xpQueuedBoosters { get; set; }
 		public DbSet<EntityAvailableSlot> xpAvailableSlots { get; set; }
 		public DbSet<EntityActiveBooster> xpActiveBoosters { get; set; }
