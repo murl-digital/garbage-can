@@ -15,6 +15,11 @@ namespace GarbageCan.XP
     public class XpManager : IFeature
     {
         private Normal _random;
+        
+        //LevelUp is fired once every time a user levels up (i.e from level 1 to 2, or from 5 to 10 (which can happen)
+        //GhostLevelUp is fired every time a user's level increments (i.e from level 1 to 2 = 1 invoke, from level 5 to 10 5 invokes)
+        public static event EventHandler<LevelUpArgs> LevelUp;
+        public static event EventHandler<XpEventArgs> GhostLevelUp;
         public void Init(DiscordClient client)
         {
             client.MessageCreated += HandleMessage;
@@ -29,7 +34,7 @@ namespace GarbageCan.XP
         
         private Task HandleMessage(DiscordClient sender, MessageCreateEventArgs e)
         {
-            if (e.Channel.IsPrivate)
+            if (e.Channel.IsPrivate || e.Author.IsBot || (e.Author.IsSystem.HasValue && e.Author.IsSystem.Value))
                 return Task.CompletedTask;
 
             Task.Run(async () =>
@@ -53,10 +58,33 @@ namespace GarbageCan.XP
                 
                 user.xp += XpEarned(e.Message.Content);
 
+                var oldLevel = user.lvl;
                 while (user.xp > TotalXpRequired(user.lvl))
                 {
                     Log.Information(TotalXpRequired(user.lvl).ToString());
                     user.lvl++;
+                    GhostLevelUp?.Invoke(this, new LevelUpArgs
+                    {
+                        client = sender,
+                        context = e,
+                        id = e.Author.Id,
+                        lvl = user.lvl,
+                        oldLvl = oldLevel,
+                        xp = user.xp   
+                    });
+                }
+
+                if (user.lvl > oldLevel)
+                {
+                    LevelUp.Invoke(this, new LevelUpArgs
+                    {
+                        client = sender,
+                        context = e,
+                        id = e.Author.Id,
+                        lvl = user.lvl,
+                        oldLvl = oldLevel,
+                        xp = user.xp
+                    });
                 }
 
                 await context.SaveChangesAsync();
@@ -70,7 +98,9 @@ namespace GarbageCan.XP
             var length = Math.Sqrt(message.Replace(" ", "").Length);
             length = Math.Min(10, length);
 
-            return length * (Math.Abs(_random.Sample()) * 5 + 1) * BoosterManager.GetMultiplier();
+            var test = length * (Math.Abs(_random.Sample()) * 5 + 1) * BoosterManager.GetMultiplier();
+            Log.Information(test.ToString());
+            return test;
         }
 
         //the level argument here is a tad misleading- pass in any level as an integer to get the amount of xp a user needs to earn in order to advance to the next level
@@ -89,5 +119,25 @@ namespace GarbageCan.XP
 
             return result;
         }
+    }
+
+    public class XpEventArgs : EventArgs
+    {
+        public DiscordClient client { get; set; }
+        public MessageCreateEventArgs context { get; set; }
+        public ulong id { get; set; }
+        public int lvl { get; set; }
+
+        private double _xp;
+        public double xp
+        {
+            get => _xp;
+            set => _xp = Math.Round(value, 1);
+        }
+    }
+
+    public class LevelUpArgs : XpEventArgs
+    {
+        public int oldLvl { get; set; }
     }
 }
