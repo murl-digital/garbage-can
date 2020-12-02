@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GarbageCan.Migrations
 {
-    [DbContext(typeof(XPContext))]
+    [DbContext(typeof(XpContext))]
     [Migration("20201115200820_init")]
     partial class init
     {

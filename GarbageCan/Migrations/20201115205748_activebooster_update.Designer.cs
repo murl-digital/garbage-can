@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GarbageCan.Migrations
 {
-    [DbContext(typeof(XPContext))]
+    [DbContext(typeof(XpContext))]
     [Migration("20201115205748_activebooster_update")]
     partial class activebooster_update
     {
