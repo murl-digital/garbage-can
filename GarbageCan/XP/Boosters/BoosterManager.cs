@@ -23,7 +23,7 @@ namespace GarbageCan.XP.Boosters
 
 		public void Init(DiscordClient client)
 		{
-			using (var context = new XPContext())
+			using (var context = new XpContext())
 			{
 				_availableSlots = context.xpAvailableSlots
 					.Select(slot => new AvailableSlot {channelId = slot.channel_id, id = slot.id})
@@ -44,7 +44,7 @@ namespace GarbageCan.XP.Boosters
 
 		public void Cleanup()
 		{
-			using var context = new XPContext();
+			using var context = new XpContext();
 			boosterTimer.Enabled = false;
 			foreach (var booster in activeBoosters.Where(booster =>
 				!context.xpActiveBoosters.Any(x => x.slot.id == booster.slot.id)))
@@ -68,7 +68,7 @@ namespace GarbageCan.XP.Boosters
 		{
 			try
 			{
-				using var context = new XPContext();
+				using var context = new XpContext();
 
 				#region retrieve queued boosters from db
 
@@ -119,7 +119,7 @@ namespace GarbageCan.XP.Boosters
 			{
 				var toProcess = new List<ActiveBooster>();
 
-				using (var context = new XPContext())
+				using (var context = new XpContext())
 				{
 					foreach (var activeBooster in activeBoosters.Where(activeBooster =>
 						activeBooster.expirationDate < DateTime.Now.ToUniversalTime()))
@@ -145,7 +145,7 @@ namespace GarbageCan.XP.Boosters
 
 
 					var channel =
-						await GarbageCan.client.GetChannelAsync(
+						await GarbageCan.Client.GetChannelAsync(
 							Convert.ToUInt64(x.slot.channelId));
 
 					await channel.ModifyAsync(model =>
@@ -168,7 +168,7 @@ namespace GarbageCan.XP.Boosters
 					Task.Run(async () =>
 					{
 						var channel =
-							await GarbageCan.client.GetChannelAsync(
+							await GarbageCan.Client.GetChannelAsync(
 								Convert.ToUInt64(booster.slot.channelId));
 
 						await channel.ModifyAsync(model =>
@@ -199,7 +199,7 @@ namespace GarbageCan.XP.Boosters
 
 			activeBoosters.Add(booster);
 
-			using (var context = new XPContext())
+			using (var context = new XpContext())
 			{
 				context.xpActiveBoosters.Add(new EntityActiveBooster
 				{
@@ -216,7 +216,7 @@ namespace GarbageCan.XP.Boosters
 
 		private static void SaveQueue()
 		{
-			using var context = new XPContext();
+			using var context = new XpContext();
 			context.xpQueuedBoosters.Delete();
 			var position = 0;
 			foreach (var booster in _queuedBoosters)
