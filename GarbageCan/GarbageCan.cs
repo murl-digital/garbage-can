@@ -62,7 +62,7 @@ namespace GarbageCan
 
 			Commands = Client.UseCommandsNext(new CommandsNextConfiguration
 			{
-				StringPrefixes = new[] { "!>" }
+				StringPrefixes = new[] { Config.commandPrefix }
 			});
 
 			Commands.RegisterCommands(Assembly.GetExecutingAssembly());
@@ -86,6 +86,7 @@ namespace GarbageCan
 		{
 			Config = new ConfigurationBuilder<IBotConfig>()
 				.UseJsonFile("dev.json")
+				.UseEnvironmentVariables()
 				.Build();
 			
 			if (Config == null) throw new NullReferenceException("Attempted to build config, but got null");

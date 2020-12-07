@@ -57,7 +57,7 @@ namespace GarbageCan.XP
         
         private Task HandleMessage(DiscordClient sender, MessageCreateEventArgs e)
         {
-            if (e.Channel.IsPrivate || e.Author.IsBot || e.Author.IsSystem.HasValue && e.Author.IsSystem.Value || IsExcluded(e.Channel.Id))
+            if (e.Channel.IsPrivate || e.Author.IsBot || e.Author.IsSystem.HasValue && e.Author.IsSystem.Value || e.Message.Content.StartsWith(GarbageCan.Config.commandPrefix) || IsExcluded(e.Channel.Id))
                 return Task.CompletedTask;
 
             Task.Run(async () =>
@@ -128,8 +128,7 @@ namespace GarbageCan.XP
             var length = Math.Sqrt(message.Replace(" ", "").Length);
             length = Math.Min(10, length);
 
-            var test = length * (Math.Abs(_random.Sample()) * 5 + 1) * BoosterManager.GetMultiplier();
-            Log.Information(test.ToString());
+            var test = length * (Math.Abs(_random.Sample()) * 0.5 + 1) * BoosterManager.GetMultiplier();
             return test;
         }
 

@@ -8,5 +8,6 @@
 		string user { get; }
 		string password { get; }
 		string xpSchema { get; }
+		string commandPrefix { get; }
 	}
 }
