@@ -23,6 +23,7 @@ namespace GarbageCan.XP
         public void Init(DiscordClient client)
         {
             client.MessageCreated += HandleMessage;
+            client.GuildMemberAdded += HandleJoin;
             
             _random = new Normal(0, 1);
         }
@@ -30,6 +31,28 @@ namespace GarbageCan.XP
         public void Cleanup()
         {
             //nope
+        }
+
+        private Task HandleJoin(DiscordClient sender, GuildMemberAddEventArgs e)
+        {
+            if (e.Member.IsBot) 
+                return Task.CompletedTask;
+
+            Task.Run(async () =>
+            {
+                await using var context = new XpContext();
+                var user = new EntityUser
+                {
+                    id = e.Member.Id,
+                    lvl = 0,
+                    xp = 0
+                };
+
+                await context.xpUsers.AddAsync(user);
+                await context.SaveChangesAsync();
+            });
+            
+            return Task.CompletedTask;
         }
         
         private Task HandleMessage(DiscordClient sender, MessageCreateEventArgs e)
