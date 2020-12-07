@@ -65,7 +65,6 @@ namespace GarbageCan.Commands.XP
         }
 
         [Command("level")]
-        [Aliases("lvl", "rank")]
         public Task LevelCommand(CommandContext ctx, DiscordMember member)
         {
             Task.Run(async () =>
