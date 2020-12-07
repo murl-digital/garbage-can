@@ -1,0 +1,21 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: akhileshns/heroku-deploy@v3.6.8 # This is the action
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "garbage-can-csharp-edition" #Must be unique in Heroku
+          heroku_email: "joseph.md.sorensen@gmail.com"
+          usedocker: true
+          docker_heroku_process_type: worker
+          appdir: GarbageCan
