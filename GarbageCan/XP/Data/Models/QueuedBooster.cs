@@ -1,8 +1,7 @@
 ﻿namespace GarbageCan.XP.Data.Models
 {
-	public class QueuedBooster
+	public class QueuedBooster : Booster
 	{
-		public float multiplier { get; set; }
 		public long durationInSeconds { get; set; }
 	}
 }
