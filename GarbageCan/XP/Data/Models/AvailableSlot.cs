@@ -3,6 +3,6 @@
 	public class AvailableSlot
 	{
 		public int id { get; set; }
-		public string channelId { get; set; }
+		public ulong channelId { get; set; }
 	}
 }

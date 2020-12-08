@@ -16,10 +16,10 @@ namespace GarbageCan.XP.Boosters
 	public class BoosterManager : IFeature
 	{
 		private static List<AvailableSlot> _availableSlots;
-		private static readonly List<ActiveBooster> activeBoosters = new List<ActiveBooster>();
+		private static readonly List<ActiveBooster> ActiveBoosters = new List<ActiveBooster>();
 		private static Queue<QueuedBooster> _queuedBoosters;
 
-		private static readonly Timer boosterTimer = new Timer(5000);
+		private static readonly Timer BoosterTimer = new Timer(5000);
 
 		public void Init(DiscordClient client)
 		{
@@ -34,10 +34,22 @@ namespace GarbageCan.XP.Boosters
 			{
 				Task.Run(Ready);
 
-				boosterTimer.Elapsed += (o, eventArgs) => Tick();
+				BoosterTimer.Elapsed += Tick;
 
-				boosterTimer.Enabled = true;
+				BoosterTimer.Enabled = true;
 
+				return Task.CompletedTask;
+			};
+
+			client.GuildUpdated += (sender, args) =>
+			{
+				Log.Information(args.GuildAfter.PremiumSubscriptionCount.ToString());
+
+				if (args.GuildAfter.PremiumSubscriptionCount > args.GuildBefore.PremiumSubscriptionCount)
+				{
+					AddBooster(2.0f, new TimeSpan(0, 0, 90, 0), true);
+				}
+				
 				return Task.CompletedTask;
 			};
 		}
@@ -45,13 +57,13 @@ namespace GarbageCan.XP.Boosters
 		public void Cleanup()
 		{
 			using var context = new XpContext();
-			boosterTimer.Enabled = false;
-			foreach (var booster in activeBoosters.Where(booster =>
+			BoosterTimer.Enabled = false;
+			foreach (var booster in ActiveBoosters.Where(booster =>
 				!context.xpActiveBoosters.Any(x => x.slot.id == booster.slot.id)))
 				context.xpActiveBoosters.Add(new EntityActiveBooster
 				{
 					expiration_date = booster.expirationDate,
-					multipler = booster.multipler,
+					multipler = booster.multiplier,
 					slot = context.xpAvailableSlots.Find(booster.slot.id)
 				});
 
@@ -59,9 +71,59 @@ namespace GarbageCan.XP.Boosters
 			SaveQueue();
 		}
 
-		public static float GetMultiplier()
+		public static float GetMultiplier() => 1 + ActiveBoosters.Sum(booster => booster.multiplier - 1);
+
+		public static void AddBooster(float multiplier, TimeSpan duration, bool queue)
 		{
-			return 1 + activeBoosters.Sum(booster => booster.multipler - 1);
+			if (ActiveBoosters.Count >= _availableSlots.Count)
+			{
+				if (!queue) return;
+				
+				_queuedBoosters.Enqueue(new QueuedBooster
+				{
+					multiplier = multiplier,
+					durationInSeconds = (long) duration.TotalSeconds
+				});
+				SaveQueue();
+				
+			}
+
+			var usedSlots = ActiveBoosters
+				.Select(b => b.slot)
+				.ToList();
+
+			var slot = _availableSlots
+				.First(s => !usedSlots.Contains(s));
+			
+			var booster = new ActiveBooster
+			{
+				expirationDate = DateTime.Now.ToUniversalTime().Add(duration),
+				multiplier = multiplier,
+				slot = slot
+			};
+			
+			ActiveBoosters.Add(booster);
+
+			Task.Run(async () =>
+			{
+				await using var context = new XpContext();
+				await context.xpActiveBoosters.AddAsync(new EntityActiveBooster
+				{
+					expiration_date = booster.expirationDate,
+					multipler = multiplier,
+					slot = context.xpAvailableSlots.Find(slot.id)
+				});
+				await context.SaveChangesAsync();
+			});
+			
+			Task.Run(async () =>
+			{
+				var channel =
+					await GarbageCan.Client.GetChannelAsync(booster.slot.channelId);
+
+				await channel.ModifyAsync(model =>
+					model.Name = GetBoosterString(booster));
+			});
 		}
 
 		private static void Ready()
@@ -98,10 +160,10 @@ namespace GarbageCan.XP.Boosters
 				#region retrieve remaining active boosters
 
 				foreach (var entity in context.xpActiveBoosters.Where(x => x.expiration_date < now).ToList())
-					activeBoosters.Add(new ActiveBooster
+					ActiveBoosters.Add(new ActiveBooster
 					{
 						expirationDate = entity.expiration_date,
-						multipler = entity.multipler,
+						multiplier = entity.multipler,
 						slot = _availableSlots.Select(x => x).First(x => x.id == entity.slot.id)
 					});
 
@@ -113,7 +175,7 @@ namespace GarbageCan.XP.Boosters
 			}
 		}
 
-		private static void Tick()
+		private static void Tick(object sender, ElapsedEventArgs elapsedEventArgs)
 		{
 			try
 			{
@@ -121,7 +183,7 @@ namespace GarbageCan.XP.Boosters
 
 				using (var context = new XpContext())
 				{
-					foreach (var activeBooster in activeBoosters.Where(activeBooster =>
+					foreach (var activeBooster in ActiveBoosters.Where(activeBooster =>
 						activeBooster.expirationDate < DateTime.Now.ToUniversalTime()))
 					{
 						var entity = context.xpActiveBoosters
@@ -136,7 +198,7 @@ namespace GarbageCan.XP.Boosters
 
 				toProcess.ForEach(async x =>
 				{
-					activeBoosters.Remove(x);
+					ActiveBoosters.Remove(x);
 
 					var slotName = "-";
 
@@ -154,11 +216,11 @@ namespace GarbageCan.XP.Boosters
 
 				var saveQueue = false;
 
-				while (_queuedBoosters.Count > 0 && activeBoosters.Count < _availableSlots.Count)
+				while (_queuedBoosters.Count > 0 && ActiveBoosters.Count < _availableSlots.Count)
 				{
 					saveQueue = true;
 
-					var usedSlots = activeBoosters
+					var usedSlots = ActiveBoosters
 						.Select(x => x.slot)
 						.ToList();
 
@@ -168,8 +230,7 @@ namespace GarbageCan.XP.Boosters
 					Task.Run(async () =>
 					{
 						var channel =
-							await GarbageCan.Client.GetChannelAsync(
-								Convert.ToUInt64(booster.slot.channelId));
+							await GarbageCan.Client.GetChannelAsync(booster.slot.channelId);
 
 						await channel.ModifyAsync(model =>
 							model.Name = slotName);
@@ -186,33 +247,34 @@ namespace GarbageCan.XP.Boosters
 
 		private static ActiveBooster ActivateQueuedBooster(out string slotName, AvailableSlot slot)
 		{
-			Log.Information("test");
 			var queuedBooster = _queuedBoosters.Dequeue();
 
 			var booster = new ActiveBooster
 			{
 				expirationDate = DateTime.Now.ToUniversalTime()
 					.AddSeconds(queuedBooster.durationInSeconds),
-				multipler = queuedBooster.multiplier,
+				multiplier = queuedBooster.multiplier,
 				slot = slot
 			};
 
-			activeBoosters.Add(booster);
+			ActiveBoosters.Add(booster);
 
 			using (var context = new XpContext())
 			{
 				context.xpActiveBoosters.Add(new EntityActiveBooster
 				{
 					expiration_date = booster.expirationDate,
-					multipler = booster.multipler,
+					multipler = booster.multiplier,
 					slot = context.xpAvailableSlots.Find(booster.slot.id)
 				});
 				context.SaveChanges();
 			}
 
-			slotName = booster.multipler.ToString(CultureInfo.InvariantCulture);
+			slotName = GetBoosterString(booster);
 			return booster;
 		}
+
+		private static string GetBoosterString(ActiveBooster booster) => $"{booster.multiplier.ToString(CultureInfo.CurrentCulture)}x";
 
 		private static void SaveQueue()
 		{
