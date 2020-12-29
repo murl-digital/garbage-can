@@ -2,12 +2,11 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using DSharpPlus;
+using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using GarbageCan.Data;
 using GarbageCan.Data.Entities;
 using GarbageCan.XP.Boosters;
-using GarbageCan.XP.Data;
-using GarbageCan.XP.Data.Entities;
 using MathNet.Numerics.Distributions;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -62,50 +61,54 @@ namespace GarbageCan.XP
             if (e.Channel.IsPrivate || e.Author.IsBot || e.Author.IsSystem.HasValue && e.Author.IsSystem.Value || e.Message.Content.StartsWith(GarbageCan.Config.commandPrefix) || IsExcluded(e.Channel.Id))
                 return Task.CompletedTask;
 
+            AddXp(e.Author.Id, XpEarned(e.Message.Content), sender, e);
+            
+            return Task.CompletedTask;
+        }
+
+        private void AddXp(ulong id, double amount, DiscordClient sender, MessageCreateEventArgs e)
+        {
             Task.Run(async () =>
             {
                 using var context = new Context();
                 var user = await context.xpUsers
-                    .Where(u => u.id == e.Author.Id)
+                    .Where(u => u.id == id)
                     .FirstOrDefaultAsync();
 
                 if (user == null)
                 {
                     user = new EntityUser
                     {
-                        id = e.Author.Id,
+                        id = id,
                         lvl = 0,
                         xp = 0
                     };
 
                     await context.xpUsers.AddAsync(user);
                 }
-                
-                user.xp += XpEarned(e.Message.Content);
+
+                user.xp += amount;
 
                 var oldLevel = user.lvl;
                 while (user.xp > TotalXpRequired(user.lvl))
                 {
-                    Log.Information(TotalXpRequired(user.lvl).ToString());
                     user.lvl++;
                     GhostLevelUp?.Invoke(this, new LevelUpArgs
                     {
-                        client = sender,
-                        context = e,
-                        id = e.Author.Id,
+                        context = e.Channel,
+                        id = user.id,
                         lvl = user.lvl,
                         oldLvl = oldLevel,
-                        xp = user.xp   
+                        xp = user.xp
                     });
                 }
 
                 if (user.lvl > oldLevel)
                 {
-                    LevelUp.Invoke(this, new LevelUpArgs
+                    LevelUp?.Invoke(this, new LevelUpArgs
                     {
-                        client = sender,
-                        context = e,
-                        id = e.Author.Id,
+                        context = e.Channel,
+                        id = user.id,
                         lvl = user.lvl,
                         oldLvl = oldLevel,
                         xp = user.xp
@@ -114,11 +117,9 @@ namespace GarbageCan.XP
 
                 await context.SaveChangesAsync();
             });
-            
-            return Task.CompletedTask;
         }
 
-        private bool IsExcluded(ulong channelId)
+        private static bool IsExcluded(ulong channelId)
         {
             using var context = new Context();
             return context.xpExcludedChannels

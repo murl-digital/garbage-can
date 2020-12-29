@@ -16,10 +16,10 @@ namespace GarbageCan.XP.Boosters
 	public class BoosterManager : IFeature
 	{
 		private static List<AvailableSlot> _availableSlots;
-		private static readonly List<ActiveBooster> ActiveBoosters = new List<ActiveBooster>();
+		private static readonly List<ActiveBooster> ActiveBoosters = new();
 		private static Queue<QueuedBooster> _queuedBoosters;
 
-		private static readonly Timer BoosterTimer = new Timer(5000);
+		private static readonly Timer BoosterTimer = new(5000);
 
 		public void Init(DiscordClient client)
 		{
@@ -30,7 +30,7 @@ namespace GarbageCan.XP.Boosters
 					.ToList();
 			}
 
-			client.Ready += (sender, args) =>
+			client.Ready += (_, _) =>
 			{
 				Task.Run(Ready);
 
@@ -41,7 +41,7 @@ namespace GarbageCan.XP.Boosters
 				return Task.CompletedTask;
 			};
 
-			client.GuildUpdated += (sender, args) =>
+			client.GuildUpdated += (_, args) =>
 			{
 				Log.Information(args.GuildAfter.PremiumSubscriptionCount.ToString());
 
@@ -87,43 +87,15 @@ namespace GarbageCan.XP.Boosters
 				SaveQueue();
 				
 			}
-
+			
 			var usedSlots = ActiveBoosters
 				.Select(b => b.slot)
 				.ToList();
 
 			var slot = _availableSlots
 				.First(s => !usedSlots.Contains(s));
-			
-			var booster = new ActiveBooster
-			{
-				expirationDate = DateTime.Now.ToUniversalTime().Add(duration),
-				multiplier = multiplier,
-				slot = slot
-			};
-			
-			ActiveBoosters.Add(booster);
 
-			Task.Run(async () =>
-			{
-				await using var context = new XpContext();
-				await context.xpActiveBoosters.AddAsync(new EntityActiveBooster
-				{
-					expiration_date = booster.expirationDate,
-					multipler = multiplier,
-					slot = context.xpAvailableSlots.Find(slot.id)
-				});
-				await context.SaveChangesAsync();
-			});
-			
-			Task.Run(async () =>
-			{
-				var channel =
-					await GarbageCan.Client.GetChannelAsync(booster.slot.channelId);
-
-				await channel.ModifyAsync(model =>
-					model.Name = GetBoosterString(booster));
-			});
+			ActivateBooster(multiplier, duration, slot);
 		}
 
 		private static void Ready()
@@ -196,45 +168,39 @@ namespace GarbageCan.XP.Boosters
 					context.SaveChanges();
 				}
 
-				toProcess.ForEach(async x =>
+				var saveQueue = false;
+				
+				toProcess.ForEach(b =>
 				{
-					ActiveBoosters.Remove(x);
-
-					var slotName = "-";
+					ActiveBoosters.Remove(b);
 
 					if (_queuedBoosters.Count > 0)
-						ActivateQueuedBooster(out slotName, x.slot);
-
-
-					var channel =
-						await GarbageCan.Client.GetChannelAsync(
-							Convert.ToUInt64(x.slot.channelId));
-
-					await channel.ModifyAsync(model =>
-						model.Name = slotName);
+					{
+						saveQueue = true;
+						ActivateQueuedBooster(b.slot);
+					}
+					else
+					{
+						Task.Run(async () =>
+						{
+							var channel = await GarbageCan.Client.GetChannelAsync(b.slot.channelId);
+							await channel.ModifyAsync(model => model.Name = "-");
+						});
+					}
 				});
-
-				var saveQueue = false;
 
 				while (_queuedBoosters.Count > 0 && ActiveBoosters.Count < _availableSlots.Count)
 				{
 					saveQueue = true;
 
 					var usedSlots = ActiveBoosters
-						.Select(x => x.slot)
+						.Select(b => b.slot)
 						.ToList();
 
-					var booster = ActivateQueuedBooster(out var slotName, _availableSlots
-						.First(slot => !usedSlots.Contains(slot)));
-
-					Task.Run(async () =>
-					{
-						var channel =
-							await GarbageCan.Client.GetChannelAsync(booster.slot.channelId);
-
-						await channel.ModifyAsync(model =>
-							model.Name = slotName);
-					});
+					var slot = _availableSlots
+						.First(s => !usedSlots.Contains(s));
+					
+					ActivateQueuedBooster(slot);
 				}
 
 				if (saveQueue) SaveQueue();
@@ -245,15 +211,18 @@ namespace GarbageCan.XP.Boosters
 			}
 		}
 
-		private static ActiveBooster ActivateQueuedBooster(out string slotName, AvailableSlot slot)
+		private static void ActivateQueuedBooster(AvailableSlot slot)
 		{
-			var queuedBooster = _queuedBoosters.Dequeue();
+			var booster = _queuedBoosters.Dequeue();
+			ActivateBooster(booster.multiplier, TimeSpan.FromSeconds(booster.durationInSeconds), slot);
+		}
 
+		private static void ActivateBooster(float multiplier, TimeSpan duration, AvailableSlot slot)
+		{
 			var booster = new ActiveBooster
 			{
-				expirationDate = DateTime.Now.ToUniversalTime()
-					.AddSeconds(queuedBooster.durationInSeconds),
-				multiplier = queuedBooster.multiplier,
+				expirationDate = DateTime.Now.ToUniversalTime().Add(duration),
+				multiplier = multiplier,
 				slot = slot
 			};
 
@@ -270,11 +239,14 @@ namespace GarbageCan.XP.Boosters
 				context.SaveChanges();
 			}
 
-			slotName = GetBoosterString(booster);
-			return booster;
+			Task.Run(async () =>
+			{
+				var channel = await GarbageCan.Client.GetChannelAsync(booster.slot.channelId);
+				await channel.ModifyAsync(model => model.Name = GetBoosterString(booster));
+			});
 		}
 
-		private static string GetBoosterString(ActiveBooster booster) => $"{booster.multiplier.ToString(CultureInfo.CurrentCulture)}x";
+		private static string GetBoosterString(Booster booster) => $"{booster.multiplier.ToString(CultureInfo.CurrentCulture)}x";
 
 		private static void SaveQueue()
 		{
