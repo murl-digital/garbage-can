@@ -13,12 +13,12 @@ namespace GarbageCan.XP
             XpManager.LevelUp += OnLevelUp;
         }
 
-        private void OnLevelUp(object? sender, LevelUpArgs e)
+        private static void OnLevelUp(object sender, LevelUpArgs e)
         {
             Task.Run(async () =>
             {
                 var member = await e.context.Guild.GetMemberAsync(e.id);
-                var webhook = await e.context.Channel.CreateWebhookAsync(member.DisplayName);
+                var webhook = await e.context.CreateWebhookAsync(member.DisplayName);
                 
                 var data = new DiscordWebhookBuilder()
                     .WithAvatarUrl(member.AvatarUrl)

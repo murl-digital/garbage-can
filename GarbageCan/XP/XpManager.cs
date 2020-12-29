@@ -152,8 +152,7 @@ namespace GarbageCan.XP
 
     public class XpEventArgs : EventArgs
     {
-        public DiscordClient client { get; set; }
-        public MessageCreateEventArgs context { get; set; }
+        public DiscordChannel context { get; set; }
         public ulong id { get; set; }
         public int lvl { get; set; }
 
