@@ -75,7 +75,8 @@ namespace GarbageCan
 			}
 			else
 			{
-				Console.CancelKeyPress += (sender, eventArgs) => Shutdown(CtrlType.CTRL_C_EVENT);
+				Console.CancelKeyPress += (_, _) => Shutdown(CtrlType.CTRL_C_EVENT);
+				AppDomain.CurrentDomain.ProcessExit += (sender, args) => Shutdown(CtrlType.CTRL_C_EVENT);
 			}
 
 			await Client.ConnectAsync();
