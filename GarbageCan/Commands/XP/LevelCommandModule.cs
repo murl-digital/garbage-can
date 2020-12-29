@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using GarbageCan.XP.Data;
+using GarbageCan.Data;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using SixLabors.Fonts;
@@ -78,7 +78,7 @@ namespace GarbageCan.Commands.XP
 
         public async Task<Stream> GenerateImage(DiscordMember discordMember)
         {
-            await using var context = new XpContext();
+            using var context = new Context();
             var user = await context.xpUsers.FirstAsync(u => u.id == discordMember.Id);
             var users = context.xpUsers.ToList();
             users.Sort((a, b) => a.xp.CompareTo(b.xp));

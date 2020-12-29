@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace GarbageCan.XP.Data.Entities
+namespace GarbageCan.Data.Entities
 {
 	[Table("xp_users")]
 	public class EntityUser

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GarbageCan.XP.Data.Models
+namespace GarbageCan.Data.Models
 {
 	public class ActiveBooster : Booster
 	{

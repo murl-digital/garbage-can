@@ -5,9 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using DSharpPlus;
-using GarbageCan.XP.Data;
-using GarbageCan.XP.Data.Entities;
-using GarbageCan.XP.Data.Models;
+using GarbageCan.Data;
+using GarbageCan.Data.Entities;
+using GarbageCan.Data.Models;
 using Serilog;
 using Z.EntityFramework.Plus;
 
@@ -23,7 +23,7 @@ namespace GarbageCan.XP.Boosters
 
 		public void Init(DiscordClient client)
 		{
-			using (var context = new XpContext())
+			using (var context = new Context())
 			{
 				_availableSlots = context.xpAvailableSlots
 					.Select(slot => new AvailableSlot {channelId = slot.channel_id, id = slot.id})
@@ -56,7 +56,7 @@ namespace GarbageCan.XP.Boosters
 
 		public void Cleanup()
 		{
-			using var context = new XpContext();
+			using var context = new Context();
 			BoosterTimer.Enabled = false;
 			foreach (var booster in ActiveBoosters.Where(booster =>
 				!context.xpActiveBoosters.Any(x => x.slot.id == booster.slot.id)))
@@ -130,7 +130,7 @@ namespace GarbageCan.XP.Boosters
 		{
 			try
 			{
-				using var context = new XpContext();
+				using var context = new Context();
 
 				#region retrieve queued boosters from db
 
@@ -181,7 +181,7 @@ namespace GarbageCan.XP.Boosters
 			{
 				var toProcess = new List<ActiveBooster>();
 
-				using (var context = new XpContext())
+				using (var context = new Context())
 				{
 					foreach (var activeBooster in ActiveBoosters.Where(activeBooster =>
 						activeBooster.expirationDate < DateTime.Now.ToUniversalTime()))
@@ -259,7 +259,7 @@ namespace GarbageCan.XP.Boosters
 
 			ActiveBoosters.Add(booster);
 
-			using (var context = new XpContext())
+			using (var context = new Context())
 			{
 				context.xpActiveBoosters.Add(new EntityActiveBooster
 				{
@@ -278,7 +278,7 @@ namespace GarbageCan.XP.Boosters
 
 		private static void SaveQueue()
 		{
-			using var context = new XpContext();
+			using var context = new Context();
 			context.xpQueuedBoosters.Delete();
 			var position = 0;
 			foreach (var booster in _queuedBoosters)

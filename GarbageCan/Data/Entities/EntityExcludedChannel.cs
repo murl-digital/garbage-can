@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace GarbageCan.XP.Data.Entities
+namespace GarbageCan.Data.Entities
 {
     [Table("xp_excluded_channels")]
     [Keyless]

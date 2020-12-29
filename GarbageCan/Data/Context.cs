@@ -1,13 +1,14 @@
-﻿using GarbageCan.XP.Data.Entities;
+﻿using GarbageCan.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace GarbageCan.XP.Data
+namespace GarbageCan.Data
 {
-	public class XpContext : DbContext
+	public class Context : DbContext
 	{
 		private string _connectionString;
 		public DbSet<EntityUser> xpUsers { get; set; }
 		public DbSet<EntityExcludedChannel> xpExcludedChannels { get; set; }
+		public DbSet<EntityLevelRole> xpLevelRoles { get; set; }
 		public DbSet<EntityQueuedBooster> xpQueuedBoosters { get; set; }
 		public DbSet<EntityAvailableSlot> xpAvailableSlots { get; set; }
 		public DbSet<EntityActiveBooster> xpActiveBoosters { get; set; }
