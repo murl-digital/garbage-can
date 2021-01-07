@@ -52,7 +52,7 @@ namespace GarbageCan.Moderation
             });
         }
 
-        public static void Mute(ulong uId, TimeSpan span)
+        public static void Mute(ulong uId, TimeSpan span, string comments)
         {
             Task.Run(async () =>
             {
@@ -67,15 +67,16 @@ namespace GarbageCan.Moderation
                     expirationDate = DateTime.Now.ToUniversalTime().Add(span)
                 });
 
-                ModUtil.SendMessage(uId, "You have been muted for " + span.Humanize());
+                ModUtil.SendMessage(uId, $"You have been muted for {span.Humanize()}." +
+                                         $"\n\nAdditional comments: {comments}");
                 
                 await context.SaveChangesAsync();
                 
-                Log(uId, PunishmentLevel.Mute, "");
+                Log(uId, PunishmentLevel.Mute, $"Muted for {span.Humanize()}. Additional comments: {comments}");
             });
         }
 
-        public static void RestrictChannel(ulong uId, ulong channelId, TimeSpan span)
+        public static void RestrictChannel(ulong uId, ulong channelId, TimeSpan span, string comments)
         {
             Task.Run(async () =>
             {
@@ -92,12 +93,13 @@ namespace GarbageCan.Moderation
                     expirationDate = DateTime.Now.ToUniversalTime().Add(span)
                 });
 
-                ModUtil.SendMessage(uId,
-                    "Your access to the " + channel.Name + " has been restricted for " + span.Humanize());
+                ModUtil.SendMessage(uId, 
+                    $"Your access to the {channel.Name} channel has been restricted for {span.Humanize()}. " +
+                    $"\n\nAdditional comments: {comments}");
 
                 await context.SaveChangesAsync();
                 
-                Log(uId, PunishmentLevel.ChannelRestrict, "");
+                Log(uId, PunishmentLevel.ChannelRestrict, $"Restricted access to {channel.Name} for {span.Humanize()}. Additional comments: {comments}");
             });
         }
 
