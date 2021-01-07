@@ -19,7 +19,7 @@ namespace GarbageCan.Roles
             //throw new System.NotImplementedException();
         }
 
-        public static void PlaceholderName(object sender, XpEventArgs args)
+        private static void PlaceholderName(object sender, XpEventArgs args)
         {
             Task.Run(() =>
             {
