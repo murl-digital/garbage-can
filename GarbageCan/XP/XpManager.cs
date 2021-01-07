@@ -49,7 +49,7 @@ namespace GarbageCan.XP
                     xp = 0
                 };
 
-                await context.xpUsers.AddAsync(user);
+                context.xpUsers.Add(user);
                 await context.SaveChangesAsync();
             });
             
@@ -84,7 +84,7 @@ namespace GarbageCan.XP
                         xp = 0
                     };
 
-                    await context.xpUsers.AddAsync(user);
+                    context.xpUsers.Add(user);
                 }
 
                 user.xp += amount;
