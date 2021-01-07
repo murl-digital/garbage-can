@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using DSharpPlus;
 using GarbageCan.Data;
-using GarbageCan.Data.Entities;
+using GarbageCan.Data.Entities.Boosters;
 using GarbageCan.Data.Models;
 using Serilog;
 using Z.EntityFramework.Plus;

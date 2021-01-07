@@ -1,4 +1,5 @@
-﻿using GarbageCan.Data.Entities;
+﻿using GarbageCan.Data.Entities.Boosters;
+using GarbageCan.Data.Entities.XP;
 using Microsoft.EntityFrameworkCore;
 
 namespace GarbageCan.Data
@@ -17,8 +18,10 @@ namespace GarbageCan.Data
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
 			if (GarbageCan.Config == null) GarbageCan.BuildConfig();
-			_connectionString =
-				$"host={GarbageCan.Config.address};port={GarbageCan.Config.port};user id={GarbageCan.Config.user};password={GarbageCan.Config.password};database={GarbageCan.Config.xpSchema}";
+			if (_connectionString == null)
+				_connectionString =
+					$"host={GarbageCan.Config.address};port={GarbageCan.Config.port};user id={GarbageCan.Config.user};password={GarbageCan.Config.password};database={GarbageCan.Config.xpSchema}";
+			
 			optionsBuilder.UseMySql(_connectionString, ServerVersion.AutoDetect(_connectionString));
 		}
 	}

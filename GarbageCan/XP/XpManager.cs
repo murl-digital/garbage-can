@@ -5,7 +5,7 @@ using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using GarbageCan.Data;
-using GarbageCan.Data.Entities;
+using GarbageCan.Data.Entities.XP;
 using GarbageCan.XP.Boosters;
 using MathNet.Numerics.Distributions;
 using Microsoft.EntityFrameworkCore;

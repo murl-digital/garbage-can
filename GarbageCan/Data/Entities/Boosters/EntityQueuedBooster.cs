@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace GarbageCan.Data.Entities
+namespace GarbageCan.Data.Entities.Boosters
 {
 	[Table("xp_queued_boosters")]
 	public class EntityQueuedBooster

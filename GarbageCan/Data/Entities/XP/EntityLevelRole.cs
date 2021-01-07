@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace GarbageCan.Data.Entities
+namespace GarbageCan.Data.Entities.XP
 {
     [Table("xp_level_roles")]
     [Keyless]
