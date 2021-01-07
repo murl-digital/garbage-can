@@ -9,5 +9,7 @@
 		string password { get; }
 		string xpSchema { get; }
 		string commandPrefix { get; }
+		
+		ulong mutedRoleId { get; }
 	}
 }

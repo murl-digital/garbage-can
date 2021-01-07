@@ -1,4 +1,5 @@
 ﻿using GarbageCan.Data.Entities.Boosters;
+using GarbageCan.Data.Entities.Moderation;
 using GarbageCan.Data.Entities.XP;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +15,10 @@ namespace GarbageCan.Data
 		public DbSet<EntityAvailableSlot> xpAvailableSlots { get; set; }
 		public DbSet<EntityActiveBooster> xpActiveBoosters { get; set; }
 		public DbSet<EntityUserBooster> xpUserBoosters { get; set; }
+		
+		public DbSet<EntityWarning> moderationWarnings { get; set; }
+		public DbSet<EntityActiveMute> moderationActiveMutes { get; set; }
+		public DbSet<EntityActiveChannelRestrict> moderationActiveChannelRestricts { get; set; }
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
