@@ -1,9 +1,11 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace GarbageCan.Data.Entities.Moderation
 {
-    [Table("moderation_active_mutes")]
+    [Table("moderation_active_channel_restricts")]
+    [Keyless]
     public class EntityActiveChannelRestrict
     {
         public ulong uId { get; set; }

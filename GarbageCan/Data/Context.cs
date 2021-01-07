@@ -16,7 +16,7 @@ namespace GarbageCan.Data
 		public DbSet<EntityActiveBooster> xpActiveBoosters { get; set; }
 		public DbSet<EntityUserBooster> xpUserBoosters { get; set; }
 		
-		public DbSet<EntityWarning> moderationWarnings { get; set; }
+		public DbSet<EntityActionLog> moderationActionLogs { get; set; }
 		public DbSet<EntityActiveMute> moderationActiveMutes { get; set; }
 		public DbSet<EntityActiveChannelRestrict> moderationActiveChannelRestricts { get; set; }
 
