@@ -8,7 +8,7 @@ namespace GarbageCan.Moderation
     {
         public static async void SendMessage(ulong uId, string message)
         {
-            var member = await GarbageCan.Client.Guilds[0].GetMemberAsync(uId);
+            var member = await GarbageCan.Client.Guilds[GarbageCan.Config.operatingGuildId].GetMemberAsync(uId);
             try
             {
                 var channel = await member.CreateDmChannelAsync();

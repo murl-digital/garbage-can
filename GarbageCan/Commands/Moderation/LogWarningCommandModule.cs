@@ -13,7 +13,7 @@ namespace GarbageCan.Commands.Moderation
         [RequirePermissions(Permissions.ViewAuditLog)]
         public Task WarnCommand(CommandContext ctx, DiscordUser user, string comments)
         {
-            ModManager.LogWarn(user.Id, comments);
+            ModManager.Log(user.Id, PunishmentLevel.VerbalWarning, comments);
             
             return Task.CompletedTask;
         }
