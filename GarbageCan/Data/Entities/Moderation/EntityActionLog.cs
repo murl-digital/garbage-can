@@ -10,6 +10,7 @@ namespace GarbageCan.Data.Entities.Moderation
     public class EntityActionLog
     {
         public ulong uId { get; set; }
+        public ulong mId { get; set; }
         [Column(TypeName = "datetime")] public DateTime issuedDate { get; set; }
         public PunishmentLevel punishmentLevel { get; set; }
         public string comments { get; set; }

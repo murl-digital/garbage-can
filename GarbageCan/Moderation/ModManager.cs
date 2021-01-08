@@ -34,7 +34,7 @@ namespace GarbageCan.Moderation
             throw new NotImplementedException();
         }
 
-        public static void Log(ulong uId, PunishmentLevel level, string comments)
+        public static void Log(ulong uId, ulong mId, PunishmentLevel level, string comments)
         {
             Task.Run(async () =>
             {
@@ -43,6 +43,7 @@ namespace GarbageCan.Moderation
                 context.moderationActionLogs.Add(new EntityActionLog
                 {
                     uId = uId,
+                    mId = mId,
                     issuedDate = now,
                     punishmentLevel = level,
                     comments = comments
@@ -52,54 +53,52 @@ namespace GarbageCan.Moderation
             });
         }
 
-        public static void Mute(ulong uId, TimeSpan span, string comments)
+        public static void Mute(DiscordMember member, DiscordMember moderator, TimeSpan span, string comments)
         {
             Task.Run(async () =>
             {
-                var member = await GetMember(uId);
-
                 await member.GrantRoleAsync(_mutedRole, "user muted for " + span.Humanize());
 
                 await using var context = new Context();
                 context.moderationActiveMutes.Add(new EntityActiveMute
                 {
-                    uId = uId,
+                    uId = member.Id,
                     expirationDate = DateTime.Now.ToUniversalTime().Add(span)
                 });
 
-                ModUtil.SendMessage(uId, $"You have been muted for {span.Humanize()}." +
-                                         $"\n\nAdditional comments: {comments}");
-                
+                ModUtil.SendMessage(member.Id, $"You have been muted for {span.Humanize()}." +
+                                               $"\n\nAdditional comments: {comments}");
+
                 await context.SaveChangesAsync();
-                
-                Log(uId, PunishmentLevel.Mute, $"Muted for {span.Humanize()}. Additional comments: {comments}");
+
+                Log(member.Id, moderator.Id, PunishmentLevel.Mute,
+                    $"Muted for {span.Humanize()}. Additional comments: {comments}");
             });
         }
 
-        public static void RestrictChannel(ulong uId, ulong channelId, TimeSpan span, string comments)
+        public static void RestrictChannel(DiscordMember member, DiscordMember moderator, DiscordChannel channel,
+            TimeSpan span, string comments)
         {
             Task.Run(async () =>
             {
-                var member = await GetMember(uId);
-                var channel = GarbageCan.Client.Guilds[GarbageCan.Config.operatingGuildId].GetChannel(channelId);
-
                 await channel.AddOverwriteAsync(member, Permissions.None, Permissions.AccessChannels);
 
                 using var context = new Context();
                 context.moderationActiveChannelRestricts.Add(new EntityActiveChannelRestrict
                 {
-                    uId = uId,
-                    channelId = channelId,
+                    uId = member.Id,
+                    channelId = channel.Id,
                     expirationDate = DateTime.Now.ToUniversalTime().Add(span)
                 });
 
-                ModUtil.SendMessage(uId, 
+                ModUtil.SendMessage(member.Id,
                     $"Your access to the {channel.Name} channel has been restricted for {span.Humanize()}. " +
                     $"\n\nAdditional comments: {comments}");
 
                 await context.SaveChangesAsync();
-                
-                Log(uId, PunishmentLevel.ChannelRestrict, $"Restricted access to {channel.Name} for {span.Humanize()}. Additional comments: {comments}");
+
+                Log(member.Id, moderator.Id, PunishmentLevel.ChannelRestrict,
+                    $"Restricted access to {channel.Name} for {span.Humanize()}. Additional comments: {comments}");
             });
         }
 
@@ -120,14 +119,15 @@ namespace GarbageCan.Moderation
                     .Where(m => m.expirationDate <= now)
                     .ForEachAsync(async m =>
                     {
-                        var member = await GarbageCan.Client.Guilds[GarbageCan.Config.operatingGuildId].GetMemberAsync(m.uId);
+                        var member = await GarbageCan.Client.Guilds[GarbageCan.Config.operatingGuildId]
+                            .GetMemberAsync(m.uId);
                         await member.RevokeRoleAsync(_mutedRole, "mute expired");
                     });
 
                 await context.moderationActiveMutes
                     .Where(m => m.expirationDate <= now)
                     .DeleteAsync();
-                
+
                 await context.SaveChangesAsync();
             });
 
@@ -140,8 +140,10 @@ namespace GarbageCan.Moderation
                     .Where(c => c.expirationDate <= now)
                     .ForEachAsync(async c =>
                     {
-                        var member = await GarbageCan.Client.Guilds[GarbageCan.Config.operatingGuildId].GetMemberAsync(c.uId);
-                        var channel = GarbageCan.Client.Guilds[GarbageCan.Config.operatingGuildId].GetChannel(c.channelId);
+                        var member = await GarbageCan.Client.Guilds[GarbageCan.Config.operatingGuildId]
+                            .GetMemberAsync(c.uId);
+                        var channel = GarbageCan.Client.Guilds[GarbageCan.Config.operatingGuildId]
+                            .GetChannel(c.channelId);
 
                         await channel.AddOverwriteAsync(member, Permissions.AccessChannels);
                     });
@@ -149,7 +151,7 @@ namespace GarbageCan.Moderation
                 await context.moderationActiveChannelRestricts
                     .Where(c => c.expirationDate <= now)
                     .DeleteAsync();
-                
+
                 await context.SaveChangesAsync();
             });
         }

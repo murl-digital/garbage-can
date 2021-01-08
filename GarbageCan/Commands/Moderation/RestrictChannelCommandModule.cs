@@ -11,18 +11,18 @@ namespace GarbageCan.Commands.Moderation
     {
         [Command("restrict")]
         [RequireRoles(RoleCheckMode.All, "Staff")]
-        public Task Restrict(CommandContext ctx, DiscordUser user, DiscordChannel channel, TimeSpan span,
+        public Task Restrict(CommandContext ctx, DiscordMember user, DiscordChannel channel, TimeSpan span,
             string comments)
         {
-            ModManager.RestrictChannel(user.Id, channel.Id, span, comments);
+            ModManager.RestrictChannel(user, ctx.Member, channel, span, comments);
 
             return Task.CompletedTask;
         }
 
         [Command("restrict")]
-        public Task RestrictDefault(CommandContext ctx, DiscordUser user, DiscordChannel channel, string comments)
+        public Task RestrictDefault(CommandContext ctx, DiscordMember user, DiscordChannel channel, string comments)
         {
-            ModManager.RestrictChannel(user.Id, channel.Id, TimeSpan.FromHours(24), comments);
+            ModManager.RestrictChannel(user, ctx.Member, channel, TimeSpan.FromHours(24), comments);
             
             return Task.CompletedTask;
         }
