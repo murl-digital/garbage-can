@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
@@ -14,7 +13,7 @@ namespace GarbageCan.Commands.Moderation
         public Task WarnCommand(CommandContext ctx, DiscordUser user, string comments)
         {
             ModManager.Log(user.Id, ctx.Member.Id, PunishmentLevel.VerbalWarning, comments);
-            
+
             return Task.CompletedTask;
         }
     }

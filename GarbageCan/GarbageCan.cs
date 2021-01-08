@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Threading;
 using System.Threading.Tasks;
 using Config.Net;
 using DSharpPlus;
@@ -14,91 +12,90 @@ using Serilog;
 
 namespace GarbageCan
 {
-	internal static class GarbageCan
-	{
-		public static DiscordClient Client;
-		public static CommandsNextExtension Commands;
-		public static IBotConfig Config;
-		
-		private static List<IFeature> _botFeatures;
+    internal static class GarbageCan
+    {
+        public static DiscordClient Client;
+        public static CommandsNextExtension Commands;
+        public static IBotConfig Config;
 
-		private static void Main(string[] args)
-		{
-			Task.Run(async () =>
-			{
-				Log.Logger = new LoggerConfiguration()
-					.WriteTo.Console()
-					.CreateLogger();
+        private static List<IFeature> _botFeatures;
 
-				var logFactory = new LoggerFactory().AddSerilog();
+        private static void Main(string[] args)
+        {
+            Task.Run(async () =>
+            {
+                Log.Logger = new LoggerConfiguration()
+                    .WriteTo.Console()
+                    .CreateLogger();
 
-				Log.Information("Reading config...");
-				BuildConfig();
+                var logFactory = new LoggerFactory().AddSerilog();
 
-				Client = new DiscordClient(new DiscordConfiguration
-				{
-					Token = Config.token,
-					TokenType = TokenType.Bot,
-					LoggerFactory = logFactory,
-					MinimumLogLevel = LogLevel.Debug
-				});
+                Log.Information("Reading config...");
+                BuildConfig();
 
-				Log.Information("Initializing features...");
-				_botFeatures = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes())
-					.Where(x => typeof(IFeature).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-					.Select(x => (IFeature) Activator.CreateInstance(x))
-					.ToList();
+                Client = new DiscordClient(new DiscordConfiguration
+                {
+                    Token = Config.token,
+                    TokenType = TokenType.Bot,
+                    LoggerFactory = logFactory,
+                    MinimumLogLevel = LogLevel.Debug
+                });
 
-				foreach (var feature in _botFeatures)
-				{
-					Log.Information("Feature " + feature.GetType().Name + " found, attempting to initialize...");
-					feature.Init(Client);
-					Log.Information("Success!");
-				}
+                Log.Information("Initializing features...");
+                _botFeatures = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes())
+                    .Where(x => typeof(IFeature).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
+                    .Select(x => (IFeature) Activator.CreateInstance(x))
+                    .ToList();
 
-				Commands = Client.UseCommandsNext(new CommandsNextConfiguration
-				{
-					StringPrefixes = new[] {Config.commandPrefix}
-				});
+                foreach (var feature in _botFeatures)
+                {
+                    Log.Information("Feature " + feature.GetType().Name + " found, attempting to initialize...");
+                    feature.Init(Client);
+                    Log.Information("Success!");
+                }
 
-				Commands.RegisterCommands(Assembly.GetExecutingAssembly());
+                Commands = Client.UseCommandsNext(new CommandsNextConfiguration
+                {
+                    StringPrefixes = new[] {Config.commandPrefix}
+                });
 
-				Client.Ready += (_, _) =>
-				{
-					Log.Information("ready");
-					return Task.CompletedTask;
-				};
+                Commands.RegisterCommands(Assembly.GetExecutingAssembly());
 
-				await Client.ConnectAsync();
+                Client.Ready += (_, _) =>
+                {
+                    Log.Information("ready");
+                    return Task.CompletedTask;
+                };
 
-				AppDomain.CurrentDomain.ProcessExit += Shutdown;
-				AppDomain.CurrentDomain.DomainUnload += Shutdown;
-				Console.CancelKeyPress += Shutdown;
-			});
+                await Client.ConnectAsync();
 
-			while (!Environment.HasShutdownStarted) {}
-		}
+                AppDomain.CurrentDomain.ProcessExit += Shutdown;
+                AppDomain.CurrentDomain.DomainUnload += Shutdown;
+                Console.CancelKeyPress += Shutdown;
+            });
 
-		public static void BuildConfig()
-		{
-			Config = new ConfigurationBuilder<IBotConfig>()
-				.UseJsonFile("dev.json")
-				.UseEnvironmentVariables()
-				.Build();
-			
-			if (Config == null) throw new NullReferenceException("Attempted to build config, but got null");
-		}
-		
-		private static void Shutdown(object? sender, EventArgs eventArgs)
-		{
-			Log.Information("Shutting down...");
+            while (!Environment.HasShutdownStarted)
+            {
+            }
+        }
 
-			foreach (var feature in _botFeatures)
-			{
-				feature.Cleanup();
-			}
-			Client.UpdateStatusAsync(null, UserStatus.Offline).GetAwaiter().GetResult();
-			Client.Dispose();
-		}
-	}
+        public static void BuildConfig()
+        {
+            Config = new ConfigurationBuilder<IBotConfig>()
+                .UseJsonFile("dev.json")
+                .UseEnvironmentVariables()
+                .Build();
+
+            if (Config == null) throw new NullReferenceException("Attempted to build config, but got null");
+        }
+
+        private static void Shutdown(object? sender, EventArgs eventArgs)
+        {
+            Log.Information("Shutting down...");
+
+            foreach (var feature in _botFeatures) feature.Cleanup();
+            Client.UpdateStatusAsync(null, UserStatus.Offline).GetAwaiter().GetResult();
+            Client.Dispose();
+        }
+    }
 }

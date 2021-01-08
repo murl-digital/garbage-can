@@ -36,7 +36,8 @@ namespace GarbageCan.Moderation
 
                 await channel.SendMessageAsync(
                     "Hello, " + member
-                        .Mention + ". We tried to send you a direct message, however your direct messages are disabled for this server. Below is the message in question.");
+                        .Mention +
+                    ". We tried to send you a direct message, however your direct messages are disabled for this server. Below is the message in question.");
                 await channel.SendMessageAsync(message);
             }
         }

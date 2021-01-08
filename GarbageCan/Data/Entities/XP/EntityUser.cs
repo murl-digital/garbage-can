@@ -4,17 +4,21 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GarbageCan.Data.Entities.XP
 {
-	[Table("xp_users")]
-	public class EntityUser
-	{
-		[Key] [DatabaseGenerated(DatabaseGeneratedOption.None)] public ulong id { get; set; }
-		public int lvl { get; set; }
+    [Table("xp_users")]
+    public class EntityUser
+    {
+        private double _xp;
 
-		private double _xp;
-		public double xp
-		{
-			get => _xp;
-			set => _xp = Math.Round(value, 1);
-		}
-	}
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public ulong id { get; set; }
+
+        public int lvl { get; set; }
+
+        public double xp
+        {
+            get => _xp;
+            set => _xp = Math.Round(value, 1);
+        }
+    }
 }

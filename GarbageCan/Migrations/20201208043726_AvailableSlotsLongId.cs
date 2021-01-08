@@ -7,9 +7,9 @@ namespace GarbageCan.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<ulong>(
-                name: "channel_id",
-                table: "xp_available_slots",
-                type: "bigint unsigned",
+                "channel_id",
+                "xp_available_slots",
+                "bigint unsigned",
                 nullable: false,
                 defaultValue: 0ul,
                 oldClrType: typeof(string),
@@ -21,9 +21,9 @@ namespace GarbageCan.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<string>(
-                name: "channel_id",
-                table: "xp_available_slots",
-                type: "varchar(18) CHARACTER SET utf8mb4",
+                "channel_id",
+                "xp_available_slots",
+                "varchar(18) CHARACTER SET utf8mb4",
                 maxLength: 18,
                 nullable: true,
                 oldClrType: typeof(ulong),

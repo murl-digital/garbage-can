@@ -2,9 +2,9 @@
 
 namespace GarbageCan
 {
-	public interface IFeature
-	{
-		public void Init(DiscordClient client);
-		public void Cleanup();
-	}
+    public interface IFeature
+    {
+        public void Init(DiscordClient client);
+        public void Cleanup();
+    }
 }

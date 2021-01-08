@@ -7,20 +7,18 @@ namespace GarbageCan.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "xp_excluded_channels",
-                columns: table => new
+                "xp_excluded_channels",
+                table => new
                 {
-                    channel_id = table.Column<ulong>(type: "bigint unsigned", nullable: false)
+                    channel_id = table.Column<ulong>("bigint unsigned", nullable: false)
                 },
-                constraints: table =>
-                {
-                });
+                constraints: table => { });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "xp_excluded_channels");
+                "xp_excluded_channels");
         }
     }
 }

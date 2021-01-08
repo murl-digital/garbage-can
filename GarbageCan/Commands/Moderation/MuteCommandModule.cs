@@ -14,7 +14,7 @@ namespace GarbageCan.Commands.Moderation
         public Task Mute(CommandContext ctx, DiscordMember user, TimeSpan span, string comments)
         {
             ModManager.Mute(user, ctx.Member, span, comments);
-            
+
             return Task.CompletedTask;
         }
 

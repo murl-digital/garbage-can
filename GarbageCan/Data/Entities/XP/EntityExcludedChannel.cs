@@ -7,6 +7,6 @@ namespace GarbageCan.Data.Entities.XP
     [Keyless]
     public class EntityExcludedChannel
     {
-        public ulong channel_id { get; set; }   
+        public ulong channel_id { get; set; }
     }
 }

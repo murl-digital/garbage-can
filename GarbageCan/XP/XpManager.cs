@@ -9,23 +9,18 @@ using GarbageCan.Data.Entities.XP;
 using GarbageCan.XP.Boosters;
 using MathNet.Numerics.Distributions;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 
 namespace GarbageCan.XP
 {
     public class XpManager : IFeature
     {
         private Normal _random;
-        
-        //LevelUp is fired once every time a user levels up (i.e from level 1 to 2, or from 5 to 10 (which can happen)
-        //GhostLevelUp is fired every time a user's level increments (i.e from level 1 to 2 = 1 invoke, from level 5 to 10 5 invokes)
-        public static event EventHandler<LevelUpArgs> LevelUp;
-        public static event EventHandler<XpEventArgs> GhostLevelUp;
+
         public void Init(DiscordClient client)
         {
             client.MessageCreated += HandleMessage;
             client.GuildMemberAdded += HandleJoin;
-            
+
             _random = new Normal(0, 1);
         }
 
@@ -34,9 +29,14 @@ namespace GarbageCan.XP
             //nope
         }
 
+        //LevelUp is fired once every time a user levels up (i.e from level 1 to 2, or from 5 to 10 (which can happen)
+        //GhostLevelUp is fired every time a user's level increments (i.e from level 1 to 2 = 1 invoke, from level 5 to 10 5 invokes)
+        public static event EventHandler<LevelUpArgs> LevelUp;
+        public static event EventHandler<XpEventArgs> GhostLevelUp;
+
         private Task HandleJoin(DiscordClient sender, GuildMemberAddEventArgs e)
         {
-            if (e.Member.IsBot) 
+            if (e.Member.IsBot)
                 return Task.CompletedTask;
 
             Task.Run(async () =>
@@ -52,17 +52,18 @@ namespace GarbageCan.XP
                 context.xpUsers.Add(user);
                 await context.SaveChangesAsync();
             });
-            
+
             return Task.CompletedTask;
         }
-        
+
         private Task HandleMessage(DiscordClient sender, MessageCreateEventArgs e)
         {
-            if (e.Channel.IsPrivate || e.Author.IsBot || e.Author.IsSystem.HasValue && e.Author.IsSystem.Value || e.Message.Content.StartsWith(GarbageCan.Config.commandPrefix) || IsExcluded(e.Channel.Id))
+            if (e.Channel.IsPrivate || e.Author.IsBot || e.Author.IsSystem.HasValue && e.Author.IsSystem.Value ||
+                e.Message.Content.StartsWith(GarbageCan.Config.commandPrefix) || IsExcluded(e.Channel.Id))
                 return Task.CompletedTask;
 
             AddXp(e.Author.Id, XpEarned(e.Message.Content), sender, e);
-            
+
             return Task.CompletedTask;
         }
 
@@ -104,7 +105,6 @@ namespace GarbageCan.XP
                 }
 
                 if (user.lvl > oldLevel)
-                {
                     LevelUp?.Invoke(this, new LevelUpArgs
                     {
                         context = e.Channel,
@@ -113,7 +113,6 @@ namespace GarbageCan.XP
                         oldLvl = oldLevel,
                         xp = user.xp
                     });
-                }
 
                 await context.SaveChangesAsync();
             });
@@ -144,10 +143,7 @@ namespace GarbageCan.XP
         private static double TotalXpRequired(int lvl)
         {
             var result = 0.0;
-            for (var i = 0; i <= lvl; i++)
-            {
-                result += XpRequired(i);
-            }
+            for (var i = 0; i <= lvl; i++) result += XpRequired(i);
 
             return result;
         }
@@ -155,11 +151,11 @@ namespace GarbageCan.XP
 
     public class XpEventArgs : EventArgs
     {
+        private double _xp;
         public DiscordChannel context { get; set; }
         public ulong id { get; set; }
         public int lvl { get; set; }
 
-        private double _xp;
         public double xp
         {
             get => _xp;
