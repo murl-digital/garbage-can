@@ -10,7 +10,7 @@ namespace GarbageCan.Commands.Moderation
     public class LogWarningCommandModule : BaseCommandModule
     {
         [Command("logWarning")]
-        [RequirePermissions(Permissions.ViewAuditLog)]
+        [RequireRoles(RoleCheckMode.All, "Staff")]
         public Task WarnCommand(CommandContext ctx, DiscordUser user, string comments)
         {
             ModManager.Log(user.Id, PunishmentLevel.VerbalWarning, comments);
