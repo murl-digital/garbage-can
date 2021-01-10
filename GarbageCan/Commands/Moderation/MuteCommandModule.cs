@@ -4,6 +4,7 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using GarbageCan.Moderation;
+using Serilog;
 
 namespace GarbageCan.Commands.Moderation
 {

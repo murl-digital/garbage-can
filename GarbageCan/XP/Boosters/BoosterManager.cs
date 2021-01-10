@@ -147,7 +147,7 @@ namespace GarbageCan.XP.Boosters
             }
         }
 
-        private static void Tick(object sender, ElapsedEventArgs elapsedEventArgs)
+        private static async void Tick(object sender, ElapsedEventArgs elapsedEventArgs)
         {
             try
             {
@@ -165,7 +165,7 @@ namespace GarbageCan.XP.Boosters
                         toProcess.Add(activeBooster);
                     }
 
-                    context.SaveChanges();
+                    await context.SaveChangesAsync();
                 }
 
                 var saveQueue = false;
@@ -183,8 +183,15 @@ namespace GarbageCan.XP.Boosters
                     {
                         Task.Run(async () =>
                         {
-                            var channel = await GarbageCan.Client.GetChannelAsync(b.slot.channelId);
-                            await channel.ModifyAsync(model => model.Name = "-");
+                            try
+                            {
+                                var channel = await GarbageCan.Client.GetChannelAsync(b.slot.channelId);
+                                await channel.ModifyAsync(model => model.Name = "-");
+                            }
+                            catch (Exception e)
+                            {
+                                Log.Error(e.ToString());
+                            }
                         });
                     }
                 });
@@ -219,31 +226,45 @@ namespace GarbageCan.XP.Boosters
 
         private static void ActivateBooster(float multiplier, TimeSpan duration, AvailableSlot slot)
         {
-            var booster = new ActiveBooster
+            try
             {
-                expirationDate = DateTime.Now.ToUniversalTime().Add(duration),
-                multiplier = multiplier,
-                slot = slot
-            };
-
-            ActiveBoosters.Add(booster);
-
-            using (var context = new Context())
-            {
-                context.xpActiveBoosters.Add(new EntityActiveBooster
+                var booster = new ActiveBooster
                 {
-                    expirationDate = booster.expirationDate,
-                    multipler = booster.multiplier,
-                    slot = context.xpAvailableSlots.Find(booster.slot.id)
-                });
-                context.SaveChanges();
-            }
+                    expirationDate = DateTime.Now.ToUniversalTime().Add(duration),
+                    multiplier = multiplier,
+                    slot = slot
+                };
 
-            Task.Run(async () =>
+                ActiveBoosters.Add(booster);
+
+                using (var context = new Context())
+                {
+                    context.xpActiveBoosters.Add(new EntityActiveBooster
+                    {
+                        expirationDate = booster.expirationDate,
+                        multipler = booster.multiplier,
+                        slot = context.xpAvailableSlots.Find(booster.slot.id)
+                    });
+                    context.SaveChanges();
+                }
+                
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        var channel = await GarbageCan.Client.GetChannelAsync(booster.slot.channelId);
+                        await channel.ModifyAsync(model => model.Name = GetBoosterString(booster));    
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error(e.ToString());
+                    }
+                });
+            }
+            catch (Exception e)
             {
-                var channel = await GarbageCan.Client.GetChannelAsync(booster.slot.channelId);
-                await channel.ModifyAsync(model => model.Name = GetBoosterString(booster));
-            });
+                Log.Error(e.ToString());
+            }
         }
 
         private static string GetBoosterString(Booster booster)
@@ -253,21 +274,31 @@ namespace GarbageCan.XP.Boosters
 
         private static void SaveQueue()
         {
-            using var context = new Context();
-            context.xpQueuedBoosters.Delete();
-            var position = 0;
-            foreach (var booster in _queuedBoosters)
+            Task.Run(async () =>
             {
-                context.xpQueuedBoosters.Add(new EntityQueuedBooster
+                try
                 {
-                    durationInSeconds = booster.durationInSeconds,
-                    multiplier = booster.multiplier,
-                    position = position
-                });
-                position++;
-            }
+                    using var context = new Context();
+                    context.xpQueuedBoosters.Delete();
+                    var position = 0;
+                    foreach (var booster in _queuedBoosters)
+                    {
+                        context.xpQueuedBoosters.Add(new EntityQueuedBooster
+                        {
+                            durationInSeconds = booster.durationInSeconds,
+                            multiplier = booster.multiplier,
+                            position = position
+                        });
+                        position++;
+                    }
 
-            context.SaveChanges();
+                    await context.SaveChangesAsync();
+                }
+                catch (Exception e)
+                {
+                    Log.Error(e.ToString());
+                }
+            });
         }
     }
 }

@@ -1,9 +1,11 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using DSharpPlus;
 using GarbageCan.Data;
 using GarbageCan.XP;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace GarbageCan.Roles
 {
@@ -23,19 +25,26 @@ namespace GarbageCan.Roles
         {
             Task.Run(() =>
             {
-                var lvlArgs = (LevelUpArgs) args;
-                using var context = new Context();
-                context.xpLevelRoles.Where(r => r.lvl == lvlArgs.oldLvl).ForEachAsync(r =>
+                try
                 {
-                    if (r.remain) return;
-                    var role = args.context.Guild.GetRole(r.roleId);
-                    args.context.Guild.GetMemberAsync(args.id).ContinueWith(t => t.Result.RevokeRoleAsync(role));
-                });
-                context.xpLevelRoles.Where(r => r.lvl == lvlArgs.lvl).ForEachAsync(r =>
+                    var lvlArgs = (LevelUpArgs) args;
+                    using var context = new Context();
+                    context.xpLevelRoles.Where(r => r.lvl == lvlArgs.oldLvl).ForEachAsync(r =>
+                    {
+                        if (r.remain) return;
+                        var role = args.context.Guild.GetRole(r.roleId);
+                        args.context.Guild.GetMemberAsync(args.id).ContinueWith(t => t.Result.RevokeRoleAsync(role));
+                    });
+                    context.xpLevelRoles.Where(r => r.lvl == lvlArgs.lvl).ForEachAsync(r =>
+                    {
+                        var role = args.context.Guild.GetRole(r.roleId);
+                        args.context.Guild.GetMemberAsync(args.id).ContinueWith(t => t.Result.GrantRoleAsync(role));
+                    });
+                }
+                catch (Exception e)
                 {
-                    var role = args.context.Guild.GetRole(r.roleId);
-                    args.context.Guild.GetMemberAsync(args.id).ContinueWith(t => t.Result.GrantRoleAsync(role));
-                });
+                    Log.Error(e.ToString());
+                }
             });
         }
     }

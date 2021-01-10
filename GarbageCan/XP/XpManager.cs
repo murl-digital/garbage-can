@@ -9,6 +9,7 @@ using GarbageCan.Data.Entities.XP;
 using GarbageCan.XP.Boosters;
 using MathNet.Numerics.Distributions;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace GarbageCan.XP
 {
@@ -41,16 +42,21 @@ namespace GarbageCan.XP
 
             Task.Run(async () =>
             {
-                using var context = new Context();
-                var user = new EntityUser
+                try
                 {
-                    id = e.Member.Id,
-                    lvl = 0,
-                    xp = 0
-                };
-
-                context.xpUsers.Add(user);
-                await context.SaveChangesAsync();
+                    using var context = new Context();
+                    context.xpUsers.Add(new EntityUser
+                    {
+                        id = e.Member.Id,
+                        lvl = 0,
+                        xp = 0
+                    });
+                    await context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex.ToString());
+                }
             });
 
             return Task.CompletedTask;
@@ -71,50 +77,57 @@ namespace GarbageCan.XP
         {
             Task.Run(async () =>
             {
-                using var context = new Context();
-                var user = await context.xpUsers
-                    .Where(u => u.id == id)
-                    .FirstOrDefaultAsync();
-
-                if (user == null)
+                try
                 {
-                    user = new EntityUser
+                    using var context = new Context();
+                    var user = await context.xpUsers
+                        .Where(u => u.id == id)
+                        .FirstOrDefaultAsync();
+
+                    if (user == null)
                     {
-                        id = id,
-                        lvl = 0,
-                        xp = 0
-                    };
+                        user = new EntityUser
+                        {
+                            id = id,
+                            lvl = 0,
+                            xp = 0
+                        };
 
-                    context.xpUsers.Add(user);
+                        context.xpUsers.Add(user);
+                    }
+
+                    user.xp += amount;
+
+                    var oldLevel = user.lvl;
+                    while (user.xp > TotalXpRequired(user.lvl))
+                    {
+                        user.lvl++;
+                        GhostLevelUp?.Invoke(this, new LevelUpArgs
+                        {
+                            context = e.Channel,
+                            id = user.id,
+                            lvl = user.lvl,
+                            oldLvl = oldLevel,
+                            xp = user.xp
+                        });
+                    }
+
+                    if (user.lvl > oldLevel)
+                        LevelUp?.Invoke(this, new LevelUpArgs
+                        {
+                            context = e.Channel,
+                            id = user.id,
+                            lvl = user.lvl,
+                            oldLvl = oldLevel,
+                            xp = user.xp
+                        });
+
+                    await context.SaveChangesAsync();
                 }
-
-                user.xp += amount;
-
-                var oldLevel = user.lvl;
-                while (user.xp > TotalXpRequired(user.lvl))
+                catch (Exception e)
                 {
-                    user.lvl++;
-                    GhostLevelUp?.Invoke(this, new LevelUpArgs
-                    {
-                        context = e.Channel,
-                        id = user.id,
-                        lvl = user.lvl,
-                        oldLvl = oldLevel,
-                        xp = user.xp
-                    });
+                    Log.Error(e.ToString());
                 }
-
-                if (user.lvl > oldLevel)
-                    LevelUp?.Invoke(this, new LevelUpArgs
-                    {
-                        context = e.Channel,
-                        id = user.id,
-                        lvl = user.lvl,
-                        oldLvl = oldLevel,
-                        xp = user.xp
-                    });
-
-                await context.SaveChangesAsync();
             });
         }
 
