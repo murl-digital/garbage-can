@@ -69,7 +69,7 @@ namespace GarbageCan.Moderation
                 logEntry = null;
             }
         }
-        
+
         public static void Log(ulong uId, ulong mId, PunishmentLevel level, string comments)
         {
             try

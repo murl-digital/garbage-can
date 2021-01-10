@@ -16,7 +16,7 @@ namespace GarbageCan.Commands.Moderation
             member.BanAsync(reason: reason);
             ModManager.Log(member.Id, ctx.Member.Id, PunishmentLevel.Ban, reason);
             ctx.RespondAsync($"{GarbageCan.Check} {member.DisplayName} has been banned");
-            
+
             return Task.CompletedTask;
         }
     }

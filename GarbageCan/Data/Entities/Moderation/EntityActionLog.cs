@@ -2,7 +2,6 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using GarbageCan.Moderation;
-using Microsoft.EntityFrameworkCore;
 
 namespace GarbageCan.Data.Entities.Moderation
 {

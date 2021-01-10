@@ -4,7 +4,6 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using GarbageCan.Moderation;
-using Serilog;
 
 namespace GarbageCan.Commands.Moderation
 {
@@ -16,7 +15,7 @@ namespace GarbageCan.Commands.Moderation
         {
             ModManager.Mute(member, ctx.Member, span, comments);
             ctx.RespondAsync($"{GarbageCan.Check} {member.DisplayName} has been muted");
-            
+
             return Task.CompletedTask;
         }
 

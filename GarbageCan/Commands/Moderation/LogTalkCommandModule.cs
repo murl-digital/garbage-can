@@ -19,7 +19,7 @@ namespace GarbageCan.Commands.Moderation
             ModManager.Log(member.Id, ctx.Member.Id, PunishmentLevel.PersonalTalk, comments, out entry);
             ctx.RespondAsync(
                 $"{GarbageCan.Check} 1 on 1 talk with {member.DisplayName} has been logged with id {entry.id}");
-            
+
             return Task.CompletedTask;
         }
     }

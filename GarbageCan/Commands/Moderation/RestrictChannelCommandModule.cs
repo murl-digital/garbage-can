@@ -23,7 +23,7 @@ namespace GarbageCan.Commands.Moderation
         }
 
         [Command("restrict")]
-        public Task RestrictDefault(CommandContext ctx, DiscordMember member, DiscordChannel channel, 
+        public Task RestrictDefault(CommandContext ctx, DiscordMember member, DiscordChannel channel,
             [RemainingText] string comments)
         {
             ModManager.RestrictChannel(member, ctx.Member, channel, TimeSpan.FromHours(24), comments);

@@ -34,7 +34,7 @@ namespace GarbageCan.Moderation
                         "message-" + member.Username,
                         ChannelType.Text,
                         null,
-                        overwrites: new [] {hideOverwrite, showOverwrite, readonlyOverwrite});
+                        overwrites: new[] {hideOverwrite, showOverwrite, readonlyOverwrite});
 
                     await channel.SendMessageAsync(
                         "Hello, " + member
@@ -42,7 +42,7 @@ namespace GarbageCan.Moderation
                         ". We tried to send you a direct message, however your direct messages are disabled for this server. Below is the message in question.");
                     await channel.SendMessageAsync(message);
                 }
-            } 
+            }
             catch (Exception e)
             {
                 Log.Error(e.ToString());

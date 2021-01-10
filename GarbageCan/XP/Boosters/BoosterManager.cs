@@ -247,13 +247,13 @@ namespace GarbageCan.XP.Boosters
                     });
                     context.SaveChanges();
                 }
-                
+
                 Task.Run(async () =>
                 {
                     try
                     {
                         var channel = await GarbageCan.Client.GetChannelAsync(booster.slot.channelId);
-                        await channel.ModifyAsync(model => model.Name = GetBoosterString(booster));    
+                        await channel.ModifyAsync(model => model.Name = GetBoosterString(booster));
                     }
                     catch (Exception e)
                     {

@@ -10,11 +10,6 @@ namespace GarbageCan.Web
     {
         public IHost HostObj;
 
-        public static IHostBuilder CreateHostBuilder() =>
-            Host.CreateDefaultBuilder()
-                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
-                .UseSerilog();
-
         public void Init(DiscordClient client)
         {
             Task.Run(() =>
@@ -27,6 +22,13 @@ namespace GarbageCan.Web
         public void Cleanup()
         {
             HostObj.StopAsync();
+        }
+
+        public static IHostBuilder CreateHostBuilder()
+        {
+            return Host.CreateDefaultBuilder()
+                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
+                .UseSerilog();
         }
     }
 }

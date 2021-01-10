@@ -8,68 +8,60 @@ namespace GarbageCan.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "moderation_active_channel_restricts",
-                columns: table => new
+                "moderation_active_channel_restricts",
+                table => new
                 {
-                    uId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
-                    channelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
-                    expirationDate = table.Column<DateTime>(type: "datetime", nullable: false)
+                    uId = table.Column<ulong>("bigint unsigned", nullable: false),
+                    channelId = table.Column<ulong>("bigint unsigned", nullable: false),
+                    expirationDate = table.Column<DateTime>("datetime", nullable: false)
                 },
-                constraints: table =>
-                {
-                });
+                constraints: table => { });
 
             migrationBuilder.CreateTable(
-                name: "moderation_active_mutes",
-                columns: table => new
+                "moderation_active_mutes",
+                table => new
                 {
-                    uId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
-                    expirationDate = table.Column<DateTime>(type: "datetime", nullable: false)
+                    uId = table.Column<ulong>("bigint unsigned", nullable: false),
+                    expirationDate = table.Column<DateTime>("datetime", nullable: false)
                 },
-                constraints: table =>
-                {
-                });
+                constraints: table => { });
 
             migrationBuilder.CreateTable(
-                name: "moderation_warnings",
-                columns: table => new
+                "moderation_warnings",
+                table => new
                 {
-                    uId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
-                    mId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
-                    issuedDate = table.Column<DateTime>(type: "datetime", nullable: false),
-                    punishmentLevel = table.Column<int>(type: "int", nullable: false),
-                    comments = table.Column<string>(type: "longtext CHARACTER SET utf8mb4", nullable: true)
+                    uId = table.Column<ulong>("bigint unsigned", nullable: false),
+                    mId = table.Column<ulong>("bigint unsigned", nullable: false),
+                    issuedDate = table.Column<DateTime>("datetime", nullable: false),
+                    punishmentLevel = table.Column<int>("int", nullable: false),
+                    comments = table.Column<string>("longtext CHARACTER SET utf8mb4", nullable: true)
                 },
-                constraints: table =>
-                {
-                });
+                constraints: table => { });
 
             migrationBuilder.CreateTable(
-                name: "xp_level_roles",
-                columns: table => new
+                "xp_level_roles",
+                table => new
                 {
-                    lvl = table.Column<int>(type: "int", nullable: false),
-                    id = table.Column<ulong>(type: "bigint unsigned", nullable: false),
-                    remain = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                    lvl = table.Column<int>("int", nullable: false),
+                    id = table.Column<ulong>("bigint unsigned", nullable: false),
+                    remain = table.Column<bool>("tinyint(1)", nullable: false)
                 },
-                constraints: table =>
-                {
-                });
+                constraints: table => { });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "moderation_active_channel_restricts");
+                "moderation_active_channel_restricts");
 
             migrationBuilder.DropTable(
-                name: "moderation_active_mutes");
+                "moderation_active_mutes");
 
             migrationBuilder.DropTable(
-                name: "moderation_warnings");
+                "moderation_warnings");
 
             migrationBuilder.DropTable(
-                name: "xp_level_roles");
+                "xp_level_roles");
         }
     }
 }
