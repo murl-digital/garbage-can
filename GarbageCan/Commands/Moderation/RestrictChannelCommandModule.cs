@@ -8,7 +8,7 @@ using Humanizer;
 
 namespace GarbageCan.Commands.Moderation
 {
-    public class RestrictChannelCommandModule
+    public class RestrictChannelCommandModule : BaseCommandModule
     {
         [Command("restrict")]
         [RequireRoles(RoleCheckMode.All, "Staff")]
@@ -17,7 +17,7 @@ namespace GarbageCan.Commands.Moderation
         {
             ModManager.RestrictChannel(member, ctx.Member, channel, span, comments);
             ctx.RespondAsync(
-                $"{GarbageCan.Check} {member.DisplayName}'s access to {channel} has been restricted for {span.Humanize()}");
+                $"{GarbageCan.Check} {member.DisplayName}'s access to {channel.Mention} has been restricted for {span.Humanize()}");
 
             return Task.CompletedTask;
         }
@@ -28,7 +28,7 @@ namespace GarbageCan.Commands.Moderation
         {
             ModManager.RestrictChannel(member, ctx.Member, channel, TimeSpan.FromHours(24), comments);
             ctx.RespondAsync(
-                $"{GarbageCan.Check} {member.DisplayName}'s access to {channel} has been restricted for 24 hours");
+                $"{GarbageCan.Check} {member.DisplayName}'s access to {channel.Mention} has been restricted for 24 hours");
 
             return Task.CompletedTask;
         }

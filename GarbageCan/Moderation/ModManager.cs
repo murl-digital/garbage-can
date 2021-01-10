@@ -203,7 +203,8 @@ namespace GarbageCan.Moderation
                             var channel = GarbageCan.Client.Guilds[GarbageCan.Config.operatingGuildId]
                                 .GetChannel(c.channelId);
 
-                            await channel.AddOverwriteAsync(member, Permissions.AccessChannels);
+                            await channel.PermissionOverwrites.First(o => o.Id == member.Id)
+                                .DeleteAsync("channel restrict expired");
                         });
 
                     await context.moderationActiveChannelRestricts
