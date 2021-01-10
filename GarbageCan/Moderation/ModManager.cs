@@ -31,7 +31,7 @@ namespace GarbageCan.Moderation
 
         public void Cleanup()
         {
-            throw new NotImplementedException();
+            // unused
         }
 
         public static void Log(ulong uId, ulong mId, PunishmentLevel level, string comments)
