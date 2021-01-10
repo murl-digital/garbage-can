@@ -19,7 +19,7 @@ namespace GarbageCan.Moderation
 
         public void Init(DiscordClient client)
         {
-            client.Ready += (sender, _) =>
+            client.GuildDownloadCompleted += (sender, _) =>
             {
                 _mutedRole = sender.Guilds[GarbageCan.Config.operatingGuildId].GetRole(GarbageCan.Config.mutedRoleId);
                 Timer.Enabled = true;
