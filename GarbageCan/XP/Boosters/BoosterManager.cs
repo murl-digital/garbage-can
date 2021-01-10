@@ -7,7 +7,7 @@ using System.Timers;
 using DSharpPlus;
 using GarbageCan.Data;
 using GarbageCan.Data.Entities.Boosters;
-using GarbageCan.Data.Models;
+using GarbageCan.Data.Models.Boosters;
 using Serilog;
 using Z.EntityFramework.Plus;
 
