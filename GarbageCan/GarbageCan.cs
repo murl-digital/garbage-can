@@ -18,8 +18,10 @@ namespace GarbageCan
         public static CommandsNextExtension Commands;
         public static IBotConfig Config;
 
+        public static DiscordEmoji Check;
+
         private static List<IFeature> _botFeatures;
-        private static bool _shutdown = false;
+        private static bool _shutdown;
 
         private static void Main(string[] args)
         {
@@ -64,7 +66,7 @@ namespace GarbageCan
 
                 Client.Ready += (_, _) =>
                 {
-                    Log.Information("ready");
+                    Check = DiscordEmoji.FromName(Client, ":white_check_mark:");
                     return Task.CompletedTask;
                 };
 

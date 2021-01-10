@@ -7,7 +7,7 @@ namespace GarbageCan.Commands.Fun
     public class OobifyCommandModule : BaseCommandModule
     {
         [Command("oobify")]
-        public async Task OobifyCommand(CommandContext ctx, string message)
+        public async Task OobifyCommand(CommandContext ctx, [RemainingText] string message)
         {
             var result = message
                 .Replace("a", "oob")

@@ -6,6 +6,7 @@ using DSharpPlus;
 using DSharpPlus.Entities;
 using GarbageCan.Data;
 using GarbageCan.Data.Entities.Moderation;
+using GarbageCan.Data.Models.Moderation;
 using Humanizer;
 using Microsoft.EntityFrameworkCore;
 using Z.EntityFramework.Plus;
@@ -34,30 +35,63 @@ namespace GarbageCan.Moderation
             // unused
         }
 
+        public static void Log(ulong uId, ulong mId, PunishmentLevel level, string comments, out ActionLog logEntry)
+        {
+            try
+            {
+                using var context = new Context();
+                var now = DateTime.Now.ToUniversalTime();
+                var log = new EntityActionLog
+                {
+                    uId = uId,
+                    mId = mId,
+                    issuedDate = now,
+                    punishmentLevel = level,
+                    comments = comments
+                };
+                context.moderationActionLogs.Add(log);
+
+                context.SaveChanges();
+
+                logEntry = new ActionLog
+                {
+                    id = log.id,
+                    uId = uId,
+                    mId = mId,
+                    issuedDate = now,
+                    punishmentLevel = level,
+                    comments = comments
+                };
+            }
+            catch (Exception e)
+            {
+                Serilog.Log.Error(e.ToString());
+                logEntry = null;
+            }
+        }
+        
         public static void Log(ulong uId, ulong mId, PunishmentLevel level, string comments)
         {
-            Task.Run(async () =>
+            try
             {
-                try
+                using var context = new Context();
+                var now = DateTime.Now.ToUniversalTime();
+                var log = new EntityActionLog
                 {
-                    using var context = new Context();
-                    var now = DateTime.Now.ToUniversalTime();
-                    context.moderationActionLogs.Add(new EntityActionLog
-                    {
-                        uId = uId,
-                        mId = mId,
-                        issuedDate = now,
-                        punishmentLevel = level,
-                        comments = comments
-                    });
+                    uId = uId,
+                    mId = mId,
+                    issuedDate = now,
+                    punishmentLevel = level,
+                    comments = comments
+                };
+                context.moderationActionLogs.Add(log);
 
-                    await context.SaveChangesAsync();
-                }
-                catch (Exception e)
-                {
-                    Serilog.Log.Error(e.ToString());
-                }
-            });
+                context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                Serilog.Log.Error(e.ToString());
+            }
         }
 
         public static void Mute(DiscordMember member, DiscordMember moderator, TimeSpan span, string comments)

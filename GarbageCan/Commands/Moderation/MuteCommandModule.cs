@@ -12,17 +12,19 @@ namespace GarbageCan.Commands.Moderation
     {
         [Command("mute")]
         [RequireRoles(RoleCheckMode.All, "Staff")]
-        public Task Mute(CommandContext ctx, DiscordMember user, TimeSpan span, string comments)
+        public Task Mute(CommandContext ctx, DiscordMember member, TimeSpan span, [RemainingText] string comments)
         {
-            ModManager.Mute(user, ctx.Member, span, comments);
-
+            ModManager.Mute(member, ctx.Member, span, comments);
+            ctx.RespondAsync($"{GarbageCan.Check} {member.DisplayName} has been muted");
+            
             return Task.CompletedTask;
         }
 
         [Command("mute")]
-        public Task MuteDefault(CommandContext ctx, DiscordMember user, string comments)
+        public Task MuteDefault(CommandContext ctx, DiscordMember member, [RemainingText] string comments)
         {
-            ModManager.Mute(user, ctx.Member, TimeSpan.FromHours(1), comments);
+            ModManager.Mute(member, ctx.Member, TimeSpan.FromHours(1), comments);
+            ctx.RespondAsync($"{GarbageCan.Check} {member.DisplayName} has been muted");
 
             return Task.CompletedTask;
         }
