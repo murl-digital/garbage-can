@@ -28,12 +28,12 @@ namespace GarbageCan.Roles
                 context.xpLevelRoles.Where(r => r.lvl == lvlArgs.oldLvl).ForEachAsync(r =>
                 {
                     if (r.remain) return;
-                    var role = args.context.Guild.GetRole(r.id);
+                    var role = args.context.Guild.GetRole(r.roleId);
                     args.context.Guild.GetMemberAsync(args.id).ContinueWith(t => t.Result.RevokeRoleAsync(role));
                 });
                 context.xpLevelRoles.Where(r => r.lvl == lvlArgs.lvl).ForEachAsync(r =>
                 {
-                    var role = args.context.Guild.GetRole(r.id);
+                    var role = args.context.Guild.GetRole(r.roleId);
                     args.context.Guild.GetMemberAsync(args.id).ContinueWith(t => t.Result.GrantRoleAsync(role));
                 });
             });
