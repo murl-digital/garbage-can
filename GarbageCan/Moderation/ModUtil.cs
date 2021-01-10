@@ -34,9 +34,7 @@ namespace GarbageCan.Moderation
                         "message-" + member.Username,
                         ChannelType.Text,
                         null,
-                        Optional.FromNoValue<string>(),
-                        null, null,
-                        new[] {hideOverwrite, showOverwrite, readonlyOverwrite});
+                        overwrites: new [] {hideOverwrite, showOverwrite, readonlyOverwrite});
 
                     await channel.SendMessageAsync(
                         "Hello, " + member
