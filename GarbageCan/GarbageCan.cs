@@ -19,6 +19,7 @@ namespace GarbageCan
         public static IBotConfig Config;
 
         private static List<IFeature> _botFeatures;
+        private static bool _shutdown = false;
 
         private static void Main(string[] args)
         {
@@ -74,7 +75,7 @@ namespace GarbageCan
                 Console.CancelKeyPress += Shutdown;
             });
 
-            while (!Environment.HasShutdownStarted)
+            while (!_shutdown)
             {
             }
         }
@@ -91,11 +92,14 @@ namespace GarbageCan
 
         private static void Shutdown(object? sender, EventArgs eventArgs)
         {
+            if (_shutdown) return;
             Log.Information("Shutting down...");
 
             foreach (var feature in _botFeatures) feature.Cleanup();
             Client.UpdateStatusAsync(null, UserStatus.Offline).GetAwaiter().GetResult();
             Client.Dispose();
+
+            _shutdown = true;
         }
     }
 }
