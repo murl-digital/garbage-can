@@ -7,6 +7,6 @@ namespace GarbageCan.Data.Entities.Boosters
     public class EntityAvailableSlot
     {
         [Key] public int id { get; set; }
-        public ulong channel_id { get; set; }
+        public ulong channelId { get; set; }
     }
 }

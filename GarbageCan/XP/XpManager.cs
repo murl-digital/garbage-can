@@ -122,7 +122,7 @@ namespace GarbageCan.XP
         {
             using var context = new Context();
             return context.xpExcludedChannels
-                .Any(c => c.channel_id == channelId);
+                .Any(c => c.channelId == channelId);
         }
 
         private double XpEarned(string message)

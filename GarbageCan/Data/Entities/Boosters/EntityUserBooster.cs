@@ -7,8 +7,8 @@ namespace GarbageCan.Data.Entities.Boosters
     public class EntityUserBooster
     {
         [Key] public string id { get; set; }
-        public ulong user_id { get; set; }
+        public ulong userId { get; set; }
         public float multiplier { get; set; }
-        public long duration_in_seconds { get; set; }
+        public long durationInSeconds { get; set; }
     }
 }

@@ -26,7 +26,7 @@ namespace GarbageCan.XP.Boosters
             using (var context = new Context())
             {
                 _availableSlots = context.xpAvailableSlots
-                    .Select(slot => new AvailableSlot {channelId = slot.channel_id, id = slot.id})
+                    .Select(slot => new AvailableSlot {channelId = slot.channelId, id = slot.id})
                     .ToList();
             }
 
@@ -60,7 +60,7 @@ namespace GarbageCan.XP.Boosters
                 !context.xpActiveBoosters.Any(x => x.slot.id == booster.slot.id)))
                 context.xpActiveBoosters.Add(new EntityActiveBooster
                 {
-                    expiration_date = booster.expirationDate,
+                    expirationDate = booster.expirationDate,
                     multipler = booster.multiplier,
                     slot = context.xpAvailableSlots.Find(booster.slot.id)
                 });
@@ -112,16 +112,16 @@ namespace GarbageCan.XP.Boosters
                 queuedEntities.Sort((x, y) => x.position.CompareTo(y.position));
 
                 _queuedBoosters = new Queue<QueuedBooster>(queuedEntities.Select(x => new QueuedBooster
-                    {durationInSeconds = x.duration_in_seconds, multiplier = x.multiplier}).ToList());
+                    {durationInSeconds = x.durationInSeconds, multiplier = x.multiplier}).ToList());
 
                 #endregion
 
                 #region remove any active boosters in db are expired
 
                 var now = DateTime.Now.ToUniversalTime();
-                if (context.xpActiveBoosters.Any(x => x.expiration_date < now))
+                if (context.xpActiveBoosters.Any(x => x.expirationDate < now))
                 {
-                    foreach (var expired in context.xpActiveBoosters.Where(x => x.expiration_date < now).ToList())
+                    foreach (var expired in context.xpActiveBoosters.Where(x => x.expirationDate < now).ToList())
                         context.xpActiveBoosters.Remove(expired);
 
                     context.SaveChanges();
@@ -131,10 +131,10 @@ namespace GarbageCan.XP.Boosters
 
                 #region retrieve remaining active boosters
 
-                foreach (var entity in context.xpActiveBoosters.Where(x => x.expiration_date < now).ToList())
+                foreach (var entity in context.xpActiveBoosters.Where(x => x.expirationDate < now).ToList())
                     ActiveBoosters.Add(new ActiveBooster
                     {
-                        expirationDate = entity.expiration_date,
+                        expirationDate = entity.expirationDate,
                         multiplier = entity.multipler,
                         slot = _availableSlots.Select(x => x).First(x => x.id == entity.slot.id)
                     });
@@ -232,7 +232,7 @@ namespace GarbageCan.XP.Boosters
             {
                 context.xpActiveBoosters.Add(new EntityActiveBooster
                 {
-                    expiration_date = booster.expirationDate,
+                    expirationDate = booster.expirationDate,
                     multipler = booster.multiplier,
                     slot = context.xpAvailableSlots.Find(booster.slot.id)
                 });
@@ -260,7 +260,7 @@ namespace GarbageCan.XP.Boosters
             {
                 context.xpQueuedBoosters.Add(new EntityQueuedBooster
                 {
-                    duration_in_seconds = booster.durationInSeconds,
+                    durationInSeconds = booster.durationInSeconds,
                     multiplier = booster.multiplier,
                     position = position
                 });

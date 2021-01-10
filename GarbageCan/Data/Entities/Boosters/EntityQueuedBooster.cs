@@ -11,6 +11,6 @@ namespace GarbageCan.Data.Entities.Boosters
         public int position { get; set; }
 
         public float multiplier { get; set; }
-        public long duration_in_seconds { get; set; }
+        public long durationInSeconds { get; set; }
     }
 }
