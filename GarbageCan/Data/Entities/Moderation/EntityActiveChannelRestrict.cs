@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GarbageCan.Data.Entities.Moderation
 {
-    [Table("moderation_active_channel_restricts")]
+    [Table("moderationActiveChannelRestricts")]
     public class EntityActiveChannelRestrict
     {
         [Key] public int id { get; set; }

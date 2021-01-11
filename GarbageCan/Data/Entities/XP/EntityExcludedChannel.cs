@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GarbageCan.Data.Entities.XP
 {
-    [Table("xp_excluded_channels")]
+    [Table("xpExcludedChannels")]
     [Keyless]
     public class EntityExcludedChannel
     {

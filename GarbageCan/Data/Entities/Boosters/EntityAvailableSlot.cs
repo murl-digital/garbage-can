@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GarbageCan.Data.Entities.Boosters
 {
-    [Table("xp_available_slots")]
+    [Table("xpAvailableSlots")]
     public class EntityAvailableSlot
     {
         [Key] public int id { get; set; }

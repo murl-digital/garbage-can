@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GarbageCan.Data.Entities.Roles
 {
-    [Table("xp_level_roles")]
+    [Table("xpLevelRoles")]
     public class EntityLevelRole
     {
         [Key] public int id { get; set; }

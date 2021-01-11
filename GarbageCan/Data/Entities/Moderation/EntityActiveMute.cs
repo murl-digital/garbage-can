@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GarbageCan.Data.Entities.Moderation
 {
-    [Table("moderation_active_mutes")]
+    [Table("moderationActiveMutes")]
     public class EntityActiveMute
     {
         [Key] public int id { get; set; }
