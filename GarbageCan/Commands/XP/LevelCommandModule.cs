@@ -55,6 +55,7 @@ namespace GarbageCan.Commands.XP
         {
             Task.Run(async () =>
             {
+                await ctx.Channel.TriggerTypingAsync();
                 var img = await GenerateImage(ctx.Member);
                 await ctx.Channel.SendFileAsync("rank.png", img);
             });
@@ -67,6 +68,7 @@ namespace GarbageCan.Commands.XP
         {
             Task.Run(async () =>
             {
+                await ctx.Channel.TriggerTypingAsync();
                 var img = await GenerateImage(member);
                 await ctx.Channel.SendFileAsync("rank.png", img);
             });
