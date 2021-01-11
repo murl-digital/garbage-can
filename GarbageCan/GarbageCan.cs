@@ -53,7 +53,15 @@ namespace GarbageCan
                 foreach (var feature in _botFeatures)
                 {
                     Log.Information("Feature " + feature.GetType().Name + " found, attempting to initialize...");
-                    feature.Init(Client);
+                    try
+                    {
+                        feature.Init(Client);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error(e.ToString());
+                        Environment.Exit(1);
+                    }
                     Log.Information("Success!");
                 }
 
@@ -94,7 +102,7 @@ namespace GarbageCan
 
         private static void Shutdown(object? sender, EventArgs eventArgs)
         {
-            if (_shutdown) return;
+            if (_shutdown || Environment.ExitCode > 0) return;
             Log.Information("Shutting down...");
 
             foreach (var feature in _botFeatures) feature.Cleanup();

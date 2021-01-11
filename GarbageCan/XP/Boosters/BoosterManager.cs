@@ -23,40 +23,33 @@ namespace GarbageCan.XP.Boosters
 
         public void Init(DiscordClient client)
         {
-            try
+            using (var context = new Context())
             {
-                using (var context = new Context())
-                {
-                    _availableSlots = context.xpAvailableSlots
-                        .Select(slot => new AvailableSlot {channelId = slot.channelId, id = slot.id})
-                        .ToList();
-                }
-
-                client.Ready += (_, _) =>
-                {
-                    Task.Run(Ready);
-
-                    BoosterTimer.Elapsed += Tick;
-
-                    BoosterTimer.Enabled = true;
-
-                    return Task.CompletedTask;
-                };
-
-                client.GuildUpdated += (_, args) =>
-                {
-                    Log.Information(args.GuildAfter.PremiumSubscriptionCount.ToString());
-
-                    if (args.GuildAfter.PremiumSubscriptionCount > args.GuildBefore.PremiumSubscriptionCount)
-                        AddBooster(2.0f, new TimeSpan(0, 0, 90, 0), true);
-
-                    return Task.CompletedTask;
-                };
+                _availableSlots = context.xpAvailableSlots
+                    .Select(slot => new AvailableSlot {channelId = slot.channelId, id = slot.id})
+                    .ToList();
             }
-            catch (Exception e)
+
+            client.Ready += (_, _) =>
             {
-                Log.Error(e.ToString());
-            }
+                Task.Run(Ready);
+
+                BoosterTimer.Elapsed += Tick;
+
+                BoosterTimer.Enabled = true;
+
+                return Task.CompletedTask;
+            };
+
+            client.GuildUpdated += (_, args) =>
+            {
+                Log.Information(args.GuildAfter.PremiumSubscriptionCount.ToString());
+
+                if (args.GuildAfter.PremiumSubscriptionCount > args.GuildBefore.PremiumSubscriptionCount)
+                    AddBooster(2.0f, new TimeSpan(0, 0, 90, 0), true);
+
+                return Task.CompletedTask;
+            };
         }
 
         public void Cleanup()
