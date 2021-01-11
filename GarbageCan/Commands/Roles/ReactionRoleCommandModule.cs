@@ -19,7 +19,7 @@ namespace GarbageCan.Commands.Roles
     {
         [Command("add")]
         [RequirePermissions(Permissions.Administrator)]
-        public static async Task AddReactionRole(CommandContext ctx, DiscordMessage msg, DiscordEmoji emote, DiscordRole role)
+        public async Task AddReactionRole(CommandContext ctx, DiscordMessage msg, DiscordEmoji emote, DiscordRole role)
         {
             try
             {
@@ -44,7 +44,7 @@ namespace GarbageCan.Commands.Roles
 
         [Command("remove")]
         [RequirePermissions(Permissions.Administrator)]
-        public static async Task RemoveReactionRole(CommandContext ctx, int id)
+        public async Task RemoveReactionRole(CommandContext ctx, int id)
         {
             try
             {

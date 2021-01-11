@@ -19,7 +19,7 @@ namespace GarbageCan.Commands.Boosters
     public class BoosterCommandModule : BaseCommandModule
     {
         [GroupCommand]
-        public static async Task GetBoosters(CommandContext ctx)
+        public async Task GetBoosters(CommandContext ctx)
         {
             try
             {
@@ -33,7 +33,7 @@ namespace GarbageCan.Commands.Boosters
         }
 
         [Command("use")]
-        public static async Task UseBooster(CommandContext ctx, int id)
+        public async Task UseBooster(CommandContext ctx, int id)
         {
             try
             {
@@ -70,7 +70,7 @@ namespace GarbageCan.Commands.Boosters
 
         [Command("list")]
         [RequirePermissions(Permissions.Administrator)]
-        public static async Task GetBoostersForUser(CommandContext ctx, DiscordUser user)
+        public async Task GetBoostersForUser(CommandContext ctx, DiscordUser user)
         {
             try
             {
@@ -85,7 +85,7 @@ namespace GarbageCan.Commands.Boosters
 
         [Command("add")]
         [RequirePermissions(Permissions.Administrator)]
-        public static async Task AddBooster(CommandContext ctx, float multiplier, TimeSpan span, bool queue)
+        public async Task AddBooster(CommandContext ctx, float multiplier, TimeSpan span, bool queue)
         {
             try
             {
@@ -111,7 +111,7 @@ namespace GarbageCan.Commands.Boosters
 
         [Command("give")]
         [RequirePermissions(Permissions.Administrator)]
-        public static async Task GiveBooster(CommandContext ctx, DiscordUser user, float multiplier, TimeSpan span)
+        public async Task GiveBooster(CommandContext ctx, DiscordUser user, float multiplier, TimeSpan span)
         {
             try
             {
@@ -132,7 +132,7 @@ namespace GarbageCan.Commands.Boosters
             }
         }
 
-        private static async Task<string> GetBoostersString(ulong uId)
+        private async Task<string> GetBoostersString(ulong uId)
         {
             try
             {
