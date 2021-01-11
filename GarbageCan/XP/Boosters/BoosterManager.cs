@@ -23,33 +23,40 @@ namespace GarbageCan.XP.Boosters
 
         public void Init(DiscordClient client)
         {
-            using (var context = new Context())
+            try
             {
-                _availableSlots = context.xpAvailableSlots
-                    .Select(slot => new AvailableSlot {channelId = slot.channelId, id = slot.id})
-                    .ToList();
+                using (var context = new Context())
+                {
+                    _availableSlots = context.xpAvailableSlots
+                        .Select(slot => new AvailableSlot {channelId = slot.channelId, id = slot.id})
+                        .ToList();
+                }
+
+                client.Ready += (_, _) =>
+                {
+                    Task.Run(Ready);
+
+                    BoosterTimer.Elapsed += Tick;
+
+                    BoosterTimer.Enabled = true;
+
+                    return Task.CompletedTask;
+                };
+
+                client.GuildUpdated += (_, args) =>
+                {
+                    Log.Information(args.GuildAfter.PremiumSubscriptionCount.ToString());
+
+                    if (args.GuildAfter.PremiumSubscriptionCount > args.GuildBefore.PremiumSubscriptionCount)
+                        AddBooster(2.0f, new TimeSpan(0, 0, 90, 0), true);
+
+                    return Task.CompletedTask;
+                };
             }
-
-            client.Ready += (_, _) =>
+            catch (Exception e)
             {
-                Task.Run(Ready);
-
-                BoosterTimer.Elapsed += Tick;
-
-                BoosterTimer.Enabled = true;
-
-                return Task.CompletedTask;
-            };
-
-            client.GuildUpdated += (_, args) =>
-            {
-                Log.Information(args.GuildAfter.PremiumSubscriptionCount.ToString());
-
-                if (args.GuildAfter.PremiumSubscriptionCount > args.GuildBefore.PremiumSubscriptionCount)
-                    AddBooster(2.0f, new TimeSpan(0, 0, 90, 0), true);
-
-                return Task.CompletedTask;
-            };
+                Log.Error(e.ToString());
+            }
         }
 
         public void Cleanup()
@@ -74,11 +81,11 @@ namespace GarbageCan.XP.Boosters
             return 1 + ActiveBoosters.Sum(booster => booster.multiplier - 1);
         }
 
-        public static void AddBooster(float multiplier, TimeSpan duration, bool queue)
+        public static BoosterResult AddBooster(float multiplier, TimeSpan duration, bool queue)
         {
             if (ActiveBoosters.Count >= _availableSlots.Count)
             {
-                if (!queue) return;
+                if (!queue) return BoosterResult.SlotsFull;
 
                 _queuedBoosters.Enqueue(new QueuedBooster
                 {
@@ -86,6 +93,7 @@ namespace GarbageCan.XP.Boosters
                     durationInSeconds = (long) duration.TotalSeconds
                 });
                 SaveQueue();
+                return BoosterResult.Queued;
             }
 
             var usedSlots = ActiveBoosters
@@ -96,6 +104,7 @@ namespace GarbageCan.XP.Boosters
                 .First(s => !usedSlots.Contains(s));
 
             ActivateBooster(multiplier, duration, slot);
+            return BoosterResult.Active;
         }
 
         private static void Ready()

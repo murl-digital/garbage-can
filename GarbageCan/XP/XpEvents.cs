@@ -2,6 +2,8 @@ using System;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.Entities;
+using GarbageCan.Data;
+using GarbageCan.Data.Entities.Boosters;
 using Serilog;
 
 namespace GarbageCan.XP
@@ -11,6 +13,18 @@ namespace GarbageCan.XP
         public void Init(DiscordClient client)
         {
             XpManager.LevelUp += OnLevelUp;
+            XpManager.GhostLevelUp += (sender, args) =>
+            {
+                if (args.lvl < 10 || args.lvl % 5 != 0) return;
+                using var context = new Context();
+                context.xpUserBoosters.Add(new EntityUserBooster
+                {
+                    userId = args.id,
+                    multiplier = 1.5f,
+                    durationInSeconds = (long) TimeSpan.FromMinutes(30).TotalSeconds
+                });
+                context.SaveChanges();
+            };
         }
 
         public void Cleanup()
