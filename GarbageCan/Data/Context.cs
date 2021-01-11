@@ -20,6 +20,8 @@ namespace GarbageCan.Data
         public DbSet<EntityActionLog> moderationActionLogs { get; set; }
         public DbSet<EntityActiveMute> moderationActiveMutes { get; set; }
         public DbSet<EntityActiveChannelRestrict> moderationActiveChannelRestricts { get; set; }
+        
+        public DbSet<EntityReactionRole> reactionRoles { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
