@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace GarbageCan.Data.Entities.XP
+namespace GarbageCan.Data.Entities.Roles
 {
     [Table("xp_level_roles")]
     public class EntityLevelRole

@@ -1,5 +1,6 @@
 ﻿using GarbageCan.Data.Entities.Boosters;
 using GarbageCan.Data.Entities.Moderation;
+using GarbageCan.Data.Entities.Roles;
 using GarbageCan.Data.Entities.XP;
 using Microsoft.EntityFrameworkCore;
 
