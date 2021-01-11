@@ -43,9 +43,7 @@ namespace GarbageCan.Commands.XP
             }
             catch (Exception e)
             {
-                Log.Error(e.Message);
-                if (e.StackTrace != null)
-                    Log.Error(e.StackTrace);
+                Log.Error(e.ToString());
             }
 
             return Task.CompletedTask;
