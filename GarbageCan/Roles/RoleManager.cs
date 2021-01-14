@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using DSharpPlus;
+using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using GarbageCan.Data;
 using GarbageCan.XP;
@@ -22,21 +23,29 @@ namespace GarbageCan.Roles
         private static Task ReactionAdded(DiscordClient sender, MessageReactionAddEventArgs args)
         {
             if (args.User.IsBot) return Task.CompletedTask;
-            
+
             Task.Run(() =>
             {
                 try
                 {
                     using var context = new Context();
-                    context.reactionRoles.Where(r => 
-                            r.channelId == args.Channel.Id && 
+                    context.reactionRoles.Where(r =>
+                            r.channelId == args.Channel.Id &&
                             r.messageId == args.Message.Id &&
-                            r.emoteId == args.Emoji.Id)
+                            r.emoteId == EmoteId(args.Emoji))
                         .ForEachAsync(async r =>
                         {
-                            var role = args.Guild.GetRole(r.roleId);
-                            var member = await args.Guild.GetMemberAsync(args.User.Id);
-                            await member.GrantRoleAsync(role, "reaction role");
+                            Log.Information(EmoteId(args.Emoji));
+                            try
+                            {
+                                var role = args.Guild.GetRole(r.roleId);
+                                var member = await args.Guild.GetMemberAsync(args.User.Id);
+                                await member.GrantRoleAsync(role, "reaction role");
+                            }
+                            catch (Exception e)
+                            {
+                                Log.Error(e.ToString()); 
+                            }
                         });
                 }
                 catch (Exception e)
@@ -52,21 +61,28 @@ namespace GarbageCan.Roles
         {
             if (args.User.IsBot) return Task.CompletedTask;
             
-            Task.Run(() =>
+            Task.Run(async () =>
             {
                 try
                 {
                     using var context = new Context();
-                    context.reactionRoles
+                    await context.reactionRoles
                         .Where(r => 
                             r.channelId == args.Channel.Id && 
                             r.messageId == args.Message.Id &&
-                            r.emoteId == args.Emoji.Id)
+                            r.emoteId == EmoteId(args.Emoji))
                         .ForEachAsync(async r =>
                         {
-                            var role = args.Guild.GetRole(r.roleId);
-                            var member = await args.Guild.GetMemberAsync(args.User.Id);
-                            await member.RevokeRoleAsync(role, "reaction role");
+                            try
+                            {
+                                var role = args.Guild.GetRole(r.roleId);
+                                var member = await args.Guild.GetMemberAsync(args.User.Id);
+                                await member.RevokeRoleAsync(role, "reaction role");
+                            }
+                            catch (Exception e)
+                            {
+                                Log.Error(e.ToString());
+                            }
                         });
                 }
                 catch (Exception e)
@@ -109,5 +125,8 @@ namespace GarbageCan.Roles
                 }
             });
         }
+
+        public static string EmoteId(DiscordEmoji emote) => emote.Id == 0 ? emote.Name : emote.Id.ToString();
+
     }
 }

@@ -8,6 +8,7 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using GarbageCan.Data;
 using GarbageCan.Data.Entities.Roles;
+using GarbageCan.Roles;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Z.EntityFramework.Plus;
@@ -28,7 +29,7 @@ namespace GarbageCan.Commands.Roles
                 {
                     channelId = msg.ChannelId,
                     messageId = msg.Id,
-                    emoteId = emote.Id,
+                    emoteId = RoleManager.EmoteId(emote),
                     roleId = role.Id
                 });
                 await context.SaveChangesAsync();
@@ -67,13 +68,12 @@ namespace GarbageCan.Commands.Roles
             try
             {
                 using var context = new Context();
-                await context.reactionRoles
-                    .ForEachAsync(async r =>
-                    {
-                        var role = ctx.Guild.GetRole(r.roleId);
-                        var msg = await ctx.Guild.GetChannel(r.channelId).GetMessageAsync(r.messageId);
-                        builder.AppendLine($"{r.id} :: msg {msg.Id} in #{msg.Channel.Name} | {role.Name}");
-                    });
+                foreach (var r in context.reactionRoles)
+                {
+                    var role = ctx.Guild.GetRole(r.roleId);
+                    var msg = await ctx.Guild.GetChannel(r.channelId).GetMessageAsync(r.messageId);
+                    builder.AppendLine($"{r.id} :: msg {msg.Id} in #{msg.Channel.Name} | {role.Name}");
+                }
                 await ctx.RespondAsync(Formatter.BlockCode(builder.ToString()));
             }
             catch (Exception e)

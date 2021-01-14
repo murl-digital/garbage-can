@@ -9,7 +9,7 @@ namespace GarbageCan.Data.Entities.Roles
         [Key] public int id { get; set; }
         public ulong messageId { get; set; }
         public ulong channelId { get; set; }
-        public ulong emoteId { get; set; }
+        public string emoteId { get; set; }
         public ulong roleId { get; set; }
     }
 }
