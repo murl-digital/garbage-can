@@ -39,13 +39,6 @@ namespace GarbageCan.Commands.XP
             DpiY = 1200
         });
 
-        private static readonly TextGraphicsOptions OptionsRight = new(new GraphicsOptions(), new TextOptions
-        {
-            DpiX = 1200,
-            DpiY = 1200,
-            HorizontalAlignment = HorizontalAlignment.Right
-        });
-
         private static readonly Point PlacementPos = new(540, 900);
         private static readonly Point UsernamePos = new(55, 485);
         private static readonly Point XpPos = new(187, 1065);
