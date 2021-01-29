@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using DSharpPlus;
+using DSharpPlus.Entities;
 using GarbageCan.Data;
 using GarbageCan.Data.Entities.Boosters;
 using GarbageCan.Data.Models.Boosters;
@@ -15,6 +17,10 @@ namespace GarbageCan.XP.Boosters
 {
     public class BoosterManager : IFeature
     {
+        public static ReadOnlyCollection<ActiveBooster> activeBoosters => ActiveBoosters.AsReadOnly();
+        public static ReadOnlyCollection<QueuedBooster> queuedBoosters => _queuedBoosters.ToList().AsReadOnly();
+        public static ReadOnlyCollection<AvailableSlot> availableSlots => _availableSlots.AsReadOnly();
+
         private static List<AvailableSlot> _availableSlots;
         private static readonly List<ActiveBooster> ActiveBoosters = new();
         private static Queue<QueuedBooster> _queuedBoosters;
@@ -107,6 +113,37 @@ namespace GarbageCan.XP.Boosters
 
             ActivateBooster(multiplier, duration, slot);
             return BoosterResult.Active;
+        }
+
+        public static void AddSlot(DiscordChannel channel)
+        {
+            Task.Run(async () =>
+            {
+                await using var context = new Context();
+                var slot = new EntityAvailableSlot
+                {
+                    channelId = channel.Id
+                };
+                context.xpAvailableSlots.Add(slot);
+                await context.SaveChangesAsync();
+                
+                _availableSlots.Add(new AvailableSlot
+                {
+                    id = slot.id,
+                    channelId = slot.channelId
+                });
+            });
+        }
+
+        public static void RemoveSlot(int id)
+        {
+            _availableSlots.Remove(_availableSlots.FirstOrDefault(s => s.id == id));
+
+            Task.Run(async () =>
+            {
+                await using var context = new Context();
+                await context.xpAvailableSlots.Where(s => s.id == id).DeleteAsync();
+            });
         }
 
         private static void Ready()
@@ -248,16 +285,17 @@ namespace GarbageCan.XP.Boosters
 
                 ActiveBoosters.Add(booster);
 
-                using (var context = new Context())
+                Task.Run(async () =>
                 {
+                    await using var context = new Context();
                     context.xpActiveBoosters.Add(new EntityActiveBooster
                     {
                         expirationDate = booster.expirationDate,
                         multipler = booster.multiplier,
                         slot = context.xpAvailableSlots.Find(booster.slot.id)
                     });
-                    context.SaveChanges();
-                }
+                    await context.SaveChangesAsync();
+                });
 
                 Task.Run(async () =>
                 {
