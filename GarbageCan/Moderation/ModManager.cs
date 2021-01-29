@@ -65,7 +65,7 @@ namespace GarbageCan.Moderation
             }
             catch (Exception e)
             {
-                Serilog.Log.Error(e.ToString());
+                Serilog.Log.Error(e, "Couldn't log action");
                 logEntry = null;
             }
         }
@@ -90,7 +90,7 @@ namespace GarbageCan.Moderation
             }
             catch (Exception e)
             {
-                Serilog.Log.Error(e.ToString());
+                Serilog.Log.Error(e, "Couldn't log action");
             }
         }
 
@@ -119,7 +119,7 @@ namespace GarbageCan.Moderation
                 }
                 catch (Exception e)
                 {
-                    Serilog.Log.Error(e.ToString());
+                    Serilog.Log.Error(e, "Couldn't mute member");
                 }
             });
         }
@@ -152,7 +152,7 @@ namespace GarbageCan.Moderation
                 }
                 catch (Exception e)
                 {
-                    Serilog.Log.Error(e.ToString());
+                    Serilog.Log.Error(e, "Couldn't restrict channel");
                 }
             });
         }
@@ -183,7 +183,7 @@ namespace GarbageCan.Moderation
                 }
                 catch (Exception e)
                 {
-                    Serilog.Log.Information(e.ToString());
+                    Serilog.Log.Information(e, "Couldn't unmute user");
                 }
             });
 
@@ -215,7 +215,7 @@ namespace GarbageCan.Moderation
                 }
                 catch (Exception e)
                 {
-                    Serilog.Log.Error(e.ToString());
+                    Serilog.Log.Error(e, "Couldn't un-restrict channel");
                 }
             });
         }

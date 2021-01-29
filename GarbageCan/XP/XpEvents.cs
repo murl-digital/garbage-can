@@ -13,7 +13,7 @@ namespace GarbageCan.XP
         public void Init(DiscordClient client)
         {
             XpManager.LevelUp += OnLevelUp;
-            XpManager.GhostLevelUp += (sender, args) =>
+            XpManager.GhostLevelUp += (_, args) =>
             {
                 if (args.lvl < 10 || args.lvl % 5 != 0) return;
                 using var context = new Context();
@@ -55,7 +55,7 @@ namespace GarbageCan.XP
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(ex.ToString());
+                    Log.Error(ex, "Level up couldn't be handled");
                 }
             });
         }

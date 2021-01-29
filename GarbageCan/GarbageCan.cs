@@ -9,6 +9,7 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Exceptions;
 
 namespace GarbageCan
 {
@@ -23,11 +24,12 @@ namespace GarbageCan
         private static List<IFeature> _botFeatures;
         private static bool _shutdown;
 
-        private static void Main(string[] args)
+        private static void Main()
         {
             Task.Run(async () =>
             {
                 Log.Logger = new LoggerConfiguration()
+                    .Enrich.WithExceptionDetails()
                     .WriteTo.Console()
                     .CreateLogger();
 
@@ -52,14 +54,14 @@ namespace GarbageCan
 
                 foreach (var feature in _botFeatures)
                 {
-                    Log.Information("Feature " + feature.GetType().Name + " found, attempting to initialize...");
+                    Log.Information("Feature {Name} found, attempting to initialize...", feature.GetType().Name);
                     try
                     {
                         feature.Init(Client);
                     }
                     catch (Exception e)
                     {
-                        Log.Error(e.ToString());
+                        Log.Error(e, "A feature failed to initialize");
                         Environment.Exit(1);
                     }
                     Log.Information("Success!");
@@ -100,12 +102,16 @@ namespace GarbageCan
             if (Config == null) throw new NullReferenceException("Attempted to build config, but got null");
         }
 
-        private static void Shutdown(object? sender, EventArgs eventArgs)
+        private static void Shutdown(object sender, EventArgs eventArgs)
         {
             if (_shutdown || Environment.ExitCode > 0) return;
             Log.Information("Shutting down...");
 
-            foreach (var feature in _botFeatures) feature.Cleanup();
+            foreach (var feature in _botFeatures)
+            {
+                Log.Information("Cleaning up {Name}...", feature.GetType().Name);
+                feature.Cleanup();
+            }
             Client.UpdateStatusAsync(null, UserStatus.Offline).GetAwaiter().GetResult();
             Client.Dispose();
 

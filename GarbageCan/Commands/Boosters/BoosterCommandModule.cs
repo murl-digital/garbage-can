@@ -63,7 +63,7 @@ namespace GarbageCan.Commands.Boosters
             }
             catch (Exception e)
             {
-                Log.Error(e.ToString());
+                Log.Error(e, "Couldn't use booster");
                 await ctx.RespondAsync("An error occured");
             }
         }
@@ -104,7 +104,7 @@ namespace GarbageCan.Commands.Boosters
             }
             catch (Exception e)
             {
-                Log.Error(e.ToString());
+                Log.Error(e, "Couldn't add booster");
                 await ctx.RespondAsync("An error occured");
             }
         }
@@ -127,7 +127,7 @@ namespace GarbageCan.Commands.Boosters
             }
             catch (Exception e)
             {
-                Log.Error(e.ToString());
+                Log.Error(e, "Couldn't give booster");
                 await ctx.RespondAsync("An error occured");
             }
         }
@@ -149,7 +149,7 @@ namespace GarbageCan.Commands.Boosters
             }
             catch (Exception e)
             {
-                Log.Error(e.ToString());
+                Log.Error(e, "Couldn't generate boosters string");
                 throw;
             }
         }

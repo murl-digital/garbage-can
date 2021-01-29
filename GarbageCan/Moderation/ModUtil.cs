@@ -45,7 +45,7 @@ namespace GarbageCan.Moderation
             }
             catch (Exception e)
             {
-                Log.Error(e.ToString());
+                Log.Error(e, "Couldn't send message");
             }
         }
     }

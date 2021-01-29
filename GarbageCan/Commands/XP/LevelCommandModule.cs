@@ -82,9 +82,17 @@ namespace GarbageCan.Commands.XP
         {
             Task.Run(async () =>
             {
-                await ctx.Channel.TriggerTypingAsync();
-                var img = await GenerateImage(ctx.Member);
-                await ctx.Channel.SendFileAsync("rank.png", img);
+                try
+                {
+                    await ctx.Channel.TriggerTypingAsync();
+                    var img = await GenerateImage(ctx.Member);
+                    await ctx.Channel.SendFileAsync("rank.png", img);
+                }
+                catch (Exception e)
+                {
+                    Log.Error(e, "LevelCommand failed");
+                    await ctx.RespondAsync("there was a problem");
+                }
             });
 
             return Task.CompletedTask;
@@ -95,9 +103,17 @@ namespace GarbageCan.Commands.XP
         {
             Task.Run(async () =>
             {
-                await ctx.Channel.TriggerTypingAsync();
-                var img = await GenerateImage(member);
-                await ctx.Channel.SendFileAsync("rank.png", img);
+                try
+                {
+                    await ctx.Channel.TriggerTypingAsync();
+                    var img = await GenerateImage(member);
+                    await ctx.Channel.SendFileAsync("rank.png", img);
+                }
+                catch (Exception e)
+                {
+                    Log.Error(e, "LevelCommand failed");
+                    await ctx.RespondAsync("there was a problem");
+                }
             });
 
             return Task.CompletedTask;

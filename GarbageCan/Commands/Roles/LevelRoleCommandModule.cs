@@ -35,7 +35,7 @@ namespace GarbageCan.Commands.Roles
             }
             catch (Exception e)
             {
-                Log.Error(e.ToString());
+                Log.Error(e, "Couldn't add level role");
                 ctx.RespondAsync("An error occured");
             }
             
@@ -54,7 +54,7 @@ namespace GarbageCan.Commands.Roles
             }
             catch (Exception e)
             {
-                Log.Error(e.ToString());
+                Log.Error(e, "Couldn't remove level role");
                 await ctx.RespondAsync("An error occured");
             }
         }
@@ -77,7 +77,7 @@ namespace GarbageCan.Commands.Roles
             }
             catch (Exception e)
             {
-                Log.Error(e.ToString());
+                Log.Error(e, "Couldn't list level roles");
                 await ctx.RespondAsync("An error occured");
             }
         }

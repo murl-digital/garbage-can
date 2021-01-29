@@ -9,7 +9,6 @@ using DSharpPlus.Entities;
 using GarbageCan.Data;
 using GarbageCan.Data.Entities.Roles;
 using GarbageCan.Roles;
-using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Z.EntityFramework.Plus;
 
@@ -38,7 +37,7 @@ namespace GarbageCan.Commands.Roles
             }
             catch (Exception e)
             {
-                Log.Error(e.ToString());
+                Log.Error(e, "Couldn't add reaction role");
                 await ctx.RespondAsync("An error occured");
             }
         }
@@ -55,7 +54,7 @@ namespace GarbageCan.Commands.Roles
             }
             catch (Exception e)
             {
-                Log.Error(e.ToString());
+                Log.Error(e, "Couldn't remove reaction role");
                 await ctx.RespondAsync("An error occured");
             }
         }
@@ -78,7 +77,7 @@ namespace GarbageCan.Commands.Roles
             }
             catch (Exception e)
             {
-                Log.Error(e.ToString());
+                Log.Error(e, "Couldn't list reaction roles");
                 await ctx.RespondAsync("An error occured");
             }
         }

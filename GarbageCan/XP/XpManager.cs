@@ -55,7 +55,7 @@ namespace GarbageCan.XP
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(ex.ToString());
+                    Log.Error(ex, "A user join couldn't be handled");
                 }
             });
 
@@ -68,12 +68,12 @@ namespace GarbageCan.XP
                 e.Message.Content.StartsWith(GarbageCan.Config.commandPrefix) || IsExcluded(e.Channel.Id))
                 return Task.CompletedTask;
 
-            AddXp(e.Author.Id, XpEarned(e.Message.Content), sender, e);
+            AddXp(e.Author.Id, XpEarned(e.Message.Content), e);
 
             return Task.CompletedTask;
         }
 
-        private void AddXp(ulong id, double amount, DiscordClient sender, MessageCreateEventArgs e)
+        private void AddXp(ulong id, double amount, MessageCreateEventArgs e)
         {
             Task.Run(async () =>
             {
@@ -124,9 +124,9 @@ namespace GarbageCan.XP
 
                     await context.SaveChangesAsync();
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    Log.Error(e.ToString());
+                    Log.Error(ex, "Couldn't add xp to user");
                 }
             });
         }
@@ -148,12 +148,12 @@ namespace GarbageCan.XP
         }
 
         //the level argument here is a tad misleading- pass in any level as an integer to get the amount of xp a user needs to earn in order to advance to the next level
-        private static double XpRequired(int lvl)
+        public static double XpRequired(int lvl)
         {
             return Math.Round(250 + 75 * Math.Pow(lvl, 0.6), 1);
         }
 
-        private static double TotalXpRequired(int lvl)
+        public static double TotalXpRequired(int lvl)
         {
             var result = 0.0;
             for (var i = 0; i <= lvl; i++) result += XpRequired(i);

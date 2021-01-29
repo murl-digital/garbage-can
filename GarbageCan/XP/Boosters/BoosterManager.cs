@@ -43,7 +43,7 @@ namespace GarbageCan.XP.Boosters
 
             client.GuildUpdated += (_, args) =>
             {
-                Log.Information(args.GuildAfter.PremiumSubscriptionCount.ToString());
+                Log.Information("{PremiumSubscriptionCount}", args.GuildAfter.PremiumSubscriptionCount);
 
                 if (args.GuildAfter.PremiumSubscriptionCount > args.GuildBefore.PremiumSubscriptionCount)
                     AddBooster(2.0f, new TimeSpan(0, 0, 90, 0), true);
@@ -145,7 +145,7 @@ namespace GarbageCan.XP.Boosters
             }
             catch (Exception e)
             {
-                Log.Error(e.ToString());
+                Log.Error(e, "Booster manager ready failed");
             }
         }
 
@@ -192,7 +192,7 @@ namespace GarbageCan.XP.Boosters
                             }
                             catch (Exception e)
                             {
-                                Log.Error(e.ToString());
+                                Log.Error(e, "Couldn't update channel name");
                             }
                         });
                     }
@@ -216,7 +216,7 @@ namespace GarbageCan.XP.Boosters
             }
             catch (Exception e)
             {
-                Log.Error(e.ToString());
+                Log.Error(e, "Couldn't execute BoosterManager cycle");
             }
         }
 
@@ -259,13 +259,13 @@ namespace GarbageCan.XP.Boosters
                     }
                     catch (Exception e)
                     {
-                        Log.Error(e.ToString());
+                        Log.Error(e, "Couldn't update channel name");
                     }
                 });
             }
             catch (Exception e)
             {
-                Log.Error(e.ToString());
+                Log.Error(e, "Couldn't activate booster");
             }
         }
 
@@ -298,7 +298,7 @@ namespace GarbageCan.XP.Boosters
                 }
                 catch (Exception e)
                 {
-                    Log.Error(e.ToString());
+                    Log.Error(e, "Queue couldn't be saved");
                 }
             });
         }

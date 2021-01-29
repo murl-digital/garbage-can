@@ -35,7 +35,6 @@ namespace GarbageCan.Roles
                             r.emoteId == EmoteId(args.Emoji))
                         .ForEachAsync(async r =>
                         {
-                            Log.Information(EmoteId(args.Emoji));
                             try
                             {
                                 var role = args.Guild.GetRole(r.roleId);
@@ -44,13 +43,13 @@ namespace GarbageCan.Roles
                             }
                             catch (Exception e)
                             {
-                                Log.Error(e.ToString()); 
+                                Log.Error(e, "Couldn't assign reaction role"); 
                             }
                         });
                 }
                 catch (Exception e)
                 {
-                    Log.Error(e.ToString());
+                    Log.Error(e, "uh oh");
                 }
             });
 
@@ -81,13 +80,13 @@ namespace GarbageCan.Roles
                             }
                             catch (Exception e)
                             {
-                                Log.Error(e.ToString());
+                                Log.Error(e, "Couldn't remove reaction role");
                             }
                         });
                 }
                 catch (Exception e)
                 {
-                    Log.Error(e.ToString());
+                    Log.Error(e, "uh oh");
                 }
             });
 
@@ -96,7 +95,6 @@ namespace GarbageCan.Roles
 
         public void Cleanup()
         {
-            //throw new System.NotImplementedException();
         }
 
         private static void PlaceholderName(object sender, XpEventArgs args)
@@ -121,7 +119,7 @@ namespace GarbageCan.Roles
                 }
                 catch (Exception e)
                 {
-                    Log.Error(e.ToString());
+                    Log.Error(e, "Level roles failed");
                 }
             });
         }
