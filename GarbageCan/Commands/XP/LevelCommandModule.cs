@@ -4,10 +4,13 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using GarbageCan.Data;
+using GarbageCan.Data.Entities.XP;
+using GarbageCan.XP;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using SixLabors.Fonts;
@@ -19,34 +22,65 @@ using SixLabors.ImageSharp.Processing;
 
 namespace GarbageCan.Commands.XP
 {
-    public class LevelCommandModule : BaseCommandModule
+    public class LevelCommandModule : BaseCommandModule, IFeature
     {
-        private Font _font;
+        private const int BarDifference = 1199;
+        private static Font _font;
+        private static Font _fontBold;
+        private static Font _fontSmall;
+        private static Stream _templateFile;
 
-        public override Task BeforeExecutionAsync(CommandContext ctx)
+        private static readonly Point IconPos = new(63, 67);
+        private static readonly Point LvlPos = new(60, 900);
+
+        private static readonly TextGraphicsOptions Options = new(new GraphicsOptions(), new TextOptions
         {
-            try
-            {
-                if (_font == null)
-                {
-                    var fontFile = Assembly.GetExecutingAssembly()
-                        .GetManifestResourceStream("GarbageCan.Assets.LvlCommandFont.ttf");
+            DpiX = 1200,
+            DpiY = 1200
+        });
 
-                    if (fontFile == null)
-                        throw new ApplicationException("Asset GarbageCan.Assets.LvlCommandFont.ttf is missing");
+        private static readonly TextGraphicsOptions OptionsRight = new(new GraphicsOptions(), new TextOptions
+        {
+            DpiX = 1200,
+            DpiY = 1200,
+            HorizontalAlignment = HorizontalAlignment.Right
+        });
 
-                    var collection = new FontCollection();
-                    var family =
-                        collection.Install(fontFile);
-                    _font = family.CreateFont(107, FontStyle.Bold);
-                }
-            }
-            catch (Exception e)
-            {
-                Log.Error(e.ToString());
-            }
+        private static readonly Point PlacementPos = new(540, 900);
+        private static readonly Point UsernamePos = new(55, 485);
+        private static readonly Point XpPos = new(187, 1065);
 
-            return Task.CompletedTask;
+        private static readonly Color Primary = Color.Parse("FCFFFD");
+        private static readonly Color Secondary = Color.Parse("B1B3B1");
+        private static readonly Color BarColor = Color.Parse("33FE6B");
+
+        public void Init(DiscordClient client)
+        {
+            var fontFile = Assembly.GetExecutingAssembly()
+                .GetManifestResourceStream("GarbageCan.Assets.LvlCommandFont.ttf");
+            var boldFontFile = Assembly.GetExecutingAssembly()
+                .GetManifestResourceStream("GarbageCan.Assets.LvlCommandFontBold.ttf");
+
+            if (fontFile == null)
+                throw new ApplicationException("Asset GarbageCan.Assets.LvlCommandFont.ttf is missing");
+            if (boldFontFile == null)
+                throw new ApplicationException("Asset GarbageCan.Assets.LvlCommandFontBold.ttf is missing");
+
+            var collection = new FontCollection();
+            _font = collection.Install(fontFile).CreateFont(6.5f, FontStyle.Regular);
+            var boldFamily = collection.Install(boldFontFile);
+            _fontBold = boldFamily.CreateFont(5.5f, FontStyle.Bold);
+            _fontSmall = boldFamily.CreateFont(4.0f, FontStyle.Bold);
+
+            _templateFile = Assembly.GetExecutingAssembly()
+                .GetManifestResourceStream("GarbageCan.Assets.LvlCommandTemplate.png");
+
+            if (_templateFile == null)
+                throw new ApplicationException("Asset GarbageCan.Assets.LvlCommandTemplate.png is missing");
+        }
+
+        public void Cleanup()
+        {
         }
 
         [Command("level")]
@@ -76,43 +110,77 @@ namespace GarbageCan.Commands.XP
             return Task.CompletedTask;
         }
 
-        public async Task<Stream> GenerateImage(DiscordMember discordMember)
+        private static async Task<Stream> GenerateImage(DiscordMember discordMember)
         {
-            using var context = new Context();
-            var user = await context.xpUsers.FirstAsync(u => u.id == discordMember.Id);
-            var users = context.xpUsers.ToList();
-            users.Sort((a, b) => a.xp.CompareTo(b.xp));
-            var placement = users.FindIndex(u => u.id == user.id) + 1;
+            EntityUser user;
+            int placement;
+            await using (var context = new Context())
+            {
+                user = await context.xpUsers.FirstAsync(u => u.id == discordMember.Id);
+                placement = context.xpUsers
+                    .OrderBy(u => u.xp)
+                    .Select(u => u.id)
+                    .ToList()
+                    .FindIndex(u => u == user.id) + 1;
+            }
 
-            var iconPos = new Point(63, 67);
-            var usernamePos = new Point(55, 474);
-            var lvlPos = new Point(59, 942 - 28);
-            var xpPos = new Point(190, 1088 - 28);
-            var placementPos = new Point(538, 940 - 28);
+            var currentXp = user.xp - XpManager.TotalXpRequired(user.lvl - 1);
+            var required = XpManager.TotalXpRequired(user.lvl);
+            var progress = currentXp / XpManager.XpRequired(user.lvl);
+
+            var test = (float) (20 + BarDifference * progress);
+
+            var barPoints = new[]
+            {
+                new PointF(20, 1229),
+                new PointF(20, 1258),
+                new PointF(Math.Clamp(test, 20, 1190), 1258),
+                new PointF(test, 1229)
+            };
 
             var result = new MemoryStream();
 
-            var templateFile = Assembly.GetExecutingAssembly()
-                .GetManifestResourceStream("GarbageCan.Assets.LvlCommandTemplate.png");
+            using var image = await Image.LoadAsync(_templateFile);
+            using (var icon = await Image.LoadAsync(new WebClient().OpenRead(discordMember.AvatarUrl)))
+            {
+                icon.Mutate(i => i.ConvertToAvatar(new Size(401, 401), 200));
+                image.Mutate(i => i.DrawImage(icon, IconPos, 1f));
+            }
 
-            if (templateFile == null)
-                throw new ApplicationException("Asset GarbageCan.Assets.LvlCommandTemplate.png is missing");
+            var glyphs = TextBuilder.GenerateGlyphs(discordMember.DisplayName, UsernamePos,
+                new RendererOptions(_fontBold, 1200));
 
-            using var icon = await Image.LoadAsync(new WebClient().OpenRead(discordMember.AvatarUrl));
-            using var image = await Image.LoadAsync(templateFile);
+            var widthScale = 763 / glyphs.Bounds.Width;
+            var heightScale = 66 / glyphs.Bounds.Height;
+            var minScale = Math.Min(widthScale, heightScale);
+            glyphs = glyphs.Scale(minScale);
+            glyphs = glyphs.Translate(-(glyphs.Bounds.X - UsernamePos.X), 0);
 
-            icon.Mutate(i => i.ConvertToAvatar(new Size(401, 401), 200));
+            var discPos = new Point((int) (glyphs.Bounds.Right + 29), 515);
 
-            image.Mutate(i => i.DrawImage(icon, iconPos, 1f));
+            image.Mutate(i => i.Fill(Primary, glyphs));
+            image.Mutate(i => i.DrawText(Options, $"#{discordMember.Discriminator}", _fontSmall, Secondary, discPos));
 
-            image.Mutate(i => i.DrawText(discordMember.DisplayName, _font, Color.Black, usernamePos));
+            image.Mutate(i => i.DrawText(Options, user.lvl.ToString("D"), _font, Primary, LvlPos));
+            image.Mutate(i => i.DrawText(Options, placement.ToString("D"), _font, Primary, PlacementPos));
 
-            image.Mutate(i => i.DrawText($"{user.lvl}", _font, Color.Black, lvlPos));
-            image.Mutate(i => i.DrawText(user.xp.ToString("N1"), _font, Color.Black, xpPos));
-            image.Mutate(i => i.DrawText($"{placement}", _font, Color.Black, placementPos));
+            image.Mutate(i => i.DrawText(Options, $"{user.xp:N0}/{required:N0}", _font, Primary, XpPos));
+
+            var path = new PathBuilder()
+                .AddLine(barPoints[0], barPoints[1])
+                .AddLine(barPoints[1], barPoints[2])
+                .AddLine(barPoints[2], barPoints[3])
+                .AddLine(barPoints[3], barPoints[0])
+                .Build();
+
+            image.Mutate(i => i.Fill(BarColor, path));
+
+            var (width, height) = image.Size();
+            image.Mutate(i => i.Resize(width / 2, height / 2));
 
             await image.SaveAsPngAsync(result);
             result.Seek(0, SeekOrigin.Begin);
+            _templateFile.Seek(0, SeekOrigin.Begin);
 
             return result;
         }

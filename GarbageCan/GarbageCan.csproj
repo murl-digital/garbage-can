@@ -35,6 +35,7 @@
 
     <ItemGroup>
       <EmbeddedResource Include="Assets\LvlCommandFont.ttf" />
+        <EmbeddedResource Include="Assets\LvlCommandFontBold.ttf" />
       <EmbeddedResource Include="Assets\LvlCommandTemplate.png" />
     </ItemGroup>
 
