@@ -18,6 +18,8 @@ namespace GarbageCan.XP.Boosters
         private static List<AvailableSlot> _availableSlots;
         private static readonly List<ActiveBooster> ActiveBoosters = new();
         private static Queue<QueuedBooster> _queuedBoosters;
+        
+        private static int _nitroBoosterCount;
 
         private static readonly Timer BoosterTimer = new(5000);
 
@@ -41,12 +43,19 @@ namespace GarbageCan.XP.Boosters
                 return Task.CompletedTask;
             };
 
+            client.GuildDownloadCompleted += (_, args) =>
+            {
+                _nitroBoosterCount = args.Guilds.First().Value.PremiumSubscriptionCount ?? _nitroBoosterCount;
+                
+                return Task.CompletedTask;
+            };
+
             client.GuildUpdated += (_, args) =>
             {
-                Log.Information("{PremiumSubscriptionCount}", args.GuildAfter.PremiumSubscriptionCount);
-
-                if (args.GuildAfter.PremiumSubscriptionCount > args.GuildBefore.PremiumSubscriptionCount)
+                if (args.GuildAfter.PremiumSubscriptionCount > _nitroBoosterCount)
                     AddBooster(2.0f, new TimeSpan(0, 0, 90, 0), true);
+
+                _nitroBoosterCount = args.GuildAfter.PremiumSubscriptionCount ?? _nitroBoosterCount;
 
                 return Task.CompletedTask;
             };
