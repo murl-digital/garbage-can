@@ -206,22 +206,23 @@ namespace GarbageCan.Roles
 
         private static void HandleLevelRoles(object sender, XpEventArgs args)
         {
-            Task.Run(() =>
+            Task.Run(async () =>
             {
                 try
                 {
                     var lvlArgs = (LevelUpArgs) args;
-                    using var context = new Context();
-                    context.levelRoles.Where(r => r.lvl == lvlArgs.oldLvl).ForEachAsync(r =>
+                    await using var context = new Context();
+                    await context.levelRoles.Where(r => r.lvl == lvlArgs.oldLvl && !r.remain).ForEachAsync(async r =>
                     {
-                        if (r.remain) return;
                         var role = args.context.Guild.GetRole(r.roleId);
-                        args.context.Guild.GetMemberAsync(args.id).ContinueWith(t => t.Result.RevokeRoleAsync(role));
+                        var member = await args.context.Guild.GetMemberAsync(args.id);
+                        await member.RevokeRoleAsync(role);
                     });
-                    context.levelRoles.Where(r => r.lvl == lvlArgs.lvl).ForEachAsync(r =>
+                    await context.levelRoles.Where(r => r.lvl == lvlArgs.lvl).ForEachAsync(async r =>
                     {
                         var role = args.context.Guild.GetRole(r.roleId);
-                        args.context.Guild.GetMemberAsync(args.id).ContinueWith(t => t.Result.GrantRoleAsync(role));
+                        var member = await args.context.Guild.GetMemberAsync(args.id);
+                        await member.GrantRoleAsync(role);
                     });
                 }
                 catch (Exception e)
