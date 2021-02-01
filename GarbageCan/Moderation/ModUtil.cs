@@ -10,7 +10,7 @@ namespace GarbageCan.Moderation
     {
         public static async void SendMessage(ulong uId, string message)
         {
-            var member = await GarbageCan.Client.Guilds[GarbageCan.Config.operatingGuildId].GetMemberAsync(uId);
+            var member = await GarbageCan.Client.Guilds[ModManager.operatingGuildId].GetMemberAsync(uId);
             try
             {
                 try

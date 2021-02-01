@@ -1,4 +1,5 @@
 ﻿using GarbageCan.Data.Entities.Boosters;
+using GarbageCan.Data.Entities.Config;
 using GarbageCan.Data.Entities.Moderation;
 using GarbageCan.Data.Entities.Roles;
 using GarbageCan.Data.Entities.XP;
@@ -9,6 +10,9 @@ namespace GarbageCan.Data
     public class Context : DbContext
     {
         private string _connectionString;
+        
+        public DbSet<EntityConfig> config { get; set; }
+        
         public DbSet<EntityUser> xpUsers { get; set; }
         public DbSet<EntityExcludedChannel> xpExcludedChannels { get; set; }
         public DbSet<EntityQueuedBooster> xpQueuedBoosters { get; set; }
