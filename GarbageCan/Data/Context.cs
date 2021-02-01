@@ -22,6 +22,7 @@ namespace GarbageCan.Data
         
         public DbSet<EntityJoinRole> joinRoles { get; set; }
         public DbSet<EntityReactionRole> reactionRoles { get; set; }
+        public DbSet<EntityConditionalRole> conditionalRoles { get; set; }
         public DbSet<EntityLevelRole> levelRoles { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
