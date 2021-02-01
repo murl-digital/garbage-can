@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GarbageCan.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20210201032030_ConiditionalRoles")]
+    [Migration("20210201050107_ConiditionalRoles")]
     partial class ConiditionalRoles
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -154,11 +154,11 @@ namespace GarbageCan.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<string>("internalRequiredRoleIds")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
-
                     b.Property<bool>("remain")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<ulong>("requiredRoleId")
+                        .HasColumnType("bigint unsigned");
 
                     b.Property<ulong>("resultRoleId")
                         .HasColumnType("bigint unsigned");

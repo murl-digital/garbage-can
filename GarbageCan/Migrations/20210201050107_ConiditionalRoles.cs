@@ -13,7 +13,7 @@ namespace GarbageCan.Migrations
                 {
                     id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    internalRequiredRoleIds = table.Column<string>(type: "longtext CHARACTER SET utf8mb4", nullable: true),
+                    requiredRoleId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
                     resultRoleId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
                     remain = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },

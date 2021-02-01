@@ -152,11 +152,11 @@ namespace GarbageCan.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<string>("internalRequiredRoleIds")
-                        .HasColumnType("longtext CHARACTER SET utf8mb4");
-
                     b.Property<bool>("remain")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<ulong>("requiredRoleId")
+                        .HasColumnType("bigint unsigned");
 
                     b.Property<ulong>("resultRoleId")
                         .HasColumnType("bigint unsigned");
