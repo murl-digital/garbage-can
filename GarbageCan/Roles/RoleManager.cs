@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DSharpPlus;
@@ -13,11 +14,54 @@ namespace GarbageCan.Roles
 {
     public class RoleManager : IFeature
     {
+        private readonly List<ulong> _watchedUsers = new();
         public void Init(DiscordClient client)
         {
             XpManager.GhostLevelUp += HandleLevelRoles;
             client.MessageReactionAdded += ReactionAdded;
             client.MessageReactionRemoved += ReactionRemoved;
+
+            client.GuildMemberAdded += (_, args) =>
+            {
+                _watchedUsers.Add(args.Member.Id);
+                return Task.CompletedTask;
+            }; 
+            client.GuildMemberUpdated += HandleJoinRoles;
+        }
+
+        private Task HandleJoinRoles(DiscordClient sender, GuildMemberUpdateEventArgs e)
+        {
+            try
+            {
+                if (!_watchedUsers.Contains(e.Member.Id)) return Task.CompletedTask;
+                if (e.Member.IsPending ?? true) return Task.CompletedTask;
+                _watchedUsers.Remove(e.Member.Id);
+
+                Task.Run(async () =>
+                {
+                    await using var context = new Context();
+
+                    await context.joinRoles.ForEachAsync(async r =>
+                    {
+                        try
+                        {
+                            var role = e.Guild.GetRole(r.roleId);
+                            await e.Member.GrantRoleAsync(role, "join role");
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Error(e, "couldn't grant role to user");
+                        }
+                    });
+                });
+
+                return Task.CompletedTask;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Something went wrong");
+                return Task.CompletedTask;
+            }
         }
 
         #region reaction roles
