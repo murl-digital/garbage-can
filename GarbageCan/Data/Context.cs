@@ -11,7 +11,6 @@ namespace GarbageCan.Data
         private string _connectionString;
         public DbSet<EntityUser> xpUsers { get; set; }
         public DbSet<EntityExcludedChannel> xpExcludedChannels { get; set; }
-        public DbSet<EntityLevelRole> xpLevelRoles { get; set; }
         public DbSet<EntityQueuedBooster> xpQueuedBoosters { get; set; }
         public DbSet<EntityAvailableSlot> xpAvailableSlots { get; set; }
         public DbSet<EntityActiveBooster> xpActiveBoosters { get; set; }
@@ -22,6 +21,7 @@ namespace GarbageCan.Data
         public DbSet<EntityActiveChannelRestrict> moderationActiveChannelRestricts { get; set; }
         
         public DbSet<EntityReactionRole> reactionRoles { get; set; }
+        public DbSet<EntityLevelRole> levelRoles { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

@@ -24,7 +24,7 @@ namespace GarbageCan.Commands.Roles
             try
             {
                 using var context = new Context();
-                context.xpLevelRoles.Add(new EntityLevelRole
+                context.levelRoles.Add(new EntityLevelRole
                 {
                     lvl = lvl,
                     roleId = role.Id,
@@ -49,7 +49,7 @@ namespace GarbageCan.Commands.Roles
             try
             {
                 using var context = new Context();
-                await context.xpLevelRoles.Where(r => r.id == id).DeleteAsync();
+                await context.levelRoles.Where(r => r.id == id).DeleteAsync();
                 await ctx.RespondAsync("Role removed successfully");
             }
             catch (Exception e)
@@ -67,7 +67,7 @@ namespace GarbageCan.Commands.Roles
             try
             {
                 using var context = new Context();
-                await context.xpLevelRoles
+                await context.levelRoles
                     .ForEachAsync(r =>
                     {
                         var role = ctx.Guild.GetRole(r.roleId);
