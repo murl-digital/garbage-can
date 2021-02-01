@@ -15,10 +15,12 @@ namespace GarbageCan.Roles
     {
         public void Init(DiscordClient client)
         {
-            XpManager.GhostLevelUp += PlaceholderName;
+            XpManager.GhostLevelUp += HandleLevelRoles;
             client.MessageReactionAdded += ReactionAdded;
             client.MessageReactionRemoved += ReactionRemoved;
         }
+
+        #region reaction roles
 
         private static Task ReactionAdded(DiscordClient sender, MessageReactionAddEventArgs args)
         {
@@ -93,11 +95,15 @@ namespace GarbageCan.Roles
             return Task.CompletedTask;
         }
 
+        #endregion
+
         public void Cleanup()
         {
         }
 
-        private static void PlaceholderName(object sender, XpEventArgs args)
+        #region level roles
+
+        private static void HandleLevelRoles(object sender, XpEventArgs args)
         {
             Task.Run(() =>
             {
@@ -123,6 +129,8 @@ namespace GarbageCan.Roles
                 }
             });
         }
+
+        #endregion
 
         public static string EmoteId(DiscordEmoji emote) => emote.Id == 0 ? emote.Name : emote.Id.ToString();
 
