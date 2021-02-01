@@ -20,6 +20,7 @@ namespace GarbageCan.Data
         public DbSet<EntityActiveMute> moderationActiveMutes { get; set; }
         public DbSet<EntityActiveChannelRestrict> moderationActiveChannelRestricts { get; set; }
         
+        public DbSet<EntityJoinRole> joinRoles { get; set; }
         public DbSet<EntityReactionRole> reactionRoles { get; set; }
         public DbSet<EntityLevelRole> levelRoles { get; set; }
 
