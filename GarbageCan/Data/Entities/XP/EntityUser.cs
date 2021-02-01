@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GarbageCan.Data.Entities.XP
 {
-    [Table("xpUsers")]
     public class EntityUser
     {
         private double _xp;

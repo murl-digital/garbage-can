@@ -1,9 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GarbageCan.Data.Entities.Roles
 {
-    [Table("reactionRoles")]
     public class EntityReactionRole
     {
         [Key] public int id { get; set; }

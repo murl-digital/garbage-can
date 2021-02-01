@@ -5,7 +5,6 @@ using GarbageCan.Moderation;
 
 namespace GarbageCan.Data.Entities.Moderation
 {
-    [Table("moderationActionLogs")]
     public class EntityActionLog
     {
         [Key] public int id { get; set; }

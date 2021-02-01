@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GarbageCan.Data.Entities.Boosters
 {
-    [Table("xpActiveBoosters")]
     public class EntityActiveBooster
     {
         [ForeignKey("id")] [Key] public virtual EntityAvailableSlot slot { get; set; } = new();

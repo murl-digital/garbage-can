@@ -1,9 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GarbageCan.Data.Entities.Boosters
 {
-    [Table("xpUserBoosters")]
     public class EntityUserBooster
     {
         [Key] public int id { get; set; }
