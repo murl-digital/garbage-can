@@ -86,7 +86,7 @@ namespace GarbageCan.Commands.XP
                 {
                     await ctx.Channel.TriggerTypingAsync();
                     var img = await GenerateImage(ctx.Member);
-                    await ctx.Channel.SendFileAsync("rank.png", img);
+                    await ctx.RespondAsync(new DiscordMessageBuilder().WithFile("rank.png", img).WithReply(ctx.Message.Id, true));
                 }
                 catch (Exception e)
                 {
@@ -107,7 +107,7 @@ namespace GarbageCan.Commands.XP
                 {
                     await ctx.Channel.TriggerTypingAsync();
                     var img = await GenerateImage(member);
-                    await ctx.Channel.SendFileAsync("rank.png", img);
+                    await ctx.RespondAsync(new DiscordMessageBuilder().WithFile("rank.png", img).WithReply(ctx.Message.Id, true));
                 }
                 catch (Exception e)
                 {
