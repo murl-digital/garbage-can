@@ -27,12 +27,69 @@ namespace GarbageCan.Roles
                 return Task.CompletedTask;
             }; 
             client.GuildMemberUpdated += HandleJoinRoles;
+            client.GuildMemberUpdated += HandleConditionalRoles;
+        }
+
+        private static Task HandleConditionalRoles(DiscordClient sender, GuildMemberUpdateEventArgs e)
+        {
+            if (e.Member.IsBot) return Task.CompletedTask;
+            if (e.RolesBefore.Count == e.RolesAfter.Count) return Task.CompletedTask;
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await using var context = new Context();
+
+                    if (e.RolesBefore.Count < e.RolesAfter.Count)
+                    {
+                        var roles = e.RolesAfter.Except(e.RolesBefore);
+
+                        foreach (var role in roles)
+                        {
+                            if (!context.conditionalRoles.Any(r => r.requiredRoleId == role.Id)) continue;
+
+                            await context.conditionalRoles.Where(r => r.requiredRoleId == role.Id).ForEachAsync(r =>
+                            {
+                                var toBeAssigned = e.Guild.GetRole(r.resultRoleId);
+                                e.Member.GrantRoleAsync(toBeAssigned);
+                            });
+                        }
+                    }
+                
+                    if (e.RolesBefore.Count > e.RolesAfter.Count)
+                    {
+                        var roles = e.RolesBefore.Except(e.RolesAfter);
+
+                        foreach (var role in roles)
+                        {
+                            if (!context.conditionalRoles.Any(r => r.requiredRoleId == role.Id)) continue;
+                            if (context.conditionalRoles.Count(r =>
+                                r.resultRoleId == role.Id && e.RolesAfter.Select(d => d.Id).Contains(r.requiredRoleId)) > 1)
+                                continue;
+
+                            await context.conditionalRoles.Where(r => r.requiredRoleId == role.Id && !r.remain).ForEachAsync(r =>
+                            {
+                                var toBeRemoved = e.Guild.GetRole(r.resultRoleId);
+                                e.Member.RevokeRoleAsync(toBeRemoved);
+                            });
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "uh oh");
+                }
+            });
+            
+            return Task.CompletedTask;
         }
 
         private Task HandleJoinRoles(DiscordClient sender, GuildMemberUpdateEventArgs e)
         {
             try
             {
+                if (e.Member.IsBot) return Task.CompletedTask;
                 if (!_watchedUsers.Contains(e.Member.Id)) return Task.CompletedTask;
                 if (e.Member.IsPending ?? true) return Task.CompletedTask;
                 _watchedUsers.Remove(e.Member.Id);

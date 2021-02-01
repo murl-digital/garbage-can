@@ -43,7 +43,10 @@ namespace GarbageCan
                     Token = Config.token,
                     TokenType = TokenType.Bot,
                     LoggerFactory = logFactory,
-                    MinimumLogLevel = LogLevel.Debug
+                    MinimumLogLevel = LogLevel.Debug,
+                    // i dont know why but i need to do this for conditional roles to work
+                    // TODO: be more goddamn specific with these intents man
+                    Intents = DiscordIntents.All
                 });
 
                 Log.Information("Initializing features...");
