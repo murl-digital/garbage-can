@@ -127,12 +127,12 @@ namespace GarbageCan.Roles
         {
             if (args.User.IsBot) return Task.CompletedTask;
 
-            Task.Run(() =>
+            Task.Run(async () =>
             {
                 try
                 {
                     using var context = new Context();
-                    context.reactionRoles.Where(r =>
+                    await context.reactionRoles.Where(r =>
                             r.channelId == args.Channel.Id &&
                             r.messageId == args.Message.Id &&
                             r.emoteId == EmoteId(args.Emoji))
