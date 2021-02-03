@@ -46,14 +46,16 @@ namespace GarbageCan.Roles
                 try
                 {
                     using var context = new Context();
-                    await context.reactionRoles.Where(r =>
-                            r.channelId == args.Channel.Id &&
-                            r.messageId == args.Message.Id &&
-                            r.emoteId == EmoteId(args.Emoji))
-                        .ForEachAsync(async r =>
+                    await context.reactionRoles.ForEachAsync(async r =>
                         {
                             try
                             {
+                                // before you say "BUT JOE YOU CAN USE .WHERE() JOE" hear me out
+                                // i tried that. i really did. but for some reason it didnt work.
+                                // it would just say "hey all these rows satisfy the predicate!" ...even though they don't
+                                // conclusion: linq is a lie thank you for coming to my ted talk
+                                if (r.channelId != args.Channel.Id || r.messageId != args.Message.Id ||
+                                    r.emoteId != EmoteId(args.Emoji)) return;
                                 var role = args.Guild.GetRole(r.roleId);
                                 var member = await args.Guild.GetMemberAsync(args.User.Id);
                                 await member.GrantRoleAsync(role, "reaction role");
@@ -82,15 +84,12 @@ namespace GarbageCan.Roles
                 try
                 {
                     using var context = new Context();
-                    await context.reactionRoles
-                        .Where(r =>
-                            r.channelId == args.Channel.Id &&
-                            r.messageId == args.Message.Id &&
-                            r.emoteId == EmoteId(args.Emoji))
-                        .ForEachAsync(async r =>
+                    await context.reactionRoles.ForEachAsync(async r =>
                         {
                             try
                             {
+                                if (r.channelId != args.Channel.Id || r.messageId != args.Message.Id ||
+                                    r.emoteId != EmoteId(args.Emoji)) return;
                                 var role = args.Guild.GetRole(r.roleId);
                                 var member = await args.Guild.GetMemberAsync(args.User.Id);
                                 await member.RevokeRoleAsync(role, "reaction role");
