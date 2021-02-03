@@ -27,7 +27,6 @@ namespace GarbageCan.XP
 
         public void Cleanup()
         {
-            //nope
         }
 
         //LevelUp is fired once every time a user levels up (i.e from level 1 to 2, or from 5 to 10 (which can happen)

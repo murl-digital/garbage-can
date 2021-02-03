@@ -50,7 +50,6 @@ namespace GarbageCan.Moderation
 
         public void Cleanup()
         {
-            // unused
         }
 
         public static void Log(ulong uId, ulong mId, PunishmentLevel level, string comments, out ActionLog logEntry)
