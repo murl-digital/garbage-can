@@ -125,7 +125,21 @@ namespace GarbageCan.Commands.XP
             int placement;
             await using (var context = new Context())
             {
-                user = await context.xpUsers.FirstAsync(u => u.id == discordMember.Id);
+                try
+                {
+                    user = await context.xpUsers.FirstAsync(u => u.id == discordMember.Id);
+                }
+                catch (InvalidOperationException)
+                {
+                    user = new EntityUser
+                    {
+                        id = discordMember.Id,
+                        lvl = 0,
+                        xp = 0
+                    };
+                    context.Add(user);
+                    await context.SaveChangesAsync();
+                }
                 placement = context.xpUsers
                     .OrderBy(u => u.xp)
                     .Select(u => u.id)
