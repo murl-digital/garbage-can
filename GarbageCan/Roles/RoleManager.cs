@@ -151,18 +151,25 @@ namespace GarbageCan.Roles
                 try
                 {
                     var lvlArgs = (LevelUpArgs) args;
+                    var member = await args.context.Guild.GetMemberAsync(args.id);
+                    
                     await using var context = new Context();
-                    await context.levelRoles.Where(r => r.lvl == lvlArgs.oldLvl && !r.remain).ForEachAsync(
-                        async r =>
+                    var roles = context.levelRoles.OrderBy(r => r.lvl).Where(r => !r.remain).ToList();
+                    var index = 0;
+                    foreach (var r in roles)
+                    {
+                        if (r.lvl == lvlArgs.lvl && index > 0)
                         {
-                            var role = args.context.Guild.GetRole(r.roleId);
-                            var member = await args.context.Guild.GetMemberAsync(args.id);
+                            var role = args.context.Guild.GetRole(roles[index-1].roleId);
                             await member.RevokeRoleAsync(role);
-                        });
+                            break;
+                        }
+
+                        index++;
+                    }
                     await context.levelRoles.Where(r => r.lvl == lvlArgs.lvl).ForEachAsync(async r =>
                     {
                         var role = args.context.Guild.GetRole(r.roleId);
-                        var member = await args.context.Guild.GetMemberAsync(args.id);
                         await member.GrantRoleAsync(role);
                     });
                 }
