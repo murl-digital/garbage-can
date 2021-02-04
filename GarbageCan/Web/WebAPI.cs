@@ -6,7 +6,7 @@ using Serilog;
 
 namespace GarbageCan.Web
 {
-    public class Program : IFeature
+    public class WebAPI : IFeature
     {
         public IHost HostObj;
 
