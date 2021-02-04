@@ -115,7 +115,6 @@ namespace GarbageCan.Roles
             {
                 if (e.Member.IsBot) return Task.CompletedTask;
                 if (!_watchedUsers.Contains(e.Member.Id)) return Task.CompletedTask;
-                if (e.Member.IsPending ?? true) return Task.CompletedTask;
                 _watchedUsers.Remove(e.Member.Id);
 
                 Task.Run(async () =>
@@ -153,21 +152,19 @@ namespace GarbageCan.Roles
                 {
                     var lvlArgs = (LevelUpArgs) args;
                     await using var context = new Context();
-                    var removeRoles = context.levelRoles.Where(r => r.lvl == lvlArgs.oldLvl && !r.remain).ForEachAsync(
+                    await context.levelRoles.Where(r => r.lvl == lvlArgs.oldLvl && !r.remain).ForEachAsync(
                         async r =>
                         {
                             var role = args.context.Guild.GetRole(r.roleId);
                             var member = await args.context.Guild.GetMemberAsync(args.id);
                             await member.RevokeRoleAsync(role);
                         });
-                    var addRoles = context.levelRoles.Where(r => r.lvl == lvlArgs.lvl).ForEachAsync(async r =>
+                    await context.levelRoles.Where(r => r.lvl == lvlArgs.lvl).ForEachAsync(async r =>
                     {
                         var role = args.context.Guild.GetRole(r.roleId);
                         var member = await args.context.Guild.GetMemberAsync(args.id);
                         await member.GrantRoleAsync(role);
                     });
-
-                    await Task.WhenAll(removeRoles, addRoles);
                 }
                 catch (Exception e)
                 {
