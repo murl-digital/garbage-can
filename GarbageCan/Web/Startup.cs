@@ -2,6 +2,8 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
@@ -49,6 +51,16 @@ namespace GarbageCan.Web
             }
 
             //app.UseHttpsRedirection();
+            
+            var forwardedHeadersOptions = new ForwardedHeadersOptions {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            };
+            forwardedHeadersOptions.KnownNetworks.Clear();
+            forwardedHeadersOptions.KnownProxies.Clear();
+            app.UseForwardedHeaders(forwardedHeadersOptions);
+
+            var rewriteOptions = new RewriteOptions().AddRedirectToHttps(308);
+            app.UseRewriter(rewriteOptions);
 
             app.UseRouting();
             app.UseCors("gbc");
