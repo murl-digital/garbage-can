@@ -29,7 +29,6 @@ namespace GarbageCan.XP
 
         public void Cleanup()
         {
-            //nope
         }
 
         private static void OnLevelUp(object sender, LevelUpArgs e)

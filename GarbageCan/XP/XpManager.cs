@@ -15,14 +15,12 @@ namespace GarbageCan.XP
 {
     public class XpManager : IFeature
     {
-        private Normal _random;
+        private static readonly Normal Random = new(3, 7);
 
         public void Init(DiscordClient client)
         {
             client.MessageCreated += HandleMessage;
             client.GuildMemberAdded += HandleJoin;
-
-            _random = new Normal(0, 1);
         }
 
         public void Cleanup()
@@ -34,7 +32,7 @@ namespace GarbageCan.XP
         public static event EventHandler<LevelUpArgs> LevelUp;
         public static event EventHandler<XpEventArgs> GhostLevelUp;
 
-        private Task HandleJoin(DiscordClient sender, GuildMemberAddEventArgs e)
+        private static Task HandleJoin(DiscordClient sender, GuildMemberAddEventArgs e)
         {
             if (e.Member.IsBot)
                 return Task.CompletedTask;
@@ -137,12 +135,12 @@ namespace GarbageCan.XP
                 .Any(c => c.channelId == channelId);
         }
 
-        private double XpEarned(string message)
+        private static double XpEarned(string message)
         {
             var length = Math.Sqrt(message.Replace(" ", "").Length);
             length = Math.Min(10, length);
 
-            var test = length * (Math.Abs(_random.Sample()) * 0.5 + 1) * BoosterManager.GetMultiplier();
+            var test = length * (Math.Abs(Random.Sample()) * 0.5 + 1) * BoosterManager.GetMultiplier();
             return test;
         }
 
