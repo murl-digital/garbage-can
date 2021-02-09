@@ -15,7 +15,7 @@ using Z.EntityFramework.Plus;
 
 namespace GarbageCan.XP.Boosters
 {
-    public class BoosterManager : IFeature
+    public partial class BoosterManager : IFeature
     {
         public static ReadOnlyCollection<ActiveBooster> activeBoosters => ActiveBoosters.AsReadOnly();
         public static ReadOnlyCollection<QueuedBooster> queuedBoosters => _queuedBoosters.ToList().AsReadOnly();
@@ -38,20 +38,21 @@ namespace GarbageCan.XP.Boosters
                     .ToList();
             }
 
-            client.Ready += (_, _) =>
-            {
-                Task.Run(Ready);
+            client.Ready += (_, _) => { 
+                Task.Run(async () => {
+                    await Task.Run(Ready);
+                
+                    BoosterTimer.Elapsed += Tick;
 
-                BoosterTimer.Elapsed += Tick;
-
-                BoosterTimer.Enabled = true;
+                    BoosterTimer.Enabled = true;
+                });
 
                 return Task.CompletedTask;
             };
 
             client.GuildDownloadCompleted += (_, args) =>
             {
-                _nitroBoosterCount = args.Guilds.First().Value.PremiumSubscriptionCount ?? _nitroBoosterCount;
+                _nitroBoosterCount = args.Guilds[GarbageCan.operatingGuildId].PremiumSubscriptionCount ?? _nitroBoosterCount;
                 
                 return Task.CompletedTask;
             };
@@ -143,210 +144,6 @@ namespace GarbageCan.XP.Boosters
             {
                 await using var context = new Context();
                 await context.xpAvailableSlots.Where(s => s.id == id).DeleteAsync();
-            });
-        }
-
-        private static void Ready()
-        {
-            try
-            {
-                using var context = new Context();
-
-                #region retrieve queued boosters from db
-
-                var queuedEntities = context.xpQueuedBoosters
-                    .Select(x => x)
-                    .ToList();
-                queuedEntities.Sort((x, y) => x.position.CompareTo(y.position));
-
-                _queuedBoosters = new Queue<QueuedBooster>(queuedEntities.Select(x => new QueuedBooster
-                    {durationInSeconds = x.durationInSeconds, multiplier = x.multiplier}).ToList());
-
-                #endregion
-
-                #region remove any active boosters in db are expired
-
-                var now = DateTime.Now.ToUniversalTime();
-                if (context.xpActiveBoosters.Any(x => x.expirationDate < now))
-                {
-                    foreach (var expired in context.xpActiveBoosters.Where(x => x.expirationDate < now).ToList())
-                        context.xpActiveBoosters.Remove(expired);
-
-                    context.SaveChanges();
-                }
-
-                #endregion
-
-                #region retrieve remaining active boosters
-
-                foreach (var entity in context.xpActiveBoosters.Where(x => x.expirationDate < now).ToList())
-                    ActiveBoosters.Add(new ActiveBooster
-                    {
-                        expirationDate = entity.expirationDate,
-                        multiplier = entity.multipler,
-                        slot = _availableSlots.Select(x => x).First(x => x.id == entity.slot.id)
-                    });
-
-                #endregion
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "Booster manager ready failed");
-            }
-        }
-
-        private static async void Tick(object sender, ElapsedEventArgs elapsedEventArgs)
-        {
-            try
-            {
-                var toProcess = new List<ActiveBooster>();
-
-                using (var context = new Context())
-                {
-                    foreach (var activeBooster in ActiveBoosters.Where(activeBooster =>
-                        activeBooster.expirationDate < DateTime.Now.ToUniversalTime()))
-                    {
-                        var entity = context.xpActiveBoosters
-                            .First(x => x.slot.id == activeBooster.slot.id);
-                        context.xpActiveBoosters.Remove(entity);
-
-                        toProcess.Add(activeBooster);
-                    }
-
-                    await context.SaveChangesAsync();
-                }
-
-                var saveQueue = false;
-
-                toProcess.ForEach(b =>
-                {
-                    ActiveBoosters.Remove(b);
-
-                    if (_queuedBoosters.Count > 0)
-                    {
-                        saveQueue = true;
-                        ActivateQueuedBooster(b.slot);
-                    }
-                    else
-                    {
-                        Task.Run(async () =>
-                        {
-                            try
-                            {
-                                var channel = await GarbageCan.Client.GetChannelAsync(b.slot.channelId);
-                                await channel.ModifyAsync(model => model.Name = "-");
-                            }
-                            catch (Exception e)
-                            {
-                                Log.Error(e, "Couldn't update channel name");
-                            }
-                        });
-                    }
-                });
-
-                while (_queuedBoosters.Count > 0 && ActiveBoosters.Count < _availableSlots.Count)
-                {
-                    saveQueue = true;
-
-                    var usedSlots = ActiveBoosters
-                        .Select(b => b.slot)
-                        .ToList();
-
-                    var slot = _availableSlots
-                        .First(s => !usedSlots.Contains(s));
-
-                    ActivateQueuedBooster(slot);
-                }
-
-                if (saveQueue) SaveQueue();
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "Couldn't execute BoosterManager cycle");
-            }
-        }
-
-        private static void ActivateQueuedBooster(AvailableSlot slot)
-        {
-            var booster = _queuedBoosters.Dequeue();
-            ActivateBooster(booster.multiplier, TimeSpan.FromSeconds(booster.durationInSeconds), slot);
-        }
-
-        private static void ActivateBooster(float multiplier, TimeSpan duration, AvailableSlot slot)
-        {
-            try
-            {
-                var booster = new ActiveBooster
-                {
-                    expirationDate = DateTime.Now.ToUniversalTime().Add(duration),
-                    multiplier = multiplier,
-                    slot = slot
-                };
-
-                ActiveBoosters.Add(booster);
-
-                Task.Run(async () =>
-                {
-                    await using var context = new Context();
-                    context.xpActiveBoosters.Add(new EntityActiveBooster
-                    {
-                        expirationDate = booster.expirationDate,
-                        multipler = booster.multiplier,
-                        slot = context.xpAvailableSlots.Find(booster.slot.id)
-                    });
-                    await context.SaveChangesAsync();
-                });
-
-                Task.Run(async () =>
-                {
-                    try
-                    {
-                        var channel = await GarbageCan.Client.GetChannelAsync(booster.slot.channelId);
-                        await channel.ModifyAsync(model => model.Name = GetBoosterString(booster));
-                    }
-                    catch (Exception e)
-                    {
-                        Log.Error(e, "Couldn't update channel name");
-                    }
-                });
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "Couldn't activate booster");
-            }
-        }
-
-        private static string GetBoosterString(Booster booster)
-        {
-            return $"{booster.multiplier.ToString(CultureInfo.CurrentCulture)}x";
-        }
-
-        private static void SaveQueue()
-        {
-            Task.Run(async () =>
-            {
-                try
-                {
-                    using var context = new Context();
-                    context.xpQueuedBoosters.Delete();
-                    var position = 0;
-                    foreach (var booster in _queuedBoosters)
-                    {
-                        context.xpQueuedBoosters.Add(new EntityQueuedBooster
-                        {
-                            durationInSeconds = booster.durationInSeconds,
-                            multiplier = booster.multiplier,
-                            position = position
-                        });
-                        position++;
-                    }
-
-                    await context.SaveChangesAsync();
-                }
-                catch (Exception e)
-                {
-                    Log.Error(e, "Queue couldn't be saved");
-                }
             });
         }
     }
