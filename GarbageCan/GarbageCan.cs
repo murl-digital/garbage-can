@@ -7,6 +7,7 @@ using Config.Net;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using GarbageCan.Data;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Exceptions;
@@ -18,6 +19,15 @@ namespace GarbageCan
         public static DiscordClient Client;
         public static CommandsNextExtension Commands;
         public static IBotConfig Config;
+        
+        public static ulong operatingGuildId
+        {
+            get
+            {
+                using var context = new Context();
+                return ulong.Parse(context.config.First(c => c.key == "operatingGuildId").value);
+            }
+        }
 
         public static DiscordEmoji Check;
 

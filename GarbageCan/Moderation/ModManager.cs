@@ -18,15 +18,6 @@ namespace GarbageCan.Moderation
         private static DiscordRole _mutedRole;
         private static readonly Timer Timer = new(TimeSpan.FromMinutes(1).TotalMilliseconds);
 
-        internal static ulong operatingGuildId
-        {
-            get
-            {
-                using var context = new Context();
-                return ulong.Parse(context.config.First(c => c.key == "operatingGuildId").value);
-            }
-        }
-
         private static ulong mutedRoleId
         {
             get
@@ -40,7 +31,7 @@ namespace GarbageCan.Moderation
         {
             client.GuildDownloadCompleted += (sender, _) =>
             {
-                _mutedRole = sender.Guilds[operatingGuildId].GetRole(mutedRoleId);
+                _mutedRole = sender.Guilds[GarbageCan.operatingGuildId].GetRole(mutedRoleId);
                 Timer.Enabled = true;
                 return Task.CompletedTask;
             };
@@ -187,7 +178,7 @@ namespace GarbageCan.Moderation
                         .Where(m => m.expirationDate <= now)
                         .ForEachAsync(async m =>
                         {
-                            var member = await GarbageCan.Client.Guilds[operatingGuildId]
+                            var member = await GarbageCan.Client.Guilds[GarbageCan.operatingGuildId]
                                 .GetMemberAsync(m.uId);
                             await member.RevokeRoleAsync(_mutedRole, "mute expired");
                         });
@@ -215,9 +206,9 @@ namespace GarbageCan.Moderation
                         .Where(c => c.expirationDate <= now)
                         .ForEachAsync(async c =>
                         {
-                            var member = await GarbageCan.Client.Guilds[operatingGuildId]
+                            var member = await GarbageCan.Client.Guilds[GarbageCan.operatingGuildId]
                                 .GetMemberAsync(c.uId);
-                            var channel = GarbageCan.Client.Guilds[operatingGuildId]
+                            var channel = GarbageCan.Client.Guilds[GarbageCan.operatingGuildId]
                                 .GetChannel(c.channelId);
 
                             await channel.PermissionOverwrites.First(o => o.Id == member.Id)
