@@ -80,6 +80,7 @@ namespace GarbageCan
                 Client.Ready += (_, _) =>
                 {
                     Check = DiscordEmoji.FromName(Client, ":white_check_mark:");
+                    Client.UpdateStatusAsync(new DiscordActivity("my maracas | !>help", ActivityType.Playing));
                     return Task.CompletedTask;
                 };
 
