@@ -150,28 +150,31 @@ namespace GarbageCan.Roles
             {
                 try
                 {
+                    var tasks = new List<Task>();
+                    
                     var lvlArgs = (LevelUpArgs) args;
                     var member = await args.context.Guild.GetMemberAsync(args.id);
+                    var memberRoles = member.Roles.Select(r => r.Id).ToArray();
                     
                     await using var context = new Context();
-                    var roles = context.levelRoles.OrderBy(r => r.lvl).Where(r => !r.remain).ToList();
-                    var index = 0;
-                    foreach (var r in roles)
+                    var roles = context.levelRoles.OrderBy(r => r.lvl).Where(r => !r.remain).ToArray();
+                    for (var i = 0; i < roles.Length-1; i++)
                     {
-                        if (r.lvl == lvlArgs.lvl && index > 0)
-                        {
-                            var role = args.context.Guild.GetRole(roles[index-1].roleId);
-                            await member.RevokeRoleAsync(role);
-                            break;
-                        }
-
-                        index++;
+                        if (roles[i].lvl > lvlArgs.lvl) break;
+                        if (!memberRoles.Contains(roles[i].roleId)) continue;
+                        if (lvlArgs.lvl >= roles[i].lvl && lvlArgs.lvl < roles[i + 1].lvl) continue;
+                        
+                        var role = member.Guild.GetRole(roles[i].roleId);
+                        tasks.Add(member.RevokeRoleAsync(role, "level roles"));
                     }
-                    await context.levelRoles.Where(r => r.lvl == lvlArgs.lvl).ForEachAsync(async r =>
+                    
+                    tasks.Add(context.levelRoles.Where(r => r.lvl == lvlArgs.lvl).ForEachAsync(async r =>
                     {
                         var role = args.context.Guild.GetRole(r.roleId);
-                        await member.GrantRoleAsync(role);
-                    });
+                        await member.GrantRoleAsync(role, "level roles");
+                    }));
+
+                    await Task.WhenAll(tasks.ToArray());
                 }
                 catch (Exception e)
                 {
