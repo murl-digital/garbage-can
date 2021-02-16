@@ -6,16 +6,16 @@ using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using GarbageCan.Data;
+using GarbageCan.Data.Entities.Roles;
 using GarbageCan.XP;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Z.EntityFramework.Plus;
 
 namespace GarbageCan.Roles
 {
     public class RoleManager : IFeature
     {
-        private readonly List<ulong> _watchedUsers = new();
-
         public void Init(DiscordClient client)
         {
             XpManager.GhostLevelUp += HandleLevelRoles;
@@ -24,7 +24,12 @@ namespace GarbageCan.Roles
 
             client.GuildMemberAdded += (_, args) =>
             {
-                _watchedUsers.Add(args.Member.Id);
+                using var context = new Context();
+                context.joinWatchlist.Add(new EntityWatchedUser
+                {
+                    id = args.Member.Id
+                });
+                context.SaveChanges();
                 return Task.CompletedTask;
             };
             client.GuildMemberUpdated += HandleJoinRoles;
@@ -109,30 +114,33 @@ namespace GarbageCan.Roles
             return Task.CompletedTask;
         }
 
-        private Task HandleJoinRoles(DiscordClient sender, GuildMemberUpdateEventArgs e)
+        private static Task HandleJoinRoles(DiscordClient sender, GuildMemberUpdateEventArgs e)
         {
             try
             {
                 if (e.Member.IsBot) return Task.CompletedTask;
-                if (!_watchedUsers.Contains(e.Member.Id)) return Task.CompletedTask;
-                _watchedUsers.Remove(e.Member.Id);
 
                 Task.Run(async () =>
                 {
                     await using var context = new Context();
 
-                    await context.joinRoles.ForEachAsync(async r =>
+                    if (context.joinWatchlist.Any(u => u.id == e.Member.Id))
                     {
-                        try
+                        await context.joinWatchlist.Where(u => u.id == e.Member.Id).DeleteAsync();
+
+                        await context.joinRoles.ForEachAsync(async r =>
                         {
-                            var role = e.Guild.GetRole(r.roleId);
-                            await e.Member.GrantRoleAsync(role, "join role");
-                        }
-                        catch (Exception e)
-                        {
-                            Log.Error(e, "couldn't grant role to user");
-                        }
-                    });
+                            try
+                            {
+                                var role = e.Guild.GetRole(r.roleId);
+                                await e.Member.GrantRoleAsync(role, "join role");
+                            }
+                            catch (Exception e)
+                            {
+                                Log.Error(e, "couldn't grant role to user");
+                            }
+                        });
+                    }
                 });
 
                 return Task.CompletedTask;
