@@ -8,6 +8,7 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using GarbageCan.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Exceptions;
@@ -31,7 +32,7 @@ namespace GarbageCan
 
         public static DiscordEmoji Check;
 
-        private static List<IFeature> _botFeatures;
+        private static IFeature[] _botFeatures;
         private static bool _shutdown;
 
         private static void Main()
@@ -47,6 +48,12 @@ namespace GarbageCan
 
                 Log.Information("Reading config...");
                 BuildConfig();
+                
+                Log.Information("Ensuring database is up to date...");
+                await using (var context = new Context())
+                {
+                    await context.Database.MigrateAsync();
+                }
 
                 Client = new DiscordClient(new DiscordConfiguration
                 {
@@ -60,10 +67,11 @@ namespace GarbageCan
                 });
 
                 Log.Information("Initializing features...");
-                _botFeatures = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes())
+                _botFeatures = AppDomain.CurrentDomain.GetAssemblies()
+                    .SelectMany(x => x.GetTypes())
                     .Where(x => typeof(IFeature).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
                     .Select(x => (IFeature) Activator.CreateInstance(x))
-                    .ToList();
+                    .ToArray();
 
                 foreach (var feature in _botFeatures)
                 {
