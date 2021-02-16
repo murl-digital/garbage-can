@@ -51,8 +51,9 @@ namespace GarbageCan.Web
             }
 
             //app.UseHttpsRedirection();
-            
-            var forwardedHeadersOptions = new ForwardedHeadersOptions {
+
+            var forwardedHeadersOptions = new ForwardedHeadersOptions
+            {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             };
             forwardedHeadersOptions.KnownNetworks.Clear();
@@ -64,7 +65,7 @@ namespace GarbageCan.Web
 
             app.UseRouting();
             app.UseCors("gbc");
-            
+
             app.UseAuthentication();
             app.UseAuthorization();
 

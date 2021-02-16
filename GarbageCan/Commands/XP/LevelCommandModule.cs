@@ -86,7 +86,8 @@ namespace GarbageCan.Commands.XP
                 {
                     await ctx.Channel.TriggerTypingAsync();
                     var img = await GenerateImage(ctx.Member);
-                    await ctx.RespondAsync(new DiscordMessageBuilder().WithFile("rank.png", img).WithReply(ctx.Message.Id, true));
+                    await ctx.RespondAsync(new DiscordMessageBuilder().WithFile("rank.png", img)
+                        .WithReply(ctx.Message.Id, true));
                 }
                 catch (Exception e)
                 {
@@ -107,7 +108,8 @@ namespace GarbageCan.Commands.XP
                 {
                     await ctx.Channel.TriggerTypingAsync();
                     var img = await GenerateImage(member);
-                    await ctx.RespondAsync(new DiscordMessageBuilder().WithFile("rank.png", img).WithReply(ctx.Message.Id, true));
+                    await ctx.RespondAsync(new DiscordMessageBuilder().WithFile("rank.png", img)
+                        .WithReply(ctx.Message.Id, true));
                 }
                 catch (Exception e)
                 {
@@ -140,6 +142,7 @@ namespace GarbageCan.Commands.XP
                     context.Add(user);
                     await context.SaveChangesAsync();
                 }
+
                 placement = context.xpUsers
                     .OrderByDescending(u => u.xp)
                     .Select(u => u.id)

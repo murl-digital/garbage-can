@@ -14,7 +14,8 @@ using Z.EntityFramework.Plus;
 
 namespace GarbageCan.Commands.Roles
 {
-    [Group("reactionRoles"), Aliases("reactionRole", "rr")]
+    [Group("reactionRoles")]
+    [Aliases("reactionRole", "rr")]
     public class ReactionRoleCommandModule : BaseCommandModule
     {
         [Command("add")]
@@ -73,6 +74,7 @@ namespace GarbageCan.Commands.Roles
                     var msg = await ctx.Guild.GetChannel(r.channelId).GetMessageAsync(r.messageId);
                     builder.AppendLine($"{r.id} :: msg {msg.Id} in #{msg.Channel.Name} | {role.Name}");
                 }
+
                 await ctx.RespondAsync(Formatter.BlockCode(builder.ToString()));
             }
             catch (Exception e)

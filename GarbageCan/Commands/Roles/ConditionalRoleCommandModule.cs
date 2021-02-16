@@ -8,13 +8,13 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using GarbageCan.Data;
 using GarbageCan.Data.Entities.Roles;
-using GarbageCan.Roles;
 using Serilog;
 using Z.EntityFramework.Plus;
 
 namespace GarbageCan.Commands.Roles
 {
-    [Group("conditionalRoles"), Aliases("conditionalRole", "cr")]
+    [Group("conditionalRoles")]
+    [Aliases("conditionalRole", "cr")]
     public class ConditionalRoleCommandModule : BaseCommandModule
     {
         [Command("add")]
@@ -25,12 +25,12 @@ namespace GarbageCan.Commands.Roles
             {
                 await using var context = new Context();
                 context.conditionalRoles.Add(new EntityConditionalRole
-                    {
-                        requiredRoleId = required.Id,
-                        resultRoleId = result.Id,
-                        remain = remain
-                    });
-                    await context.SaveChangesAsync();
+                {
+                    requiredRoleId = required.Id,
+                    resultRoleId = result.Id,
+                    remain = remain
+                });
+                await context.SaveChangesAsync();
                 await ctx.RespondAsync("Role added successfully");
             }
             catch (Exception e)
@@ -71,6 +71,7 @@ namespace GarbageCan.Commands.Roles
                     var requiredRole = ctx.Guild.GetRole(role.requiredRoleId);
                     builder.AppendLine($"{role.id} :: {requiredRole.Name} | {resultRole.Name}");
                 }
+
                 await ctx.RespondAsync(Formatter.BlockCode(builder.ToString()));
             }
             catch (Exception e)

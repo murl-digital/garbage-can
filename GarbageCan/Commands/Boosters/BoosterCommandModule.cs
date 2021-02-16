@@ -15,7 +15,8 @@ using Serilog;
 
 namespace GarbageCan.Commands.Boosters
 {
-    [Group("boosters"), Aliases("booster")]
+    [Group("boosters")]
+    [Aliases("booster")]
     public class BoosterCommandModule : BaseCommandModule
     {
         [GroupCommand]
@@ -28,7 +29,7 @@ namespace GarbageCan.Commands.Boosters
             }
             catch (Exception e)
             {
-                Log.Error(e,"Couldn't list boosters");
+                Log.Error(e, "Couldn't list boosters");
                 await ctx.RespondAsync("An error occured");
             }
         }
@@ -46,7 +47,8 @@ namespace GarbageCan.Commands.Boosters
                     return;
                 }
 
-                var result = BoosterManager.AddBooster(booster.multiplier, TimeSpan.FromSeconds(booster.durationInSeconds), true);
+                var result = BoosterManager.AddBooster(booster.multiplier,
+                    TimeSpan.FromSeconds(booster.durationInSeconds), true);
                 switch (result)
                 {
                     case BoosterResult.Active:
@@ -75,22 +77,18 @@ namespace GarbageCan.Commands.Boosters
             try
             {
                 var builder = new StringBuilder();
-                
+
                 var activeBuilder = new StringBuilder();
                 foreach (var booster in BoosterManager.activeBoosters)
-                {
                     activeBuilder.AppendLine(
                         $"slot {booster.slot.id} :: {booster.multiplier}x expiring {booster.expirationDate.Humanize()}");
-                }
                 if (activeBuilder.Length == 0) activeBuilder.AppendLine("No boosters");
-                
+
                 var queuedBuilder = new StringBuilder();
                 var queue = BoosterManager.queuedBoosters;
                 foreach (var booster in queue)
-                {
                     queuedBuilder.AppendLine(
                         $"{queue.IndexOf(booster)} :: {booster.multiplier}x for {TimeSpan.FromSeconds(booster.durationInSeconds).Humanize()}");
-                }
                 if (queuedBuilder.Length == 0) queuedBuilder.AppendLine("No boosters");
 
                 builder.AppendLine("-- Active Boosters --");
@@ -107,7 +105,7 @@ namespace GarbageCan.Commands.Boosters
                 await ctx.RespondAsync("An error occured");
             }
         }
-        
+
         [Command("list")]
         [RequirePermissions(Permissions.Administrator)]
         public async Task GetBoostersForUser(CommandContext ctx, DiscordUser user)
@@ -121,7 +119,7 @@ namespace GarbageCan.Commands.Boosters
             {
                 Log.Error(e, "Couldn't get boosters");
                 await ctx.RespondAsync("An error occured");
-            }   
+            }
         }
 
         [Command("add")]
@@ -187,7 +185,7 @@ namespace GarbageCan.Commands.Boosters
                         builder.AppendLine(
                             $"{b.id} :: {b.multiplier}x for {TimeSpan.FromSeconds(b.durationInSeconds).Humanize()}"));
                 if (builder.Length == 0) builder.AppendLine("-- No boosters --");
-                
+
                 return builder.ToString();
             }
             catch (Exception e)
@@ -197,7 +195,8 @@ namespace GarbageCan.Commands.Boosters
             }
         }
 
-        [Group("slots"), Aliases("slot")]
+        [Group("slots")]
+        [Aliases("slot")]
         public class SlotCommandModule : BaseCommandModule
         {
             [GroupCommand]
@@ -208,10 +207,8 @@ namespace GarbageCan.Commands.Boosters
                 {
                     var builder = new StringBuilder();
                     foreach (var slot in BoosterManager.availableSlots)
-                    {
                         builder.AppendLine(
                             $"{slot.id} :: {slot.channelId}");
-                    }
 
                     if (builder.Length == 0) builder.AppendLine("No slots");
 
@@ -250,7 +247,7 @@ namespace GarbageCan.Commands.Boosters
                         await ctx.RespondAsync("No slot found");
                         return;
                     }
-                    
+
                     BoosterManager.RemoveSlot(id);
                 }
                 catch (Exception e)

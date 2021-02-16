@@ -8,13 +8,13 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using GarbageCan.Data;
 using GarbageCan.Data.Entities.Roles;
-using GarbageCan.Roles;
 using Serilog;
 using Z.EntityFramework.Plus;
 
 namespace GarbageCan.Commands.Roles
 {
-    [Group("joinRoles"), Aliases("joinRole", "jr")]
+    [Group("joinRoles")]
+    [Aliases("joinRole", "jr")]
     public class JoinRoleCommandModule : BaseCommandModule
     {
         [Command("add")]
@@ -68,6 +68,7 @@ namespace GarbageCan.Commands.Roles
                     var role = ctx.Guild.GetRole(r.roleId);
                     builder.AppendLine($"{r.id} :: {role.Name}");
                 }
+
                 await ctx.RespondAsync(Formatter.BlockCode(builder.ToString()));
             }
             catch (Exception e)

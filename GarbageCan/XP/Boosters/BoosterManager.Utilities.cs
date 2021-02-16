@@ -16,6 +16,7 @@ namespace GarbageCan.XP.Boosters
             var booster = _queuedBoosters.Dequeue();
             ActivateBooster(booster.multiplier, TimeSpan.FromSeconds(booster.durationInSeconds), slot);
         }
+
         private static void ActivateBooster(float multiplier, TimeSpan duration, AvailableSlot slot)
         {
             try

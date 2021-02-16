@@ -39,7 +39,7 @@ namespace GarbageCan.Roles
         public void Cleanup()
         {
         }
-        
+
         public static string EmoteId(DiscordEmoji emote) => emote.Id == 0 ? emote.Name : emote.Id.ToString();
 
         private static Task ReactionAdded(DiscordClient sender, MessageReactionAddEventArgs args)
@@ -52,24 +52,24 @@ namespace GarbageCan.Roles
                 {
                     using var context = new Context();
                     await context.reactionRoles.ForEachAsync(async r =>
+                    {
+                        try
                         {
-                            try
-                            {
-                                // before you say "BUT JOE YOU CAN USE .WHERE() JOE" hear me out
-                                // i tried that. i really did. but for some reason it didnt work.
-                                // it would just say "hey all these rows satisfy the predicate!" ...even though they don't
-                                // conclusion: linq is a lie thank you for coming to my ted talk
-                                if (r.channelId != args.Channel.Id || r.messageId != args.Message.Id ||
-                                    r.emoteId != EmoteId(args.Emoji)) return;
-                                var role = args.Guild.GetRole(r.roleId);
-                                var member = await args.Guild.GetMemberAsync(args.User.Id);
-                                await member.GrantRoleAsync(role, "reaction role");
-                            }
-                            catch (Exception e)
-                            {
-                                Log.Error(e, "Couldn't assign reaction role");
-                            }
-                        });
+                            // before you say "BUT JOE YOU CAN USE .WHERE() JOE" hear me out
+                            // i tried that. i really did. but for some reason it didnt work.
+                            // it would just say "hey all these rows satisfy the predicate!" ...even though they don't
+                            // conclusion: linq is a lie thank you for coming to my ted talk
+                            if (r.channelId != args.Channel.Id || r.messageId != args.Message.Id ||
+                                r.emoteId != EmoteId(args.Emoji)) return;
+                            var role = args.Guild.GetRole(r.roleId);
+                            var member = await args.Guild.GetMemberAsync(args.User.Id);
+                            await member.GrantRoleAsync(role, "reaction role");
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Error(e, "Couldn't assign reaction role");
+                        }
+                    });
                 }
                 catch (Exception e)
                 {
@@ -88,22 +88,22 @@ namespace GarbageCan.Roles
             {
                 try
                 {
-                    using var context = new Context();
+                    await using var context = new Context();
                     await context.reactionRoles.ForEachAsync(async r =>
+                    {
+                        try
                         {
-                            try
-                            {
-                                if (r.channelId != args.Channel.Id || r.messageId != args.Message.Id ||
-                                    r.emoteId != EmoteId(args.Emoji)) return;
-                                var role = args.Guild.GetRole(r.roleId);
-                                var member = await args.Guild.GetMemberAsync(args.User.Id);
-                                await member.RevokeRoleAsync(role, "reaction role");
-                            }
-                            catch (Exception e)
-                            {
-                                Log.Error(e, "Couldn't remove reaction role");
-                            }
-                        });
+                            if (r.channelId != args.Channel.Id || r.messageId != args.Message.Id ||
+                                r.emoteId != EmoteId(args.Emoji)) return;
+                            var role = args.Guild.GetRole(r.roleId);
+                            var member = await args.Guild.GetMemberAsync(args.User.Id);
+                            await member.RevokeRoleAsync(role, "reaction role");
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Error(e, "Couldn't remove reaction role");
+                        }
+                    });
                 }
                 catch (Exception e)
                 {
@@ -159,23 +159,23 @@ namespace GarbageCan.Roles
                 try
                 {
                     var tasks = new List<Task>();
-                    
+
                     var lvlArgs = (LevelUpArgs) args;
                     var member = await args.context.Guild.GetMemberAsync(args.id);
                     var memberRoles = member.Roles.Select(r => r.Id).ToArray();
-                    
+
                     await using var context = new Context();
                     var roles = context.levelRoles.OrderBy(r => r.lvl).Where(r => !r.remain).ToArray();
-                    for (var i = 0; i < roles.Length-1; i++)
+                    for (var i = 0; i < roles.Length - 1; i++)
                     {
                         if (roles[i].lvl > lvlArgs.lvl) break;
                         if (!memberRoles.Contains(roles[i].roleId)) continue;
                         if (lvlArgs.lvl >= roles[i].lvl && lvlArgs.lvl < roles[i + 1].lvl) continue;
-                        
+
                         var role = member.Guild.GetRole(roles[i].roleId);
                         tasks.Add(member.RevokeRoleAsync(role, "level roles"));
                     }
-                    
+
                     tasks.Add(context.levelRoles.Where(r => r.lvl == lvlArgs.lvl).ForEachAsync(async r =>
                     {
                         var role = args.context.Guild.GetRole(r.roleId);

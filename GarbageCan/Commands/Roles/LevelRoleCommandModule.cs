@@ -14,7 +14,8 @@ using Z.EntityFramework.Plus;
 
 namespace GarbageCan.Commands.Roles
 {
-    [Group("levelRoles"), Aliases("levelRole", "lr")]
+    [Group("levelRoles")]
+    [Aliases("levelRole", "lr")]
     public class LevelRoleCommandModule : BaseCommandModule
     {
         [Command("add")]
@@ -38,7 +39,7 @@ namespace GarbageCan.Commands.Roles
                 Log.Error(e, "Couldn't add level role");
                 ctx.RespondAsync("An error occured");
             }
-            
+
             return Task.CompletedTask;
         }
 

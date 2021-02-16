@@ -10,9 +10,9 @@ namespace GarbageCan.Data
     public class Context : DbContext
     {
         private string _connectionString;
-        
+
         public DbSet<EntityConfig> config { get; set; }
-        
+
         public DbSet<EntityUser> xpUsers { get; set; }
         public DbSet<EntityExcludedChannel> xpExcludedChannels { get; set; }
         public DbSet<EntityQueuedBooster> xpQueuedBoosters { get; set; }
@@ -23,7 +23,8 @@ namespace GarbageCan.Data
         public DbSet<EntityActionLog> moderationActionLogs { get; set; }
         public DbSet<EntityActiveMute> moderationActiveMutes { get; set; }
         public DbSet<EntityActiveChannelRestrict> moderationActiveChannelRestricts { get; set; }
-        
+
+        public DbSet<EntityWatchedUser> joinWatchlist { get; set; }
         public DbSet<EntityJoinRole> joinRoles { get; set; }
         public DbSet<EntityReactionRole> reactionRoles { get; set; }
         public DbSet<EntityConditionalRole> conditionalRoles { get; set; }
@@ -32,9 +33,8 @@ namespace GarbageCan.Data
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (GarbageCan.Config == null) GarbageCan.BuildConfig();
-            if (_connectionString == null)
-                _connectionString =
-                    $"host={GarbageCan.Config.address};port={GarbageCan.Config.port};user id={GarbageCan.Config.user};password={GarbageCan.Config.password};database={GarbageCan.Config.xpSchema}";
+            _connectionString ??=
+                $"host={GarbageCan.Config.address};port={GarbageCan.Config.port};user id={GarbageCan.Config.user};password={GarbageCan.Config.password};database={GarbageCan.Config.xpSchema}";
 
             optionsBuilder.UseMySql(_connectionString, ServerVersion.AutoDetect(_connectionString));
         }
