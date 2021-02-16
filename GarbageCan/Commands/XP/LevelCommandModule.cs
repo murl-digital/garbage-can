@@ -141,7 +141,7 @@ namespace GarbageCan.Commands.XP
                     await context.SaveChangesAsync();
                 }
                 placement = context.xpUsers
-                    .OrderBy(u => u.xp)
+                    .OrderByDescending(u => u.xp)
                     .Select(u => u.id)
                     .ToList()
                     .FindIndex(u => u == user.id) + 1;
