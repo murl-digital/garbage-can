@@ -3,7 +3,7 @@ using GarbageCan.Moderation;
 
 namespace GarbageCan.Data.Models.Moderation
 {
-    public class ActionLog
+    public struct ActionLog
     {
         public int id { get; set; }
         public ulong uId { get; set; }

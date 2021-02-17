@@ -15,12 +15,13 @@ namespace GarbageCan.Commands.Fun
             var builder = new DiscordEmbedBuilder();
             builder.WithThumbnail(ctx.Client.CurrentUser.AvatarUrl)
                 .WithTitle("Garbage Can")
-                .WithDescription($"{Formatter.Italic("A general purpose bot written for the DRACONIUM discord server")} | {Formatter.MaskedUrl("Github", new Uri("https://github.com/SorenNeedsCoffee/garbage-can-csharp"))}");
+                .WithDescription(
+                    $"{Formatter.Italic("A general purpose bot written for the DRACONIUM discord server")} | {Formatter.MaskedUrl("Github", new Uri("https://github.com/SorenNeedsCoffee/garbage-can-csharp"))}");
 
             builder.AddField("Data Collection",
                 $"Garbage Can collects numerical user ids for xp and logging purposes. To see exactly how your data is used, you can check the bot's {Formatter.MaskedUrl("source code", new Uri("https://github.com/SorenNeedsCoffee/garbage-can-csharp"))}");
-            
-            builder.AddField("Attributions", 
+
+            builder.AddField("Attributions",
                 $"- {Formatter.MaskedUrl(".NET Core 5", new Uri("https://github.com/dotnet/core"))} \n" +
                 $"- {Formatter.MaskedUrl("EntityFramework Core", new Uri("https://github.com/dotnet/efcore"))} \n" +
                 $"- {Formatter.MaskedUrl("Pomelo.EntityFrameworkCore.MySql", new Uri("https://github.com/PomeloFoundation/Pomelo.EntityFrameworkCore.MySql"))} \n" +
@@ -31,7 +32,7 @@ namespace GarbageCan.Commands.Fun
                 $"- {Formatter.MaskedUrl("Humanizer", new Uri("https://github.com/Humanizr/Humanizer"))} \n" +
                 $"- {Formatter.MaskedUrl("MathNet Numerics", new Uri("https://numerics.mathdotnet.com/"))} \n");
 
-            await ctx.RespondAsync(embed: builder.Build());
+            await ctx.RespondAsync(builder.Build());
         }
     }
 }

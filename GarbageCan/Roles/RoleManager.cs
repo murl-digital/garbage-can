@@ -6,16 +6,16 @@ using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using GarbageCan.Data;
+using GarbageCan.Data.Entities.Roles;
 using GarbageCan.XP;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Z.EntityFramework.Plus;
 
 namespace GarbageCan.Roles
 {
     public class RoleManager : IFeature
     {
-        private readonly List<ulong> _watchedUsers = new();
-
         public void Init(DiscordClient client)
         {
             XpManager.GhostLevelUp += HandleLevelRoles;
@@ -24,7 +24,12 @@ namespace GarbageCan.Roles
 
             client.GuildMemberAdded += (_, args) =>
             {
-                _watchedUsers.Add(args.Member.Id);
+                using var context = new Context();
+                context.joinWatchlist.Add(new EntityWatchedUser
+                {
+                    id = args.Member.Id
+                });
+                context.SaveChanges();
                 return Task.CompletedTask;
             };
             client.GuildMemberUpdated += HandleJoinRoles;
@@ -34,7 +39,7 @@ namespace GarbageCan.Roles
         public void Cleanup()
         {
         }
-        
+
         public static string EmoteId(DiscordEmoji emote) => emote.Id == 0 ? emote.Name : emote.Id.ToString();
 
         private static Task ReactionAdded(DiscordClient sender, MessageReactionAddEventArgs args)
@@ -47,24 +52,24 @@ namespace GarbageCan.Roles
                 {
                     using var context = new Context();
                     await context.reactionRoles.ForEachAsync(async r =>
+                    {
+                        try
                         {
-                            try
-                            {
-                                // before you say "BUT JOE YOU CAN USE .WHERE() JOE" hear me out
-                                // i tried that. i really did. but for some reason it didnt work.
-                                // it would just say "hey all these rows satisfy the predicate!" ...even though they don't
-                                // conclusion: linq is a lie thank you for coming to my ted talk
-                                if (r.channelId != args.Channel.Id || r.messageId != args.Message.Id ||
-                                    r.emoteId != EmoteId(args.Emoji)) return;
-                                var role = args.Guild.GetRole(r.roleId);
-                                var member = await args.Guild.GetMemberAsync(args.User.Id);
-                                await member.GrantRoleAsync(role, "reaction role");
-                            }
-                            catch (Exception e)
-                            {
-                                Log.Error(e, "Couldn't assign reaction role");
-                            }
-                        });
+                            // before you say "BUT JOE YOU CAN USE .WHERE() JOE" hear me out
+                            // i tried that. i really did. but for some reason it didnt work.
+                            // it would just say "hey all these rows satisfy the predicate!" ...even though they don't
+                            // conclusion: linq is a lie thank you for coming to my ted talk
+                            if (r.channelId != args.Channel.Id || r.messageId != args.Message.Id ||
+                                r.emoteId != EmoteId(args.Emoji)) return;
+                            var role = args.Guild.GetRole(r.roleId);
+                            var member = await args.Guild.GetMemberAsync(args.User.Id);
+                            await member.GrantRoleAsync(role, "reaction role");
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Error(e, "Couldn't assign reaction role");
+                        }
+                    });
                 }
                 catch (Exception e)
                 {
@@ -83,22 +88,22 @@ namespace GarbageCan.Roles
             {
                 try
                 {
-                    using var context = new Context();
+                    await using var context = new Context();
                     await context.reactionRoles.ForEachAsync(async r =>
+                    {
+                        try
                         {
-                            try
-                            {
-                                if (r.channelId != args.Channel.Id || r.messageId != args.Message.Id ||
-                                    r.emoteId != EmoteId(args.Emoji)) return;
-                                var role = args.Guild.GetRole(r.roleId);
-                                var member = await args.Guild.GetMemberAsync(args.User.Id);
-                                await member.RevokeRoleAsync(role, "reaction role");
-                            }
-                            catch (Exception e)
-                            {
-                                Log.Error(e, "Couldn't remove reaction role");
-                            }
-                        });
+                            if (r.channelId != args.Channel.Id || r.messageId != args.Message.Id ||
+                                r.emoteId != EmoteId(args.Emoji)) return;
+                            var role = args.Guild.GetRole(r.roleId);
+                            var member = await args.Guild.GetMemberAsync(args.User.Id);
+                            await member.RevokeRoleAsync(role, "reaction role");
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Error(e, "Couldn't remove reaction role");
+                        }
+                    });
                 }
                 catch (Exception e)
                 {
@@ -109,30 +114,33 @@ namespace GarbageCan.Roles
             return Task.CompletedTask;
         }
 
-        private Task HandleJoinRoles(DiscordClient sender, GuildMemberUpdateEventArgs e)
+        private static Task HandleJoinRoles(DiscordClient sender, GuildMemberUpdateEventArgs e)
         {
             try
             {
                 if (e.Member.IsBot) return Task.CompletedTask;
-                if (!_watchedUsers.Contains(e.Member.Id)) return Task.CompletedTask;
-                _watchedUsers.Remove(e.Member.Id);
 
                 Task.Run(async () =>
                 {
                     await using var context = new Context();
 
-                    await context.joinRoles.ForEachAsync(async r =>
+                    if (context.joinWatchlist.Any(u => u.id == e.Member.Id))
                     {
-                        try
+                        await context.joinWatchlist.Where(u => u.id == e.Member.Id).DeleteAsync();
+
+                        await context.joinRoles.ForEachAsync(async r =>
                         {
-                            var role = e.Guild.GetRole(r.roleId);
-                            await e.Member.GrantRoleAsync(role, "join role");
-                        }
-                        catch (Exception e)
-                        {
-                            Log.Error(e, "couldn't grant role to user");
-                        }
-                    });
+                            try
+                            {
+                                var role = e.Guild.GetRole(r.roleId);
+                                await e.Member.GrantRoleAsync(role, "join role");
+                            }
+                            catch (Exception e)
+                            {
+                                Log.Error(e, "couldn't grant role to user");
+                            }
+                        });
+                    }
                 });
 
                 return Task.CompletedTask;
@@ -150,28 +158,31 @@ namespace GarbageCan.Roles
             {
                 try
                 {
+                    var tasks = new List<Task>();
+
                     var lvlArgs = (LevelUpArgs) args;
                     var member = await args.context.Guild.GetMemberAsync(args.id);
-                    
-                    await using var context = new Context();
-                    var roles = context.levelRoles.OrderBy(r => r.lvl).Where(r => !r.remain).ToList();
-                    var index = 0;
-                    foreach (var r in roles)
-                    {
-                        if (r.lvl == lvlArgs.lvl && index > 0)
-                        {
-                            var role = args.context.Guild.GetRole(roles[index-1].roleId);
-                            await member.RevokeRoleAsync(role);
-                            break;
-                        }
+                    var memberRoles = member.Roles.Select(r => r.Id).ToArray();
 
-                        index++;
+                    await using var context = new Context();
+                    var roles = context.levelRoles.OrderBy(r => r.lvl).Where(r => !r.remain).ToArray();
+                    for (var i = 0; i < roles.Length - 1; i++)
+                    {
+                        if (roles[i].lvl > lvlArgs.lvl) break;
+                        if (!memberRoles.Contains(roles[i].roleId)) continue;
+                        if (lvlArgs.lvl >= roles[i].lvl && lvlArgs.lvl < roles[i + 1].lvl) continue;
+
+                        var role = member.Guild.GetRole(roles[i].roleId);
+                        tasks.Add(member.RevokeRoleAsync(role, "level roles"));
                     }
-                    await context.levelRoles.Where(r => r.lvl == lvlArgs.lvl).ForEachAsync(async r =>
+
+                    tasks.Add(context.levelRoles.Where(r => r.lvl == lvlArgs.lvl).ForEachAsync(async r =>
                     {
                         var role = args.context.Guild.GetRole(r.roleId);
-                        await member.GrantRoleAsync(role);
-                    });
+                        await member.GrantRoleAsync(role, "level roles");
+                    }));
+
+                    await Task.WhenAll(tasks.ToArray());
                 }
                 catch (Exception e)
                 {

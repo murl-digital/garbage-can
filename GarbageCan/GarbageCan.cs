@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -8,6 +7,7 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using GarbageCan.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Exceptions;
@@ -19,7 +19,12 @@ namespace GarbageCan
         public static DiscordClient Client;
         public static CommandsNextExtension Commands;
         public static IBotConfig Config;
-        
+
+        public static DiscordEmoji Check;
+
+        private static IFeature[] _botFeatures;
+        private static bool _shutdown;
+
         public static ulong operatingGuildId
         {
             get
@@ -28,11 +33,6 @@ namespace GarbageCan
                 return ulong.Parse(context.config.First(c => c.key == "operatingGuildId").value);
             }
         }
-
-        public static DiscordEmoji Check;
-
-        private static List<IFeature> _botFeatures;
-        private static bool _shutdown;
 
         private static void Main()
         {
@@ -48,6 +48,12 @@ namespace GarbageCan
                 Log.Information("Reading config...");
                 BuildConfig();
 
+                Log.Information("Ensuring database is up to date...");
+                await using (var context = new Context())
+                {
+                    await context.Database.MigrateAsync();
+                }
+
                 Client = new DiscordClient(new DiscordConfiguration
                 {
                     Token = Config.token,
@@ -60,10 +66,11 @@ namespace GarbageCan
                 });
 
                 Log.Information("Initializing features...");
-                _botFeatures = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes())
+                _botFeatures = AppDomain.CurrentDomain.GetAssemblies()
+                    .SelectMany(x => x.GetTypes())
                     .Where(x => typeof(IFeature).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
                     .Select(x => (IFeature) Activator.CreateInstance(x))
-                    .ToList();
+                    .ToArray();
 
                 foreach (var feature in _botFeatures)
                 {
@@ -77,6 +84,7 @@ namespace GarbageCan
                         Log.Error(e, "A feature failed to initialize");
                         Environment.Exit(1);
                     }
+
                     Log.Information("Success!");
                 }
 
@@ -126,6 +134,7 @@ namespace GarbageCan
                 Log.Information("Cleaning up {Name}...", feature.GetType().Name);
                 feature.Cleanup();
             }
+
             Client.UpdateStatusAsync(null, UserStatus.Offline).GetAwaiter().GetResult();
             Client.Dispose();
 

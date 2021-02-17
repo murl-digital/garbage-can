@@ -1,8 +1,8 @@
 ﻿namespace GarbageCan.Data.Models.XP
 {
-    public class User
+    public struct User
     {
-        public string id { get; set; }
+        public ulong id { get; set; }
         public int lvl { get; set; }
         public double xp { get; set; }
     }

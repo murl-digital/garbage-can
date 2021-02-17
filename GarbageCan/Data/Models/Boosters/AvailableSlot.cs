@@ -1,6 +1,6 @@
 ﻿namespace GarbageCan.Data.Models.Boosters
 {
-    public class AvailableSlot
+    public struct AvailableSlot
     {
         public int id { get; set; }
         public ulong channelId { get; set; }

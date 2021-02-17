@@ -1,6 +1,6 @@
 namespace GarbageCan.Data.Models.Boosters
 {
-    public class Booster
+    public interface IBooster
     {
         public float multiplier { get; set; }
     }

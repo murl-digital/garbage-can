@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
@@ -10,24 +9,22 @@ using DSharpPlus.Entities;
 using GarbageCan.Data;
 using GarbageCan.Data.Entities.Boosters;
 using GarbageCan.Data.Models.Boosters;
-using Serilog;
 using Z.EntityFramework.Plus;
 
 namespace GarbageCan.XP.Boosters
 {
     public partial class BoosterManager : IFeature
     {
-        public static ReadOnlyCollection<ActiveBooster> activeBoosters => ActiveBoosters.AsReadOnly();
-        public static ReadOnlyCollection<QueuedBooster> queuedBoosters => _queuedBoosters.ToList().AsReadOnly();
-        public static ReadOnlyCollection<AvailableSlot> availableSlots => _availableSlots.AsReadOnly();
-
         private static List<AvailableSlot> _availableSlots;
         private static readonly List<ActiveBooster> ActiveBoosters = new();
         private static Queue<QueuedBooster> _queuedBoosters;
-        
+
         private static int _nitroBoosterCount;
 
         private static readonly Timer BoosterTimer = new(5000);
+        public static ReadOnlyCollection<ActiveBooster> activeBoosters => ActiveBoosters.AsReadOnly();
+        public static ReadOnlyCollection<QueuedBooster> queuedBoosters => _queuedBoosters.ToList().AsReadOnly();
+        public static ReadOnlyCollection<AvailableSlot> availableSlots => _availableSlots.AsReadOnly();
 
         public void Init(DiscordClient client)
         {
@@ -38,10 +35,12 @@ namespace GarbageCan.XP.Boosters
                     .ToList();
             }
 
-            client.Ready += (_, _) => { 
-                Task.Run(async () => {
+            client.Ready += (_, _) =>
+            {
+                Task.Run(async () =>
+                {
                     await Task.Run(Ready);
-                
+
                     BoosterTimer.Elapsed += Tick;
 
                     BoosterTimer.Enabled = true;
@@ -52,8 +51,9 @@ namespace GarbageCan.XP.Boosters
 
             client.GuildDownloadCompleted += (_, args) =>
             {
-                _nitroBoosterCount = args.Guilds[GarbageCan.operatingGuildId].PremiumSubscriptionCount ?? _nitroBoosterCount;
-                
+                _nitroBoosterCount = args.Guilds[GarbageCan.operatingGuildId].PremiumSubscriptionCount ??
+                                     _nitroBoosterCount;
+
                 return Task.CompletedTask;
             };
 
@@ -85,10 +85,7 @@ namespace GarbageCan.XP.Boosters
             SaveQueue();
         }
 
-        public static float GetMultiplier()
-        {
-            return 1 + ActiveBoosters.Sum(booster => booster.multiplier - 1);
-        }
+        public static float GetMultiplier() => 1 + ActiveBoosters.Sum(booster => booster.multiplier - 1);
 
         public static BoosterResult AddBooster(float multiplier, TimeSpan duration, bool queue)
         {
@@ -127,7 +124,7 @@ namespace GarbageCan.XP.Boosters
                 };
                 context.xpAvailableSlots.Add(slot);
                 await context.SaveChangesAsync();
-                
+
                 _availableSlots.Add(new AvailableSlot
                 {
                     id = slot.id,
