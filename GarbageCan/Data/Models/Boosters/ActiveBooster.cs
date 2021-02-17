@@ -2,8 +2,9 @@
 
 namespace GarbageCan.Data.Models.Boosters
 {
-    public class ActiveBooster : Booster
+    public struct ActiveBooster : IBooster
     {
+        public float multiplier { get; set; }
         public AvailableSlot slot { get; set; }
         public DateTime expirationDate { get; set; }
     }

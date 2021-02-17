@@ -1,6 +1,6 @@
 ﻿namespace GarbageCan.Data.Models.Boosters
 {
-    public class UserBooster
+    public struct UserBooster
     {
         public string id { get; set; }
         public string userId { get; set; }

@@ -1,3 +1,4 @@
+using System.Security.Policy;
 using System.Threading.Tasks;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
@@ -14,9 +15,9 @@ namespace GarbageCan.Commands.Moderation
         [RequireRoles(RoleCheckMode.All, "Staff")]
         public Task WarnCommand(CommandContext ctx, DiscordUser user, [RemainingText] string comments)
         {
-            ActionLog entry;
+            ActionLog? entry;
             ModManager.Log(user.Id, ctx.Member.Id, PunishmentLevel.VerbalWarning, comments, out entry);
-            ctx.RespondAsync($"{GarbageCan.Check} Verbal warning logged with id {entry.id}");
+            ctx.RespondAsync($"{GarbageCan.Check} Verbal warning logged with id {entry?.id}");
 
             return Task.CompletedTask;
         }

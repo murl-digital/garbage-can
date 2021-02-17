@@ -61,7 +61,7 @@ namespace GarbageCan.XP.Boosters
             }
         }
 
-        private static string GetBoosterString(Booster booster)
+        private static string GetBoosterString(IBooster booster)
         {
             return $"{(booster.multiplier + 1).ToString(CultureInfo.CurrentCulture)}x";
         }

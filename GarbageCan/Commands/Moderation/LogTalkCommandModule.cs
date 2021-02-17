@@ -15,10 +15,10 @@ namespace GarbageCan.Commands.Moderation
         [RequirePermissions(Permissions.Administrator)]
         public Task LogTalk(CommandContext ctx, DiscordMember member, [RemainingText] string comments)
         {
-            ActionLog entry;
+            ActionLog? entry;
             ModManager.Log(member.Id, ctx.Member.Id, PunishmentLevel.PersonalTalk, comments, out entry);
             ctx.RespondAsync(
-                $"{GarbageCan.Check} 1 on 1 talk with {member.DisplayName} has been logged with id {entry.id}");
+                $"{GarbageCan.Check} 1 on 1 talk with {member.DisplayName} has been logged with id {entry?.id}");
 
             return Task.CompletedTask;
         }
