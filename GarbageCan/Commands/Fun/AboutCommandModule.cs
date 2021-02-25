@@ -16,7 +16,7 @@ namespace GarbageCan.Commands.Fun
             builder.WithThumbnail(ctx.Client.CurrentUser.AvatarUrl)
                 .WithTitle("Garbage Can")
                 .WithDescription(
-                    $"{Formatter.Italic("A general purpose bot written for the DRACONIUM discord server")} | {Formatter.MaskedUrl("Github", new Uri("https://github.com/SorenNeedsCoffee/garbage-can-csharp"))}");
+                    $"{Formatter.Italic("A general purpose bot written for the DRACONIUM discord server")} | {Formatter.MaskedUrl("Github", new Uri("https://github.com/murl-digital/garbage-can"))}");
 
             builder.AddField("Data Collection",
                 $"Garbage Can collects numerical user ids for xp and logging purposes. To see exactly how your data is used, you can check the bot's {Formatter.MaskedUrl("source code", new Uri("https://github.com/SorenNeedsCoffee/garbage-can-csharp"))}");
@@ -26,7 +26,7 @@ namespace GarbageCan.Commands.Fun
                 $"- {Formatter.MaskedUrl("EntityFramework Core", new Uri("https://github.com/dotnet/efcore"))} \n" +
                 $"- {Formatter.MaskedUrl("Pomelo.EntityFrameworkCore.MySql", new Uri("https://github.com/PomeloFoundation/Pomelo.EntityFrameworkCore.MySql"))} \n" +
                 $"- {Formatter.MaskedUrl("DSharpPlus", new Uri("https://github.com/DSharpPlus/DSharpPlus"))} \n" +
-                $"- SixLabors' {Formatter.MaskedUrl("ImageSharp", new Uri("https://github.com/SixLabors/ImageSharp"))} \n" +
+                $"- {Formatter.MaskedUrl("ImageSharp", new Uri("https://github.com/SixLabors/ImageSharp"))} \n" +
                 $"- {Formatter.MaskedUrl("Serilog", new Uri("https://github.com/serilog/serilog"))} \n" +
                 $"- {Formatter.MaskedUrl("Config.Net", new Uri("https://github.com/aloneguid/config"))} \n" +
                 $"- {Formatter.MaskedUrl("Humanizer", new Uri("https://github.com/Humanizr/Humanizer"))} \n" +
