@@ -25,5 +25,5 @@ jobs:
           heroku_app_name: "garbage-can" #Must be unique in Heroku
           heroku_email: "joseph.md.sorensen@gmail.com"
           usedocker: true
-          docker_heroku_process_type: worker
+          docker_heroku_process_type: web
           appdir: GarbageCan
