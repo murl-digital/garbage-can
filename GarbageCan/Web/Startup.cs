@@ -52,7 +52,7 @@ namespace GarbageCan.Web
 
             //app.UseHttpsRedirection();
 
-            var forwardedHeadersOptions = new ForwardedHeadersOptions
+            /*var forwardedHeadersOptions = new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             };
@@ -61,7 +61,7 @@ namespace GarbageCan.Web
             app.UseForwardedHeaders(forwardedHeadersOptions);
 
             var rewriteOptions = new RewriteOptions().AddRedirectToHttps(308);
-            app.UseRewriter(rewriteOptions);
+            app.UseRewriter(rewriteOptions);*/
 
             app.UseRouting();
             app.UseCors("gbc");

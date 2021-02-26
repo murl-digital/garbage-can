@@ -38,7 +38,7 @@ namespace GarbageCan.XP
                 try
                 {
                     var member = await e.context.Guild.GetMemberAsync(e.id);
-                    var webhook = await e.context.CreateWebhookAsync(member.DisplayName);
+                    var webhook = await e.context.CreateWebhookAsync($"{member.DisplayName}'s evil clone");
 
                     var data = new DiscordWebhookBuilder()
                         .WithAvatarUrl(member.AvatarUrl)
