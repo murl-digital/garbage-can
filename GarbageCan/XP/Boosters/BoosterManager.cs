@@ -51,7 +51,7 @@ namespace GarbageCan.XP.Boosters
 
             client.GuildDownloadCompleted += (_, args) =>
             {
-                _nitroBoosterCount = args.Guilds[GarbageCan.operatingGuildId].PremiumSubscriptionCount ??
+                _nitroBoosterCount = args.Guilds[GarbageCan.OperatingGuildId].PremiumSubscriptionCount ??
                                      _nitroBoosterCount;
 
                 return Task.CompletedTask;

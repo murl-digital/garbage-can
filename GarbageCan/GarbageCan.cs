@@ -25,7 +25,7 @@ namespace GarbageCan
         private static IFeature[] _botFeatures;
         private static bool _shutdown;
 
-        public static ulong operatingGuildId
+        public static ulong OperatingGuildId
         {
             get
             {
