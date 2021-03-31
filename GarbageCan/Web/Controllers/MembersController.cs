@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using GarbageCan.Data;
 using GarbageCan.Web.Models;
+using GarbageCan.XP;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GarbageCan.Web.Controllers
@@ -19,7 +20,7 @@ namespace GarbageCan.Web.Controllers
 
             foreach (var member in members)
             {
-                var xpMember = await context.xpUsers.FindAsync(member.Id);
+                var xpMember = await XpManager.GetUser(member.Id);
                 result.Add(new Member
                 {
                     Id = member.Id,

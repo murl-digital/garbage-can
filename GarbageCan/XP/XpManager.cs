@@ -76,7 +76,7 @@ namespace GarbageCan.XP
             {
                 try
                 {
-                    using var context = new Context();
+                    await using var context = new Context();
                     var user = await context.xpUsers
                         .Where(u => u.id == id)
                         .FirstOrDefaultAsync();
@@ -92,7 +92,6 @@ namespace GarbageCan.XP
 
                         context.xpUsers.Add(user);
                     }
-
                     user.xp += amount;
 
                     var oldLevel = user.lvl;
@@ -126,6 +125,29 @@ namespace GarbageCan.XP
                     Log.Error(ex, "Couldn't add xp to user");
                 }
             });
+        }
+
+        public static async Task<EntityUser> GetUser(ulong id)
+        {
+            await using var context = new Context();
+            var user = await context.xpUsers
+                .Where(u => u.id == id)
+                .FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                user = new EntityUser
+                {
+                    id = id,
+                    lvl = 0,
+                    xp = 0
+                };
+
+                context.xpUsers.Add(user);
+                await context.SaveChangesAsync();
+            }
+
+            return user;
         }
 
         private static bool IsExcluded(ulong channelId)
