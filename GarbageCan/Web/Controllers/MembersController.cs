@@ -20,6 +20,7 @@ namespace GarbageCan.Web.Controllers
 
             foreach (var member in members)
             {
+                if (member.IsBot) continue;
                 var xpMember = await XpManager.GetUser(member.Id);
                 result.Add(new Member
                 {
