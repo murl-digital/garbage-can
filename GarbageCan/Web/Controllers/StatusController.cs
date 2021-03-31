@@ -12,12 +12,10 @@ namespace GarbageCan.Web.Controllers
         [HttpGet]
         public Status Get()
         {
-            var result = new Status
+            return new()
             {
                 ping = GarbageCan.Client.Ping,
             };
-
-            return result;
         }
     }
 }
