@@ -10,7 +10,7 @@ namespace GarbageCan.Web.Controllers
     public class StatusController
     {
         [HttpGet]
-        public async Task<Status> Get()
+        public Status Get()
         {
             var result = new Status
             {
