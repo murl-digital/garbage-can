@@ -34,8 +34,8 @@ namespace GarbageCan.Web.Controllers
             return result;
         }
 
-        [Route("{id}")]
         [HttpGet]
+        [Route("{id}")]
         public async Task<IActionResult> Get(ulong id)
         {
             await using var context = new Context();
