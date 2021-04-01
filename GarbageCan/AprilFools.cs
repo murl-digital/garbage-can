@@ -41,7 +41,6 @@ namespace GarbageCan
             {
                 Task.Run(async () =>
                 {
-                    await Task.Delay(TimeSpan.FromHours(2));
                     BanTimer.Enabled = true;
                 });
 
