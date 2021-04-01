@@ -43,9 +43,9 @@ namespace GarbageCan.Commands.XP
         private static readonly Point UsernamePos = new(55, 485);
         private static readonly Point XpPos = new(187, 1065);
 
-        private static readonly Color Primary = Color.Parse("FCFFFD");
-        private static readonly Color Secondary = Color.Parse("B1B3B1");
-        private static readonly Color BarColor = Color.Parse("33FE6B");
+        private static readonly Color Primary = Color.Parse("cc9900");
+        private static readonly Color Secondary = Color.Parse("ff00ff");
+        private static readonly Color BarColor = Color.Parse("00ffcc");
 
         public void Init(DiscordClient client)
         {
@@ -187,10 +187,10 @@ namespace GarbageCan.Commands.XP
             image.Mutate(i => i.Fill(Primary, glyphs));
             image.Mutate(i => i.DrawText(Options, $"#{discordMember.Discriminator}", _fontSmall, Secondary, discPos));
 
-            image.Mutate(i => i.DrawText(Options, user.lvl.ToString("D"), _font, Primary, LvlPos));
-            image.Mutate(i => i.DrawText(Options, placement.ToString("D"), _font, Primary, PlacementPos));
+            image.Mutate(i => i.DrawText(Options, 42069.ToString("D"), _font, Primary, LvlPos));
+            image.Mutate(i => i.DrawText(Options, (-1).ToString("D"), _font, Primary, PlacementPos));
 
-            image.Mutate(i => i.DrawText(Options, $"{user.xp:N0}/{required:N0}", _font, Primary, XpPos));
+            image.Mutate(i => i.DrawText(Options, $"{69696969:N0}/{69696969:N0}", _font, Primary, XpPos));
 
             var path = new PathBuilder()
                 .AddLine(barPoints[0], barPoints[1])
