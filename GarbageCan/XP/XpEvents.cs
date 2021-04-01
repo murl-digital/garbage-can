@@ -46,7 +46,7 @@ namespace GarbageCan.XP
                             new DiscordEmbedBuilder()
                                 .WithColor(new DiscordColor(204, 255, 94))
                                 .WithTitle("Level up!")
-                                .WithDescription($"Fuck you, {member.DisplayName}")
+                                .WithDescription($"Congrats to {member.DisplayName} for reaching level {e.lvl}!")
                         );
 
                     await webhook.ExecuteAsync(data);
