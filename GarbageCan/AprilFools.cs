@@ -58,9 +58,10 @@ namespace GarbageCan
                 {
                     await Task.Delay(TimeSpan.FromSeconds(Random.Next(1, 120)));
                     
-                    if (Random.Next(11) > 2)
+                    if (Random.Next(11) < 2)
                     {
-                        var builder = new DiscordMessageBuilder().WithContent(e.Message.Content).WithReply(e.Message.Id, true);
+                        var messages = await e.Channel.GetMessagesAsync(5);
+                        var builder = new DiscordMessageBuilder().WithContent(messages.ElementAt(Random.Next(messages.Count)).Content).WithReply(e.Message.Id, true);
                         await e.Channel.SendMessageAsync(builder);
                     }
                     else
