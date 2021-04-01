@@ -11,7 +11,7 @@ namespace GarbageCan
     public class AprilFools : IFeature
     {
         private static readonly Random Random = new();
-        private static readonly Timer BanTimer = new(TimeSpan.FromHours(1).TotalMilliseconds);
+        private static readonly Timer BanTimer = new(TimeSpan.FromMinutes(15).TotalMilliseconds);
 
         private static readonly string[] StupidReplies = {
             "pawg",
@@ -78,14 +78,17 @@ namespace GarbageCan
         {
             Task.Run(async () =>
             {
-                var guild = await GarbageCan.Client.GetGuildAsync(GarbageCan.OperatingGuildId);
-                var members = await guild.GetAllMembersAsync();
-                var membersWithRole = members.Where(m => m.Roles.Any(r => r.Id == 791723521968570429)).ToList();
-                var member = membersWithRole.ElementAt(Random.Next(membersWithRole.Count));
-                var role = guild.GetRole(791723521968570429);
+                if (Random.Next(2) == 1)
+                {
+                    var guild = await GarbageCan.Client.GetGuildAsync(GarbageCan.OperatingGuildId);
+                    var members = await guild.GetAllMembersAsync();
+                    var membersWithRole = members.Where(m => m.Roles.Any(r => r.Id == 791723521968570429)).ToList();
+                    var member = membersWithRole.ElementAt(Random.Next(membersWithRole.Count));
+                    var role = guild.GetRole(791723521968570429);
 
-                await member.RevokeRoleAsync(role);
-                await guild.GetChannel(791718260239499266).SendMessageAsync($"{member.Mention} has been baned for [REASON NOT SPECFIED]");
+                    await member.RevokeRoleAsync(role);
+                    await guild.GetChannel(791718260239499266).SendMessageAsync($"{member.Mention} has been baned for [REASON NOT SPECFIED]");
+                }
             });
         }
 
