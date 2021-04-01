@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Timers;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
@@ -16,6 +17,8 @@ namespace GarbageCan.Roles
 {
     public class RoleManager : IFeature
     {
+        private readonly Timer _roleTaskTimer = new(5000);
+
         public void Init(DiscordClient client)
         {
             XpManager.GhostLevelUp += HandleLevelRoles;
@@ -33,7 +36,14 @@ namespace GarbageCan.Roles
                 return Task.CompletedTask;
             };
             client.GuildMemberUpdated += HandleJoinRoles;
-            client.GuildMemberUpdated += HandleConditionalRoles;
+
+            client.Ready += (_, _) =>
+            {
+                _roleTaskTimer.Elapsed += Tick;
+                _roleTaskTimer.Enabled = true;
+
+                return Task.CompletedTask;
+            };
         }
 
         public void Cleanup()
@@ -50,7 +60,7 @@ namespace GarbageCan.Roles
             {
                 try
                 {
-                    using var context = new Context();
+                    await using var context = new Context();
                     await context.reactionRoles.ForEachAsync(async r =>
                     {
                         try
@@ -135,9 +145,9 @@ namespace GarbageCan.Roles
                                 var role = e.Guild.GetRole(r.roleId);
                                 await e.Member.GrantRoleAsync(role, "join role");
                             }
-                            catch (Exception e)
+                            catch (Exception ex)
                             {
-                                Log.Error(e, "couldn't grant role to user");
+                                Log.Error(ex, "couldn't grant role to user");
                             }
                         });
                     }
@@ -191,61 +201,60 @@ namespace GarbageCan.Roles
             });
         }
 
-        private static Task HandleConditionalRoles(DiscordClient sender, GuildMemberUpdateEventArgs e)
+        private static void Tick(object sender, ElapsedEventArgs elapsedEventArgs)
         {
-            if (e.Member.IsBot) return Task.CompletedTask;
-            if (e.RolesBefore.Count == e.RolesAfter.Count) return Task.CompletedTask;
-
             Task.Run(async () =>
             {
                 try
                 {
                     await using var context = new Context();
+                    var conditionalRoles = new Dictionary<ulong, List<ulong>>();
+                    var conditionalRolesEntity = await context.conditionalRoles.ToArrayAsync();
+                    var members = await GarbageCan.Client.Guilds[GarbageCan.OperatingGuildId].GetAllMembersAsync();
+                    var taskList = new List<Task>();
 
-                    if (e.RolesBefore.Count < e.RolesAfter.Count)
+                    foreach (var role in conditionalRolesEntity)
                     {
-                        var roles = e.RolesAfter.Except(e.RolesBefore);
-
-                        foreach (var role in roles)
+                        if (!conditionalRoles.TryGetValue(role.resultRoleId, out var requiredRoles))
                         {
-                            if (!context.conditionalRoles.Any(r => r.requiredRoleId == role.Id)) continue;
+                            requiredRoles = new List<ulong>();
+                            conditionalRoles.Add(role.resultRoleId, requiredRoles);
+                        }
 
-                            await context.conditionalRoles.Where(r => r.requiredRoleId == role.Id).ForEachAsync(r =>
+                        requiredRoles.Add(role.requiredRoleId);
+                    }
+
+                    var keySet = conditionalRoles.Keys;
+
+                    foreach (var member in members)
+                    {
+                        foreach (var role in member.Roles)
+                        {
+                            if (keySet.All(k => k != role.Id)) continue;
+                            if (!member.Roles.Select(r => r.Id).Any(r => conditionalRoles[role.Id].Any(i => i == r)))
                             {
-                                var toBeAssigned = e.Guild.GetRole(r.resultRoleId);
-                                e.Member.GrantRoleAsync(toBeAssigned);
-                            });
+                                if (conditionalRolesEntity.First(r => r.resultRoleId == role.Id).remain) continue;
+                                taskList.Add(member.RevokeRoleAsync(role, "conditional roles"));
+                            }
                         }
-                    }
 
-                    if (e.RolesBefore.Count > e.RolesAfter.Count)
-                    {
-                        var roles = e.RolesBefore.Except(e.RolesAfter);
-
-                        foreach (var role in roles)
+                        var roles = member.Roles.Select(r => r.Id).ToArray();
+                        foreach (var (key, value) in conditionalRoles)
                         {
-                            if (!context.conditionalRoles.Any(r => r.requiredRoleId == role.Id)) continue;
-                            if (context.conditionalRoles.Count(r =>
-                                r.resultRoleId == role.Id &&
-                                e.RolesAfter.Select(d => d.Id).Contains(r.requiredRoleId)) > 1)
-                                continue;
-
-                            await context.conditionalRoles.Where(r => r.requiredRoleId == role.Id && !r.remain)
-                                .ForEachAsync(r =>
-                                {
-                                    var toBeRemoved = e.Guild.GetRole(r.resultRoleId);
-                                    e.Member.RevokeRoleAsync(toBeRemoved);
-                                });
+                            if (roles.Any(r => value.Any(i => i == r)) && roles.All(r => r != key))
+                            {
+                                taskList.Add(member.GrantRoleAsync(member.Guild.GetRole(key), "conditional roles"));
+                            }
                         }
                     }
+
+                    await Task.WhenAll(taskList);
                 }
-                catch (Exception ex)
+                catch (Exception e)
                 {
-                    Log.Error(ex, "uh oh");
+                    Log.Error(e, "Conditional role update failed");
                 }
             });
-
-            return Task.CompletedTask;
         }
     }
 }

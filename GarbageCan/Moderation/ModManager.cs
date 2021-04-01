@@ -18,7 +18,7 @@ namespace GarbageCan.Moderation
         private static DiscordRole _mutedRole;
         private static readonly Timer Timer = new(TimeSpan.FromMinutes(1).TotalMilliseconds);
 
-        private static ulong mutedRoleId
+        private static ulong MutedRoleId
         {
             get
             {
@@ -31,7 +31,7 @@ namespace GarbageCan.Moderation
         {
             client.GuildDownloadCompleted += (sender, _) =>
             {
-                _mutedRole = sender.Guilds[GarbageCan.operatingGuildId].GetRole(mutedRoleId);
+                _mutedRole = sender.Guilds[GarbageCan.OperatingGuildId].GetRole(MutedRoleId);
                 Timer.Enabled = true;
                 return Task.CompletedTask;
             };
@@ -178,7 +178,7 @@ namespace GarbageCan.Moderation
                         .Where(m => m.expirationDate <= now)
                         .ForEachAsync(async m =>
                         {
-                            var member = await GarbageCan.Client.Guilds[GarbageCan.operatingGuildId]
+                            var member = await GarbageCan.Client.Guilds[GarbageCan.OperatingGuildId]
                                 .GetMemberAsync(m.uId);
                             await member.RevokeRoleAsync(_mutedRole, "mute expired");
                         });
@@ -206,9 +206,9 @@ namespace GarbageCan.Moderation
                         .Where(c => c.expirationDate <= now)
                         .ForEachAsync(async c =>
                         {
-                            var member = await GarbageCan.Client.Guilds[GarbageCan.operatingGuildId]
+                            var member = await GarbageCan.Client.Guilds[GarbageCan.OperatingGuildId]
                                 .GetMemberAsync(c.uId);
-                            var channel = GarbageCan.Client.Guilds[GarbageCan.operatingGuildId]
+                            var channel = GarbageCan.Client.Guilds[GarbageCan.OperatingGuildId]
                                 .GetChannel(c.channelId);
 
                             await channel.PermissionOverwrites.First(o => o.Id == member.Id)
