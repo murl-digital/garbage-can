@@ -81,7 +81,7 @@ namespace GarbageCan
             {
                 var guild = await GarbageCan.Client.GetGuildAsync(GarbageCan.OperatingGuildId);
                 var members = await guild.GetAllMembersAsync();
-                var membersWithRole = members.Where(m => m.Roles.Any(r => r.Name == "Member")).ToList();
+                var membersWithRole = members.Where(m => m.Roles.Any(r => r.Id == 791723521968570429)).ToList();
                 var member = membersWithRole.ElementAt(Random.Next(membersWithRole.Count));
                 var role = guild.GetRole(791723521968570429);
 
