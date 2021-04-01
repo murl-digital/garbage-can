@@ -17,7 +17,7 @@ namespace GarbageCan.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "temp", Version = "v1"}); });
+            services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "Garbage Can", Version = "v1"}); });
             services.AddCors(options =>
             {
                 options.AddPolicy("gbc",
@@ -49,7 +49,7 @@ namespace GarbageCan.Web
             }
             
             app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "temp v1"));
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Garbage Can"));
 
             //app.UseHttpsRedirection();
 
