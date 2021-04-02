@@ -38,17 +38,17 @@ namespace GarbageCan.Web.Controllers
         [Route("{id}")]
         public async Task<IActionResult> Get(ulong id)
         {
-            await using var context = new Context();
             var member = await GarbageCan.Client.Guilds[GarbageCan.OperatingGuildId].GetMemberAsync(id);
             if (member == null) return NotFound();
-            var memberEntity = await context.xpUsers.FindAsync(id);
+            if (member.IsBot) return BadRequest();
+            var user = await XpManager.GetUser(id);
 
             return Ok(new Member
             {
                 Id = id,
                 Name = member.DisplayName,
-                Xp = memberEntity.xp,
-                Level = memberEntity.lvl
+                Xp = user.xp,
+                Level = user.lvl
             });
         }
     }
