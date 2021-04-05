@@ -14,7 +14,7 @@ namespace GarbageCan.Web.Controllers
         {
             return new()
             {
-                ping = GarbageCan.Client.Ping,
+                Ping = GarbageCan.Client.Ping,
             };
         }
     }

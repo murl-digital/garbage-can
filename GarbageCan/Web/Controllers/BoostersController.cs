@@ -15,8 +15,8 @@ namespace GarbageCan.Web.Controllers
         {
             return BoosterManager.activeBoosters.Select(b => new Booster
             {
-                multiplier = b.multiplier,
-                expiration = b.expirationDate
+                Multiplier = b.multiplier,
+                Expiration = b.expirationDate
             }).ToList();
         }
 
@@ -26,8 +26,8 @@ namespace GarbageCan.Web.Controllers
         {
             return BoosterManager.queuedBoosters.Select(b => new QueuedBooster
             {
-                multiplier = b.multiplier,
-                durationInSeconds = b.durationInSeconds
+                Multiplier = b.multiplier,
+                DurationInSeconds = b.durationInSeconds
             }).ToList();
         }
     }
