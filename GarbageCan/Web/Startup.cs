@@ -1,9 +1,8 @@
+using System;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
@@ -20,7 +19,18 @@ namespace GarbageCan.Web
             services.AddSwaggerGen(c =>
             {
                 c.EnableAnnotations();
-                c.SwaggerDoc("v1", new OpenApiInfo {Title = "Garbage Can", Version = "v1"});
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Garbage Can",
+                    Description = "REST api to interact with the Garbage Can Discord Bot",
+                    Version = "v1",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Joe Sorensen",
+                        Email = "no peeking",
+                        Url = new Uri("https://github.com/murl-digital")
+                    }
+                });
             });
             services.AddCors(options =>
             {
@@ -54,19 +64,6 @@ namespace GarbageCan.Web
             
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Garbage Can"));
-
-            //app.UseHttpsRedirection();
-
-            /*var forwardedHeadersOptions = new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-            };
-            forwardedHeadersOptions.KnownNetworks.Clear();
-            forwardedHeadersOptions.KnownProxies.Clear();
-            app.UseForwardedHeaders(forwardedHeadersOptions);
-
-            var rewriteOptions = new RewriteOptions().AddRedirectToHttps(308);
-            app.UseRewriter(rewriteOptions);*/
 
             app.UseRouting();
             app.UseCors("gbc");
