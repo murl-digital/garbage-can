@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GarbageCan.Data;
+using GarbageCan.Web.Filters;
 using GarbageCan.Web.Models;
 using GarbageCan.XP;
 using Microsoft.AspNetCore.Mvc;
@@ -12,11 +14,17 @@ namespace GarbageCan.Web.Controllers
     public class MembersController : Controller
     {
         [HttpGet]
-        public async Task<List<Member>> Get()
+        public async Task<List<Member>> Get([FromQuery] PaginationFilter filter)
         {
+            var ( pageNumber, pageSize ) = new PaginationFilter(filter.PageNumber, filter.PageSize);
+            
             var result = new List<Member>();
-            await using var context = new Context();
-            var members = await GarbageCan.Client.Guilds[GarbageCan.OperatingGuildId].GetAllMembersAsync();
+            var members = GarbageCan.Client.Guilds[GarbageCan.OperatingGuildId].Members
+                .Where(m => !m.Value.IsBot)
+                .Select(m => m.Value)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToArray();
 
             foreach (var member in members)
             {
