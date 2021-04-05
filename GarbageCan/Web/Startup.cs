@@ -17,7 +17,11 @@ namespace GarbageCan.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "Garbage Can", Version = "v1"}); });
+            services.AddSwaggerGen(c =>
+            {
+                c.EnableAnnotations();
+                c.SwaggerDoc("v1", new OpenApiInfo {Title = "Garbage Can", Version = "v1"});
+            });
             services.AddCors(options =>
             {
                 options.AddPolicy("gbc",

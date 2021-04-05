@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GarbageCan.Data;
 using GarbageCan.Web.Filters;
 using GarbageCan.Web.Models;
 using GarbageCan.XP;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace GarbageCan.Web.Controllers
 {
@@ -14,6 +14,7 @@ namespace GarbageCan.Web.Controllers
     public class MembersController : Controller
     {
         [HttpGet]
+        [SwaggerOperation("Gets all members in the server (excluding bot accounts)", "This endpoint is paginated with a default size of 10 and a maximum size of 20")]
         public async Task<List<Member>> Get([FromQuery] PaginationFilter filter)
         {
             var ( pageNumber, pageSize ) = new PaginationFilter(filter.PageNumber, filter.PageSize);
@@ -44,6 +45,10 @@ namespace GarbageCan.Web.Controllers
 
         [HttpGet]
         [Route("{id}")]
+        [SwaggerOperation("Gets a member with a specific id, passed in the url")]
+        [SwaggerResponse(200, type: typeof(Member))]
+        [SwaggerResponse(404, "Requested member not found")]
+        [SwaggerResponse(400, "Requested member is a bot account")]
         public async Task<IActionResult> Get(ulong id)
         {
             var member = await GarbageCan.Client.Guilds[GarbageCan.OperatingGuildId].GetMemberAsync(id);
