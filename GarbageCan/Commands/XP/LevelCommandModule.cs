@@ -9,9 +9,8 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using GarbageCan.Data;
-using GarbageCan.Data.Entities.XP;
+using GarbageCan.Data.Models.XP;
 using GarbageCan.XP;
-using Microsoft.EntityFrameworkCore;
 using Serilog;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
@@ -123,26 +122,10 @@ namespace GarbageCan.Commands.XP
 
         private static async Task<Stream> GenerateImage(DiscordMember discordMember)
         {
-            EntityUser user;
+            User user = await XpManager.GetUser(discordMember.Id);
             int placement;
             await using (var context = new Context())
             {
-                try
-                {
-                    user = await context.xpUsers.FirstAsync(u => u.id == discordMember.Id);
-                }
-                catch (InvalidOperationException)
-                {
-                    user = new EntityUser
-                    {
-                        id = discordMember.Id,
-                        lvl = 0,
-                        xp = 0
-                    };
-                    context.Add(user);
-                    await context.SaveChangesAsync();
-                }
-
                 placement = context.xpUsers
                     .OrderByDescending(u => u.xp)
                     .Select(u => u.id)

@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using GarbageCan.Data;
 using GarbageCan.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace GarbageCan.Web.Controllers
 {
@@ -10,14 +11,13 @@ namespace GarbageCan.Web.Controllers
     public class StatusController
     {
         [HttpGet]
-        public async Task<Status> Get()
+        [SwaggerOperation("Gets the bot's current status")]
+        public Status Get()
         {
-            var result = new Status
+            return new()
             {
-                ping = GarbageCan.Client.Ping,
+                Ping = GarbageCan.Client.Ping,
             };
-
-            return result;
         }
     }
 }

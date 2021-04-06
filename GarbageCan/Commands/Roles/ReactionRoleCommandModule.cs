@@ -34,7 +34,7 @@ namespace GarbageCan.Commands.Roles
                 });
                 await context.SaveChangesAsync();
                 await msg.CreateReactionAsync(emote);
-                await ctx.RespondAsync("Role added successfully");
+                await ctx.RespondAsync($"{GarbageCan.Check} Role added successfully");
             }
             catch (Exception e)
             {
@@ -51,7 +51,7 @@ namespace GarbageCan.Commands.Roles
             {
                 using var context = new Context();
                 await context.reactionRoles.Where(r => r.id == id).DeleteAsync();
-                await ctx.RespondAsync("Role removed successfully");
+                await ctx.RespondAsync($"{GarbageCan.Check} Role removed successfully");
             }
             catch (Exception e)
             {

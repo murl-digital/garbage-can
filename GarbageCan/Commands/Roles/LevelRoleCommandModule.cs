@@ -32,7 +32,7 @@ namespace GarbageCan.Commands.Roles
                     remain = remain
                 });
                 context.SaveChanges();
-                ctx.RespondAsync("Role added successfully");
+                ctx.RespondAsync($"{GarbageCan.Check} Role added successfully");
             }
             catch (Exception e)
             {
@@ -51,7 +51,7 @@ namespace GarbageCan.Commands.Roles
             {
                 using var context = new Context();
                 await context.levelRoles.Where(r => r.id == id).DeleteAsync();
-                await ctx.RespondAsync("Role removed successfully");
+                await ctx.RespondAsync($"{GarbageCan.Check} Role removed successfully");
             }
             catch (Exception e)
             {

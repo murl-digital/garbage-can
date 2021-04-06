@@ -6,6 +6,7 @@ using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using GarbageCan.Data;
 using GarbageCan.Data.Entities.XP;
+using GarbageCan.Data.Models.XP;
 using GarbageCan.XP.Boosters;
 using MathNet.Numerics.Distributions;
 using Microsoft.EntityFrameworkCore;
@@ -76,7 +77,7 @@ namespace GarbageCan.XP
             {
                 try
                 {
-                    using var context = new Context();
+                    await using var context = new Context();
                     var user = await context.xpUsers
                         .Where(u => u.id == id)
                         .FirstOrDefaultAsync();
@@ -126,6 +127,38 @@ namespace GarbageCan.XP
                     Log.Error(ex, "Couldn't add xp to user");
                 }
             });
+        }
+
+        // NOTE: you need to be careful with this function
+        // as you can see, it doesn't verify if the user's even supposed to be in the database
+        // so, if you pass a fake id or bot id, itll just add it. 
+        // ALWAYS BE SURE TO VALIDATE THE ID FIRST
+        public static async Task<User> GetUser(ulong id)
+        {
+            await using var context = new Context();
+            var user = await context.xpUsers
+                .Where(u => u.id == id)
+                .FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                user = new EntityUser
+                {
+                    id = id,
+                    lvl = 0,
+                    xp = 0
+                };
+
+                context.xpUsers.Add(user);
+                await context.SaveChangesAsync();
+            }
+
+            return new User
+            {
+                id = user.id,
+                lvl = user.lvl,
+                xp = user.xp
+            };
         }
 
         private static bool IsExcluded(ulong channelId)

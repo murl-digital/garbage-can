@@ -52,10 +52,10 @@ namespace GarbageCan.Commands.Boosters
                 switch (result)
                 {
                     case BoosterResult.Active:
-                        await ctx.RespondAsync("Your booster has been activated!");
+                        await ctx.RespondAsync($"{GarbageCan.Check} Your booster has been activated!");
                         break;
                     case BoosterResult.Queued:
-                        await ctx.RespondAsync("Your booster has been queued!");
+                        await ctx.RespondAsync($"{GarbageCan.Check} Your booster has been queued!");
                         break;
                     case BoosterResult.SlotsFull:
                         break;
@@ -132,10 +132,10 @@ namespace GarbageCan.Commands.Boosters
                 switch (result)
                 {
                     case BoosterResult.Active:
-                        await ctx.RespondAsync("Booster has been activated");
+                        await ctx.RespondAsync($"{GarbageCan.Check} Booster has been activated!");
                         break;
                     case BoosterResult.Queued:
-                        await ctx.RespondAsync("Booster has been queued");
+                        await ctx.RespondAsync($"{GarbageCan.Check} Booster has been queued");
                         break;
                     case BoosterResult.SlotsFull:
                         break;
@@ -164,7 +164,7 @@ namespace GarbageCan.Commands.Boosters
                     durationInSeconds = (long) span.TotalSeconds
                 });
                 await context.SaveChangesAsync();
-                await ctx.RespondAsync("Booster has been given");
+                await ctx.RespondAsync($"{GarbageCan.Check} Booster has been given");
             }
             catch (Exception e)
             {
@@ -228,7 +228,7 @@ namespace GarbageCan.Commands.Boosters
                 try
                 {
                     BoosterManager.AddSlot(channel);
-                    await ctx.RespondAsync("Slot successfully added");
+                    await ctx.RespondAsync($"{GarbageCan.Check} Slot successfully added");
                 }
                 catch (Exception e)
                 {
@@ -249,6 +249,7 @@ namespace GarbageCan.Commands.Boosters
                     }
 
                     BoosterManager.RemoveSlot(id);
+                    await ctx.RespondAsync($"{GarbageCan.Check} Slot has been removed");
                 }
                 catch (Exception e)
                 {
