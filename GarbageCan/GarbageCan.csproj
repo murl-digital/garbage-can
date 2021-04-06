@@ -9,8 +9,8 @@
       <PackageReference Include="AspNetCoreRateLimit" Version="3.2.2" />
       <PackageReference Include="Config.Net" Version="4.15.0" />
       <PackageReference Include="Config.Net.Json" Version="4.15.0" />
-      <PackageReference Include="DSharpPlus" Version="4.0.0-rc2" />
-      <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-rc2" />
+      <PackageReference Include="DSharpPlus" Version="4.0.0-rc3" />
+      <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-rc3" />
       <PackageReference Include="Humanizer.Core" Version="2.8.26" />
       <PackageReference Include="MathNet.Numerics" Version="4.15.0" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.4" />
