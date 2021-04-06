@@ -8,23 +8,28 @@ namespace GarbageCan.Web
 {
     public class WebAPI : IFeature
     {
-        public IHost HostObj;
+        private IHost _hostObj;
 
         public void Init(DiscordClient client)
         {
-            Task.Run(() =>
+            client.Ready += (_, _) =>
             {
-                HostObj = CreateHostBuilder().Build();
-                HostObj.RunAsync();
-            });
+                Task.Run(() =>
+                {
+                    _hostObj = CreateHostBuilder().Build();
+                    _hostObj.RunAsync();
+                });
+
+                return Task.CompletedTask;
+            };
         }
 
         public void Cleanup()
         {
-            HostObj.StopAsync();
+            _hostObj.StopAsync();
         }
 
-        public static IHostBuilder CreateHostBuilder()
+        private static IHostBuilder CreateHostBuilder()
         {
             return Host.CreateDefaultBuilder()
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
