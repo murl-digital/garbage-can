@@ -6,6 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="AspNetCoreRateLimit" Version="3.2.2" />
       <PackageReference Include="Config.Net" Version="4.15.0" />
       <PackageReference Include="Config.Net.Json" Version="4.15.0" />
       <PackageReference Include="DSharpPlus" Version="4.0.0-rc2" />
