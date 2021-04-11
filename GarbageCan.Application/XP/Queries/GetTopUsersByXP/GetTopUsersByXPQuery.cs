@@ -35,8 +35,7 @@ namespace GarbageCan.Application.XP.Queries.GetTopUsersByXP
 
             foreach (var user in topUsers)
             {
-                var member = await _discordGuild.GetMemberAsync(user.User.Id);
-                user.DisplayName = member.DisplayName;
+                user.DisplayName = await _discordGuild.GetMemberDisplayNameAsync(user.User.Id);
             }
 
             var contextUser = users.First(x => x.User.Id == request.CurrentUserId);
