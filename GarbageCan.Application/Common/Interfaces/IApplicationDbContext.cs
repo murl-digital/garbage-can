@@ -1,0 +1,31 @@
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+
+namespace GarbageCan.Application.Common.Interfaces
+{
+    public interface IApplicationDbContext
+    {
+
+        public DbSet<EntityConfig> config { get; set; }
+
+        public DbSet<EntityUser> xpUsers { get; set; }
+        public DbSet<EntityExcludedChannel> xpExcludedChannels { get; set; }
+        public DbSet<EntityQueuedBooster> xpQueuedBoosters { get; set; }
+        public DbSet<EntityAvailableSlot> xpAvailableSlots { get; set; }
+        public DbSet<EntityActiveBooster> xpActiveBoosters { get; set; }
+        public DbSet<EntityUserBooster> xpUserBoosters { get; set; }
+
+        public DbSet<EntityActionLog> moderationActionLogs { get; set; }
+        public DbSet<EntityActiveMute> moderationActiveMutes { get; set; }
+        public DbSet<EntityActiveChannelRestrict> moderationActiveChannelRestricts { get; set; }
+
+        public DbSet<EntityWatchedUser> joinWatchlist { get; set; }
+        public DbSet<EntityJoinRole> joinRoles { get; set; }
+        public DbSet<EntityReactionRole> reactionRoles { get; set; }
+        public DbSet<EntityConditionalRole> conditionalRoles { get; set; }
+        public DbSet<EntityLevelRole> levelRoles { get; set; }
+
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+    }
+}

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using Config.Net;
+﻿using Config.Net;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
@@ -11,6 +7,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Exceptions;
+using System;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace GarbageCan
 {
@@ -69,7 +69,7 @@ namespace GarbageCan
                 _botFeatures = AppDomain.CurrentDomain.GetAssemblies()
                     .SelectMany(x => x.GetTypes())
                     .Where(x => typeof(IFeature).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-                    .Select(x => (IFeature) Activator.CreateInstance(x))
+                    .Select(x => (IFeature)Activator.CreateInstance(x))
                     .ToArray();
 
                 foreach (var feature in _botFeatures)
@@ -90,7 +90,7 @@ namespace GarbageCan
 
                 Commands = Client.UseCommandsNext(new CommandsNextConfiguration
                 {
-                    StringPrefixes = new[] {Config.commandPrefix}
+                    StringPrefixes = new[] { Config.commandPrefix },
                 });
 
                 Commands.RegisterCommands(Assembly.GetExecutingAssembly());
