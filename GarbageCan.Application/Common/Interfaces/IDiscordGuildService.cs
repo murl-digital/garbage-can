@@ -2,7 +2,7 @@
 
 namespace GarbageCan.Application.Common.Interfaces
 {
-    public interface IDiscordGuild
+    public interface IDiscordGuildService
     {
         Task<string> GetMemberDisplayNameAsync(ulong userId);
     }

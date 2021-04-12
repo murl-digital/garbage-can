@@ -1,4 +1,7 @@
-﻿using GarbageCan.Infrastructure.Persistence;
+﻿using GarbageCan.Application.Common.Interfaces;
+using GarbageCan.Infrastructure.Discord;
+using GarbageCan.Infrastructure.Persistence;
+using GarbageCan.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,13 +28,22 @@ namespace GarbageCan.Infrastructure
                         b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName));
                 });
             }
+            services.AddTransient<IApplicationDbContext, ApplicationDbContext>();
+            services.AddScoped<IDomainEventService, DomainEventService>();
+            services.AddTransient<IDateTime, DateTimeService>();
+
+            services.AddTransient<IDiscordGuildService, DiscordGuildService>();
+
             return services;
         }
 
-        public static async Task<IServiceProvider> MigrateDatabase(this IServiceProvider provider)
+        public static async Task<IServiceProvider> MigrateDatabaseAsync(this IServiceProvider provider)
         {
             await using var context = provider.GetRequiredService<ApplicationDbContext>();
-            await context.Database.MigrateAsync();
+            if (context.Database.IsMySql())
+            {
+                await context.Database.MigrateAsync();
+            }
             return provider;
         }
     }

@@ -15,12 +15,12 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
     {
         private ApplicationFixture _fixture;
         private DbContextFixture _dbContext;
-        private Mock<IDiscordGuild> _mock;
+        private Mock<IDiscordGuildService> _mock;
 
         [SetUp]
         public void Setup()
         {
-            _mock = new Mock<IDiscordGuild>();
+            _mock = new Mock<IDiscordGuildService>();
 
             _fixture = new ApplicationFixture();
             _dbContext = new DbContextFixture();

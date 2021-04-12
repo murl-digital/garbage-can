@@ -6,6 +6,10 @@ namespace GarbageCan.Infrastructure.Persistence
 {
     public class ApplicationDbContext : DbContext, IApplicationDbContext
     {
+        public ApplicationDbContext(DbContextOptions options) : base(options)
+        {
+        }
+
         public DbSet<EntityUser> XPUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)

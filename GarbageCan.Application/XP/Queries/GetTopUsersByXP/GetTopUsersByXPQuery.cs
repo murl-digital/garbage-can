@@ -15,12 +15,12 @@ namespace GarbageCan.Application.XP.Queries.GetTopUsersByXP
     public class GetTopUsersByXPQueryHandler : IRequestHandler<GetTopUsersByXPQuery, GetTopUsersByXPQueryVm>
     {
         private readonly IApplicationDbContext _context;
-        private readonly IDiscordGuild _discordGuild;
+        private readonly IDiscordGuildService _discordGuildService;
 
-        public GetTopUsersByXPQueryHandler(IApplicationDbContext context, IDiscordGuild discordGuild)
+        public GetTopUsersByXPQueryHandler(IApplicationDbContext context, IDiscordGuildService discordGuildService)
         {
             _context = context;
-            _discordGuild = discordGuild;
+            _discordGuildService = discordGuildService;
         }
 
         public async Task<GetTopUsersByXPQueryVm> Handle(GetTopUsersByXPQuery request, CancellationToken cancellationToken)
@@ -35,7 +35,7 @@ namespace GarbageCan.Application.XP.Queries.GetTopUsersByXP
 
             foreach (var user in topUsers)
             {
-                user.DisplayName = await _discordGuild.GetMemberDisplayNameAsync(user.User.Id);
+                user.DisplayName = await _discordGuildService.GetMemberDisplayNameAsync(user.User.Id);
             }
 
             var contextUser = users.First(x => x.User.Id == request.CurrentUserId);
