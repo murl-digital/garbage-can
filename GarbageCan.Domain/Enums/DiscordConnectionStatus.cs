@@ -3,6 +3,7 @@
     public enum DiscordConnectionStatus
     {
         Disconnected,
-        Ready
+        Ready,
+        Shutdown,
     }
 }

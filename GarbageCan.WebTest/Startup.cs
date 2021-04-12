@@ -94,7 +94,7 @@ namespace GarbageCan.WebTest
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime applicationLifetime)
         {
             if (env.IsDevelopment())
             {
@@ -112,6 +112,20 @@ namespace GarbageCan.WebTest
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
+
+            applicationLifetime.ApplicationStopped.Register(() =>
+            {
+                var service = app.ApplicationServices.GetService<IDomainEventService>();
+                var logger = app.ApplicationServices.GetService<ILogger<Startup>>();
+
+                logger.LogInformation("SHUTTING DOWN");
+                service?.Publish(new DiscordConnectionChangeEvent { Status = DiscordConnectionStatus.Shutdown }).GetAwaiter().GetResult();
+
+                var client = app.ApplicationServices.GetService<DiscordClient>();
+                client?.DisconnectAsync().GetAwaiter().GetResult();
+
+                logger.LogInformation("SHUT DOWN");
             });
         }
     }
