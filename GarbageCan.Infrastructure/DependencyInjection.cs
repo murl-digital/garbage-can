@@ -38,13 +38,14 @@ namespace GarbageCan.Infrastructure
             return services;
         }
 
-        public static async Task<IServiceProvider> MigrateDatabaseAsync(this IServiceProvider provider)
+        public static async Task<IServiceProvider> MigrateAndSeedDatabaseAsync(this IServiceProvider provider)
         {
             await using var context = provider.GetRequiredService<ApplicationDbContext>();
             if (context.Database.IsMySql())
             {
                 await context.Database.MigrateAsync();
             }
+            await ApplicationDbContextSeed.SeedSampleDataAsync(context);
             return provider;
         }
     }

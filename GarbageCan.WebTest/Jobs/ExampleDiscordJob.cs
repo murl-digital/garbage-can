@@ -21,7 +21,7 @@ namespace GarbageCan.WebTest.Jobs
         public async Task Execute(IJobExecutionContext context)
         {
             var topTenUsers = await _mediator.Send(new GetTopUsersByXPQuery { Count = 10, CurrentUserId = 39 });
-            _logger.LogInformation("Top Users: {ViewModel}", topTenUsers);
+            _logger.LogInformation("Top Users: {@ViewModel}", topTenUsers);
         }
     }
 }

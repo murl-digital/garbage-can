@@ -1,7 +1,6 @@
 ﻿using GarbageCan.Application.XP.Queries.GetTopUsersByXP;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
 namespace GarbageCan.WebTest.Controllers
@@ -10,12 +9,10 @@ namespace GarbageCan.WebTest.Controllers
     [Route("[controller]")]
     public class TestController : ControllerBase
     {
-        private readonly ILogger<TestController> _logger;
         private readonly IMediator _mediator;
 
-        public TestController(ILogger<TestController> logger, IMediator mediator)
+        public TestController(IMediator mediator)
         {
-            _logger = logger;
             _mediator = mediator;
         }
 

@@ -21,7 +21,7 @@ namespace GarbageCan.WebTest
                 var services = scope.ServiceProvider;
                 var logger = services.GetRequiredService<ILogger<Program>>();
 
-                await MigrateDatabase(services, logger);
+                await MigrateAndSeedDatabase(services, logger);
 
                 await ConnectToDiscord(services, logger);
             }
@@ -54,11 +54,11 @@ namespace GarbageCan.WebTest
             }
         }
 
-        private static async Task MigrateDatabase(IServiceProvider services, ILogger<Program> logger)
+        private static async Task MigrateAndSeedDatabase(IServiceProvider services, ILogger<Program> logger)
         {
             try
             {
-                await services.MigrateDatabaseAsync();
+                await services.MigrateAndSeedDatabaseAsync();
             }
             catch (Exception ex)
             {
