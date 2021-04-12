@@ -34,6 +34,7 @@ namespace GarbageCan.Infrastructure
             services.AddTransient<ICurrentUserService, DummyUserService>();
 
             services.AddTransient<IDiscordGuildService, DiscordGuildService>();
+            services.AddScoped<DiscordCommandContextService>();
 
             return services;
         }

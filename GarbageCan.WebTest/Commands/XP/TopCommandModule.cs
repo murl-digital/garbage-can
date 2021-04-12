@@ -13,7 +13,7 @@ namespace GarbageCan.WebTest.Commands.XP
         [Command("top")]
         public async Task TopCommand(CommandContext ctx)
         {
-            var result = await Mediator.Send(new GetTopUsersByXPQuery { Count = 10, CurrentUserId = ctx.User.Id });
+            var result = await Mediator.Send(new GetTopUsersByXPQuery { Count = 10, CurrentUserId = ctx.User.Id }, ctx);
             if (result.Succeeded)
             {
                 var topTenUsers = result.Value.TopTenUsers;

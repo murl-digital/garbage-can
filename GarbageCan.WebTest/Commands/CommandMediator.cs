@@ -1,4 +1,6 @@
-﻿using GarbageCan.WebTest.Models;
+﻿using DSharpPlus.CommandsNext;
+using GarbageCan.Infrastructure.Discord;
+using GarbageCan.WebTest.Models;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -19,12 +21,14 @@ namespace GarbageCan.WebTest.Commands
             _logger = logger;
         }
 
-        public async Task<Result<TResponse>> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<Result<TResponse>> Send<TResponse>(IRequest<TResponse> request, CommandContext commandContext, CancellationToken cancellationToken = new CancellationToken())
         {
             try
             {
                 using var scope = _provider.CreateScope();
                 var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+                var contextService = scope.ServiceProvider.GetRequiredService<DiscordCommandContextService>();
+                contextService.CommandContext = commandContext;
 
                 var result = await mediator.Send(request, cancellationToken);
                 return Result<TResponse>.Success(result);
