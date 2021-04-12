@@ -1,4 +1,5 @@
 using DSharpPlus;
+using DSharpPlus.CommandsNext;
 using GarbageCan.Application;
 using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Domain.Enums;
@@ -14,6 +15,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
+using GarbageCan.WebTest.Commands;
 
 namespace GarbageCan.WebTest
 {
@@ -44,6 +47,8 @@ namespace GarbageCan.WebTest
                 .GetRequiredService<IOptions<DiscordClientConfiguration>>()
             .Value);
 
+            services.AddTransient<CommandMediator>();
+
             services.AddSingleton<DiscordClient>(provider =>
             {
                 var config = provider.GetRequiredService<IDiscordClientConfiguration>();
@@ -56,6 +61,14 @@ namespace GarbageCan.WebTest
                     MinimumLogLevel = LogLevel.Debug,
                     Intents = DiscordIntents.All
                 });
+
+                var commands = client.UseCommandsNext(new CommandsNextConfiguration
+                {
+                    StringPrefixes = new[] { config.CommandPrefix },
+                    Services = provider
+                });
+
+                commands.RegisterCommands(Assembly.GetExecutingAssembly());
 
                 client.Ready += async (_, _) =>
                 {

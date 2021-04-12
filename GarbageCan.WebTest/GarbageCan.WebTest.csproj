@@ -6,6 +6,7 @@
   </PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-rc3" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
 		<PackageReference Include="Quartz" Version="3.2.3" />
 		<PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.2.3" />
