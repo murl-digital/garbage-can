@@ -29,6 +29,7 @@ namespace GarbageCan.WebTest.EventHandlers
         {
             if (notification.DomainEvent.Status == DiscordConnectionStatus.Ready)
             {
+                _logger.LogInformation("Starting scheduled jobs");
                 _scheduler.ConfigureJobWithCronSchedule<ExampleDiscordJob>(_logger, _configuration, "BackgroundTasks:ExampleJobCronExpression");
             }
 

@@ -29,7 +29,7 @@ namespace GarbageCan.Infrastructure
                 });
             }
             services.AddTransient<IApplicationDbContext, ApplicationDbContext>();
-            services.AddScoped<IDomainEventService, DomainEventService>();
+            services.AddTransient<IDomainEventService, DomainEventService>();
             services.AddTransient<IDateTime, DateTimeService>();
             services.AddTransient<ICurrentUserService, DummyUserService>();
 

@@ -5,6 +5,7 @@ using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Domain.Enums;
 using GarbageCan.Domain.Events;
 using GarbageCan.Infrastructure;
+using GarbageCan.WebTest.Commands;
 using GarbageCan.WebTest.Configurations;
 using GarbageCan.WebTest.Extensions;
 using Microsoft.AspNetCore.Builder;
@@ -15,8 +16,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using System;
 using System.Reflection;
-using GarbageCan.WebTest.Commands;
 
 namespace GarbageCan.WebTest
 {
@@ -38,7 +39,7 @@ namespace GarbageCan.WebTest
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "GarbageCan.WebTest", Version = "v1" });
             });
 
-            services.AddApplication();
+            services.AddApplication(typeof(Startup).Assembly);
             services.AddInfrastructure(Configuration);
             services.ConfigureQuartz(Configuration);
 
@@ -72,11 +73,20 @@ namespace GarbageCan.WebTest
 
                 client.Ready += async (_, _) =>
                 {
-                    var eventService = provider.GetRequiredService<IDomainEventService>();
-                    await eventService.Publish(new DiscordConnectionChangeEvent
+                    var logger = provider.GetRequiredService<ILogger<Startup>>();
+                    try
                     {
-                        Status = DiscordConnectionStatus.Ready
-                    });
+                        logger.LogInformation("Discord connection is {Status}", DiscordConnectionStatus.Ready);
+                        var eventService = provider.GetRequiredService<IDomainEventService>();
+                        await eventService.Publish(new DiscordConnectionChangeEvent
+                        {
+                            Status = DiscordConnectionStatus.Ready
+                        });
+                    }
+                    catch (Exception exception)
+                    {
+                        logger.LogError(exception, "Error On Ready");
+                    }
                 };
 
                 return client;
