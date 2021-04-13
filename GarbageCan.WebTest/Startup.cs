@@ -14,10 +14,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Reflection;
+using DiscordConfiguration = DSharpPlus.DiscordConfiguration;
 
 namespace GarbageCan.WebTest
 {
@@ -41,12 +41,11 @@ namespace GarbageCan.WebTest
 
             services.AddApplication(typeof(Startup).Assembly);
             services.AddInfrastructure(Configuration);
+
             services.ConfigureQuartz(Configuration);
 
-            services.Configure<DiscordClientConfiguration>(Configuration.GetSection("DiscordClient"));
-            services.AddTransient<IDiscordClientConfiguration>(provider => provider
-                .GetRequiredService<IOptions<DiscordClientConfiguration>>()
-            .Value);
+            services.Configure<IDiscordClientConfiguration, DiscordClientConfiguration>(Configuration.GetSection("Discord:Client"));
+            services.Configure<IDiscordConfiguration, Configurations.DiscordConfiguration>(Configuration.GetSection("Discord"));
 
             services.AddTransient<CommandMediator>();
 
