@@ -15,13 +15,13 @@ namespace GarbageCan.Infrastructure.Discord
 
         public async Task<string> GetMemberDisplayNameAsync(ulong userId)
         {
-            if (_contextService.CommandContext != null)
+            if (_contextService.CommandContext == null)
             {
-                var member = await _contextService.CommandContext.Guild.GetMemberAsync(userId);
-                return member?.DisplayName;
+                throw new CommandContextMissingException();
             }
 
-            throw new CommandContextMissingException();
+            var member = await _contextService.CommandContext.Guild.GetMemberAsync(userId);
+            return member?.DisplayName;
         }
     }
 }
