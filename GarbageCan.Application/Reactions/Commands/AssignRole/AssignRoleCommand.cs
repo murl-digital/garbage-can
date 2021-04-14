@@ -24,7 +24,9 @@ namespace GarbageCan.Application.Reactions.Commands.AssignRole
         private readonly ILogger<AssignRoleCommandHandler> _logger;
         private readonly IDiscordGuildRoleService _roleService;
 
-        public AssignRoleCommandHandler(IApplicationDbContext context, IDiscordGuildRoleService roleService, ILogger<AssignRoleCommandHandler> logger)
+        public AssignRoleCommandHandler(IApplicationDbContext context,
+            IDiscordGuildRoleService roleService,
+            ILogger<AssignRoleCommandHandler> logger)
         {
             _context = context;
             _roleService = roleService;

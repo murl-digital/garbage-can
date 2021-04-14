@@ -94,8 +94,10 @@ namespace GarbageCan.WebTest
                     var logger = provider.GetRequiredService<ILogger<Startup>>();
                     try
                     {
-                        logger.LogInformation("Discord connection is {Status}", DiscordConnectionStatus.Ready);
-                        var eventService = provider.GetRequiredService<IDomainEventService>();
+                        using var scope = provider.CreateScope();
+                        logger.LogInformation("MessageReactionAdded");
+
+                        var eventService = scope.ServiceProvider.GetRequiredService<IDomainEventService>();
                         await eventService.Publish(new DiscordMessageReactionAddedEvent
                         {
                             ChannelId = args.Channel.Id,
