@@ -2,6 +2,7 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using GarbageCan.Application;
 using GarbageCan.Application.Common.Interfaces;
+using GarbageCan.Domain.Entities;
 using GarbageCan.Domain.Enums;
 using GarbageCan.Domain.Events;
 using GarbageCan.Infrastructure;
@@ -85,6 +86,32 @@ namespace GarbageCan.WebTest
                     catch (Exception exception)
                     {
                         logger.LogError(exception, "Error On Ready");
+                    }
+                };
+
+                client.MessageReactionAdded += async (sender, args) =>
+                {
+                    var logger = provider.GetRequiredService<ILogger<Startup>>();
+                    try
+                    {
+                        logger.LogInformation("Discord connection is {Status}", DiscordConnectionStatus.Ready);
+                        var eventService = provider.GetRequiredService<IDomainEventService>();
+                        await eventService.Publish(new DiscordMessageReactionAddedEvent
+                        {
+                            ChannelId = args.Channel.Id,
+                            Emoji = new Emoji
+                            {
+                                Id = args.Emoji.Id,
+                                Name = args.Emoji.Name
+                            },
+                            GuildId = args.Guild.Id,
+                            MessageId = args.Message.Id,
+                            UserId = args.User.Id,
+                        });
+                    }
+                    catch (Exception exception)
+                    {
+                        logger.LogError(exception, "Error On MessageReactionAdded");
                     }
                 };
 
