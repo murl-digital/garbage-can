@@ -1,4 +1,5 @@
-﻿using GarbageCan.Domain.Entities.XP;
+﻿using GarbageCan.Domain.Entities.Roles;
+using GarbageCan.Domain.Entities.XP;
 using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,7 +23,8 @@ namespace GarbageCan.Application.Common.Interfaces
 
         //public DbSet<EntityWatchedUser> joinWatchlist { get; set; }
         //public DbSet<EntityJoinRole> joinRoles { get; set; }
-        //public DbSet<EntityReactionRole> reactionRoles { get; set; }
+        public DbSet<EntityReactionRole> reactionRoles { get; set; }
+
         //public DbSet<EntityConditionalRole> conditionalRoles { get; set; }
         //public DbSet<EntityLevelRole> levelRoles { get; set; }
 

@@ -35,6 +35,7 @@ namespace GarbageCan.Infrastructure
 
             services.AddTransient<IDiscordGuildService, DiscordGuildService>();
             services.AddTransient<IDiscordResponseService, DiscordResponseService>();
+            services.AddTransient<IDiscordGuildRoleService, DiscordGuildRoleService>();
             services.AddScoped<DiscordCommandContextService>();
             services.AddSingleton<DiscordEmojiProviderService>();
 
