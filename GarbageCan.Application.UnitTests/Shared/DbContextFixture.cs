@@ -1,4 +1,5 @@
 ﻿using GarbageCan.Application.Common.Interfaces;
+using GarbageCan.Domain.Entities.Roles;
 using GarbageCan.Domain.Entities.XP;
 using MockQueryable.Moq;
 using Moq;
@@ -20,10 +21,12 @@ namespace GarbageCan.Application.UnitTests.Shared
             setDbSet.Setup(x => x.FindAsync(It.IsAny<Guid>())).Returns(() => new ValueTask<EntityUser>(Task.FromResult(XPUsers.First())));
 
             MockContext.Setup(x => x.XPUsers).Returns(() => setDbSet.Object);
+            MockContext.Setup(x => x.reactionRoles).Returns(() => ReactionRoles.AsQueryable().BuildMockDbSet().Object);
         }
 
         public Mock<IApplicationDbContext> MockContext { get; }
 
         public List<EntityUser> XPUsers { get; set; } = new List<EntityUser>();
+        public List<EntityReactionRole> ReactionRoles { get; set; } = new List<EntityReactionRole>();
     }
 }
