@@ -7,7 +7,6 @@
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="10.1.1" />
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
-		<PackageReference Include="DSharpPlus" Version="4.0.0-rc3" />
 		<PackageReference Include="FluentValidation" Version="9.2.2" />
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="9.2.0" />
 		<PackageReference Include="MediatR" Version="9.0.0" />
