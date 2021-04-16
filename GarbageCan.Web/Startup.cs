@@ -1,5 +1,6 @@
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.EventArgs;
 using GarbageCan.Application;
 using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Domain.Entities;
@@ -18,6 +19,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Reflection;
+using System.Threading.Tasks;
 using DiscordConfiguration = DSharpPlus.DiscordConfiguration;
 
 namespace GarbageCan.Web
@@ -71,51 +73,9 @@ namespace GarbageCan.Web
 
                 commands.RegisterCommands(Assembly.GetExecutingAssembly());
 
-                client.Ready += async (_, _) =>
-                {
-                    var logger = provider.GetRequiredService<ILogger<Startup>>();
-                    try
-                    {
-                        logger.LogInformation("Discord connection is {Status}", DiscordConnectionStatus.Ready);
-                        var eventService = provider.GetRequiredService<IDomainEventService>();
-                        await eventService.Publish(new DiscordConnectionChangeEvent
-                        {
-                            Status = DiscordConnectionStatus.Ready
-                        });
-                    }
-                    catch (Exception exception)
-                    {
-                        logger.LogError(exception, "Error On Ready");
-                    }
-                };
+                client.Ready += async (sender, args) => { await OnReadyEvent(provider); };
 
-                client.MessageReactionAdded += async (sender, args) =>
-                {
-                    var logger = provider.GetRequiredService<ILogger<Startup>>();
-                    try
-                    {
-                        using var scope = provider.CreateScope();
-                        logger.LogInformation("MessageReactionAdded");
-
-                        var eventService = scope.ServiceProvider.GetRequiredService<IDomainEventService>();
-                        await eventService.Publish(new DiscordMessageReactionAddedEvent
-                        {
-                            ChannelId = args.Channel.Id,
-                            Emoji = new Emoji
-                            {
-                                Id = args.Emoji.Id,
-                                Name = args.Emoji.Name
-                            },
-                            GuildId = args.Guild.Id,
-                            MessageId = args.Message.Id,
-                            UserId = args.User.Id,
-                        });
-                    }
-                    catch (Exception exception)
-                    {
-                        logger.LogError(exception, "Error On MessageReactionAdded");
-                    }
-                };
+                client.MessageReactionAdded += async (sender, args) => { await OnMessageReactionAdded(provider, args); };
 
                 return client;
             });
@@ -155,6 +115,52 @@ namespace GarbageCan.Web
 
                 logger.LogInformation("SHUT DOWN");
             });
+        }
+
+        private static async Task OnMessageReactionAdded(IServiceProvider provider, MessageReactionAddEventArgs args)
+        {
+            var logger = provider.GetRequiredService<ILogger<Startup>>();
+            try
+            {
+                using var scope = provider.CreateScope();
+                logger.LogInformation("MessageReactionAdded");
+
+                var eventService = scope.ServiceProvider.GetRequiredService<IDomainEventService>();
+                await eventService.Publish(new DiscordMessageReactionAddedEvent
+                {
+                    ChannelId = args.Channel.Id,
+                    Emoji = new Emoji
+                    {
+                        Id = args.Emoji.Id,
+                        Name = args.Emoji.Name
+                    },
+                    GuildId = args.Guild.Id,
+                    MessageId = args.Message.Id,
+                    UserId = args.User.Id,
+                });
+            }
+            catch (Exception exception)
+            {
+                logger.LogError(exception, "Error On MessageReactionAdded");
+            }
+        }
+
+        private static async Task OnReadyEvent(IServiceProvider provider)
+        {
+            var logger = provider.GetRequiredService<ILogger<Startup>>();
+            try
+            {
+                logger.LogInformation("Discord connection is {Status}", DiscordConnectionStatus.Ready);
+                var eventService = provider.GetRequiredService<IDomainEventService>();
+                await eventService.Publish(new DiscordConnectionChangeEvent
+                {
+                    Status = DiscordConnectionStatus.Ready
+                });
+            }
+            catch (Exception exception)
+            {
+                logger.LogError(exception, "Error On Ready");
+            }
         }
     }
 }
