@@ -1,11 +1,12 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using GarbageCan.Application.Common.Interfaces;
+﻿using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GarbageCan.Application.Roles.Commands.AssignRole
 {
@@ -35,24 +36,23 @@ namespace GarbageCan.Application.Roles.Commands.AssignRole
 
         public async Task<bool> Handle(AssignRoleCommand request, CancellationToken cancellationToken)
         {
-            await _context.reactionRoles.ForEachAsync(async r =>
+            var roles = await _context.reactionRoles
+                .Where(x => x.channelId == request.ChannelId && x.messageId == request.MessageId)
+                .ToListAsync(cancellationToken);
+
+            roles = roles.Where(r => r.emoteId == EmoteId(request.Emoji)).ToList();
+
+            foreach (var reactionRole in roles)
             {
                 try
                 {
-                    // before you say "BUT JOE YOU CAN USE .WHERE() JOE" hear me out
-                    // i tried that. i really did. but for some reason it didnt work.
-                    // it would just say "hey all these rows satisfy the predicate!" ...even though they don't
-                    // conclusion: linq is a lie thank you for coming to my ted talk
-                    if (r.channelId != request.ChannelId || r.messageId != request.MessageId ||
-                        r.emoteId != EmoteId(request.Emoji)) return;
-
-                    await _roleService.GrantRoleAsync(request.GuildId, r.roleId, request.UserId, "reaction role");
+                    await _roleService.GrantRoleAsync(request.GuildId, reactionRole.roleId, request.UserId, "reaction role");
                 }
                 catch (Exception e)
                 {
                     _logger.LogError(e, "Couldn't assign reaction role");
                 }
-            }, cancellationToken);
+            }
 
             return true;
         }
