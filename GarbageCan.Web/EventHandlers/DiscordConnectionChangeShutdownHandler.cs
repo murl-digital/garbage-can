@@ -23,9 +23,6 @@ namespace GarbageCan.Web.EventHandlers
             if (notification.DomainEvent.Status == DiscordConnectionStatus.Shutdown)
             {
                 await _client.UpdateStatusAsync(null, UserStatus.Offline);
-
-                // Simulate multiple shutdown operations
-                await Task.Delay(5000, cancellationToken);
             }
         }
     }
