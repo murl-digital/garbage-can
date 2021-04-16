@@ -1,11 +1,11 @@
-﻿using GarbageCan.Application.Common.Models;
-using GarbageCan.Application.Reactions.Commands.AssignRole;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using GarbageCan.Application.Common.Models;
+using GarbageCan.Application.Roles.Commands.AssignRole;
 using GarbageCan.Domain.Events;
 using MediatR;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace GarbageCan.Application.Reactions.EventHandlers
+namespace GarbageCan.Application.Roles.EventHandlers
 {
     public class DiscordMessageReactionAddedEventHandler : INotificationHandler<DomainEventNotification<DiscordMessageReactionAddedEvent>>
     {

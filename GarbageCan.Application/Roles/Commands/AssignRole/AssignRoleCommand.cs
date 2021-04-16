@@ -1,13 +1,13 @@
-﻿using GarbageCan.Application.Common.Interfaces;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace GarbageCan.Application.Reactions.Commands.AssignRole
+namespace GarbageCan.Application.Roles.Commands.AssignRole
 {
     public class AssignRoleCommand : IRequest<bool>
     {

@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using GarbageCan.Application.Common.Interfaces;
-using GarbageCan.Application.Reactions.Commands.AssignRole;
 using GarbageCan.Application.UnitTests.Shared;
 using GarbageCan.Application.UnitTests.Shared.Logging;
 using GarbageCan.Domain.Entities;
@@ -11,6 +10,7 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
+using GarbageCan.Application.Roles.Commands.AssignRole;
 
 namespace GarbageCan.Application.UnitTests.Roles.Commands
 {
