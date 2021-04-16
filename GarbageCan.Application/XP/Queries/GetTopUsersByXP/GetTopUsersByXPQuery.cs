@@ -42,7 +42,7 @@ namespace GarbageCan.Application.XP.Queries.GetTopUsersByXP
 
             return new GetTopUsersByXPQueryVm
             {
-                TopTenUsers = users,
+                TopTenUsers = topUsers,
                 ContextUser = contextUser
             };
         }
