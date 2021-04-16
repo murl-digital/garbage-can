@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
 
-namespace GarbageCan.Application.Roles.Commands.AssignRole
+namespace GarbageCan.Application.Roles.Commands.AlterRole
 {
-    public class AssignRoleCommandValidator : AbstractValidator<AssignRoleCommand>
+    public class AlterRoleCommandValidator : AbstractValidator<AlterRoleCommand>
     {
-        public AssignRoleCommandValidator()
+        public AlterRoleCommandValidator()
         {
             RuleFor(v => v.UserId).GreaterThan(0u);
             RuleFor(v => v.ChannelId).GreaterThan(0u);

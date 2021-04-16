@@ -37,7 +37,7 @@ namespace GarbageCan.Application.Common.Behaviors
             {
                 var requestName = typeof(TRequest).Name;
                 var userId = _currentUserService.UserId ?? string.Empty;
-                _logger.LogWarning("SetManagement Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@UserId} {@UserName} {@Request}",
+                _logger.LogWarning("GarbageCan Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@UserId} {@UserName} {@Request}",
                     requestName, elapsedMilliseconds, userId, userId, request);
             }
 

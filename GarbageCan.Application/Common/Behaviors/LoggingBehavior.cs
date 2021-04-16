@@ -22,7 +22,7 @@ namespace GarbageCan.Application.Common.Behaviors
             var requestName = typeof(TRequest).Name;
             var userId = _currentUserService.UserId ?? string.Empty;
 
-            _logger.LogDebug("SetManagement Request: {Name} {@UserId} {@UserName} {@Request}", requestName, userId, userId, request);
+            _logger.LogDebug("GarbageCan Request: {Name} {@UserId} {@UserName} {@Request}", requestName, userId, userId, request);
             return Task.CompletedTask;
         }
     }

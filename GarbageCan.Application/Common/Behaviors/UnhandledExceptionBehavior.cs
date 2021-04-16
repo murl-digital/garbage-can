@@ -25,7 +25,7 @@ namespace GarbageCan.Application.Common.Behaviors
             {
                 var requestName = typeof(TRequest).Name;
 
-                _logger.LogError(ex, "SetManagement Request: Unhandled Exception for Request {Name} {@Request}", requestName, request);
+                _logger.LogError(ex, "GarbageCan Request: Unhandled Exception for Request {Name} {@Request}", requestName, request);
 
                 throw;
             }

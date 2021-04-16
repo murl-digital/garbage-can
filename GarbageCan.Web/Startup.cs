@@ -1,8 +1,8 @@
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
-using DSharpPlus.EventArgs;
 using GarbageCan.Application;
 using GarbageCan.Application.Common.Interfaces;
+using GarbageCan.Domain.Common;
 using GarbageCan.Domain.Entities;
 using GarbageCan.Domain.Enums;
 using GarbageCan.Domain.Events;
@@ -73,9 +73,45 @@ namespace GarbageCan.Web
 
                 commands.RegisterCommands(Assembly.GetExecutingAssembly());
 
-                client.Ready += async (sender, args) => { await OnReadyEvent(provider); };
+                client.Ready += async (sender, args) =>
+                {
+                    await PublishScopedEvent(provider, new DiscordConnectionChangeEvent
+                    {
+                        Status = DiscordConnectionStatus.Ready
+                    });
+                };
 
-                client.MessageReactionAdded += async (sender, args) => { await OnMessageReactionAdded(provider, args); };
+                client.MessageReactionAdded += async (sender, args) =>
+                {
+                    await PublishScopedEvent(provider, new DiscordMessageReactionAddedEvent
+                    {
+                        ChannelId = args.Channel.Id,
+                        Emoji = new Emoji
+                        {
+                            Id = args.Emoji.Id,
+                            Name = args.Emoji.Name
+                        },
+                        GuildId = args.Guild.Id,
+                        MessageId = args.Message.Id,
+                        UserId = args.User.Id,
+                    });
+                };
+
+                client.MessageReactionRemoved += async (sender, args) =>
+                {
+                    await PublishScopedEvent(provider, new DiscordMessageReactionRemovedEvent
+                    {
+                        ChannelId = args.Channel.Id,
+                        Emoji = new Emoji
+                        {
+                            Id = args.Emoji.Id,
+                            Name = args.Emoji.Name
+                        },
+                        GuildId = args.Guild.Id,
+                        MessageId = args.Message.Id,
+                        UserId = args.User.Id
+                    });
+                };
 
                 return client;
             });
@@ -117,49 +153,18 @@ namespace GarbageCan.Web
             });
         }
 
-        private static async Task OnMessageReactionAdded(IServiceProvider provider, MessageReactionAddEventArgs args)
+        private static async Task PublishScopedEvent(IServiceProvider provider, DomainEvent notification)
         {
             var logger = provider.GetRequiredService<ILogger<Startup>>();
             try
             {
                 using var scope = provider.CreateScope();
-                logger.LogInformation("MessageReactionAdded");
-
                 var eventService = scope.ServiceProvider.GetRequiredService<IDomainEventService>();
-                await eventService.Publish(new DiscordMessageReactionAddedEvent
-                {
-                    ChannelId = args.Channel.Id,
-                    Emoji = new Emoji
-                    {
-                        Id = args.Emoji.Id,
-                        Name = args.Emoji.Name
-                    },
-                    GuildId = args.Guild.Id,
-                    MessageId = args.Message.Id,
-                    UserId = args.User.Id,
-                });
+                await eventService.Publish(notification);
             }
             catch (Exception exception)
             {
-                logger.LogError(exception, "Error On MessageReactionAdded");
-            }
-        }
-
-        private static async Task OnReadyEvent(IServiceProvider provider)
-        {
-            var logger = provider.GetRequiredService<ILogger<Startup>>();
-            try
-            {
-                logger.LogInformation("Discord connection is {Status}", DiscordConnectionStatus.Ready);
-                var eventService = provider.GetRequiredService<IDomainEventService>();
-                await eventService.Publish(new DiscordConnectionChangeEvent
-                {
-                    Status = DiscordConnectionStatus.Ready
-                });
-            }
-            catch (Exception exception)
-            {
-                logger.LogError(exception, "Error On Ready");
+                logger.LogError(exception, "Error On Scoped event publish. Event: {@Event}", notification);
             }
         }
     }

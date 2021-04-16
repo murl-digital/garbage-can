@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 
 namespace GarbageCan.Application.Roles.EventHandlers
 {
-    public class DiscordMessageReactionAddedEventHandler : INotificationHandler<DomainEventNotification<DiscordMessageReactionAddedEvent>>
+    public class DiscordMessageReactionRemovedEventHandler : INotificationHandler<DomainEventNotification<DiscordMessageReactionRemovedEvent>>
     {
         private readonly IMediator _mediator;
 
-        public DiscordMessageReactionAddedEventHandler(IMediator mediator)
+        public DiscordMessageReactionRemovedEventHandler(IMediator mediator)
         {
             _mediator = mediator;
         }
 
-        public async Task Handle(DomainEventNotification<DiscordMessageReactionAddedEvent> notification, CancellationToken cancellationToken)
+        public async Task Handle(DomainEventNotification<DiscordMessageReactionRemovedEvent> notification, CancellationToken cancellationToken)
         {
             await _mediator.Send(new AlterRoleCommand
             {
@@ -25,7 +25,7 @@ namespace GarbageCan.Application.Roles.EventHandlers
                 GuildId = notification.DomainEvent.GuildId,
                 MessageId = notification.DomainEvent.MessageId,
                 UserId = notification.DomainEvent.UserId,
-                Add = true
+                Add = false
             }, cancellationToken);
         }
     }

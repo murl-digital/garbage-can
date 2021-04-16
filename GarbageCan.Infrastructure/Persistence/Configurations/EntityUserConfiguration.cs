@@ -10,6 +10,7 @@ namespace GarbageCan.Infrastructure.Persistence.Configurations
         {
             builder.HasKey(t => t.Id);
             builder.Property(t => t.Id).ValueGeneratedNever();
+            builder.ToTable("xpUsers");
         }
     }
 }

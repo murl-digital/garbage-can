@@ -21,7 +21,7 @@ namespace GarbageCan.Infrastructure.Services
 
         public async Task Publish(DomainEvent domainEvent)
         {
-            _logger.LogInformation("Publishing domain event. Event - {event}", domainEvent.GetType().Name);
+            _logger.LogDebug("Publishing domain event. Event - {@event}", domainEvent);
             await _mediator.Publish(GetNotificationCorrespondingToDomainEvent(domainEvent));
         }
 

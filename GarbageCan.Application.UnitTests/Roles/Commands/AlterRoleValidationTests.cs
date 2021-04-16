@@ -1,17 +1,17 @@
 ﻿using FluentAssertions;
 using GarbageCan.Application.Common.Exceptions;
-using GarbageCan.Application.Roles.Commands.AssignRole;
+using GarbageCan.Application.Roles.Commands.AlterRole;
 using GarbageCan.Application.UnitTests.Shared;
 using GarbageCan.Domain.Entities;
 using NUnit.Framework;
 
 namespace GarbageCan.Application.UnitTests.Roles.Commands
 {
-    public class AssignRoleValidationTests
+    public class AlterRoleValidationTests
     {
         private readonly ApplicationFixture _fixture;
 
-        public AssignRoleValidationTests()
+        public AlterRoleValidationTests()
         {
             _fixture = new ApplicationFixture();
         }
@@ -19,7 +19,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
         [Theory]
         public void ShouldThrowValidationException_WhenEmojiIsNull()
         {
-            var command = new AssignRoleCommand
+            var command = new AlterRoleCommand
             {
                 GuildId = 151,
                 UserId = 450,
@@ -41,7 +41,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
         [TestCase(41u, 41u, 41u, 41u, 0u, "   ")]
         public void ShouldThrowValidationException_WhenHasInvalidProperty(ulong guildId, ulong userId, ulong channelId, ulong messageId, ulong emojiId, string emojiName)
         {
-            var command = new AssignRoleCommand
+            var command = new AlterRoleCommand
             {
                 GuildId = guildId,
                 UserId = userId,
