@@ -1,4 +1,4 @@
-﻿namespace GarbageCan.WebTest.Configurations
+﻿namespace GarbageCan.Web.Configurations
 {
     public interface IDiscordClientConfiguration
     {

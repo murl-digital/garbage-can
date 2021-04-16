@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace GarbageCan.WebTest.Extensions
+namespace GarbageCan.Web.Extensions
 {
     public static class ConfigurationExtensions
     {

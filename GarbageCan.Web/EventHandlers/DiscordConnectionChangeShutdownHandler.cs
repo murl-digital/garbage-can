@@ -7,7 +7,7 @@ using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace GarbageCan.WebTest.EventHandlers
+namespace GarbageCan.Web.EventHandlers
 {
     public class DiscordConnectionChangeShutdownHandler : INotificationHandler<DomainEventNotification<DiscordConnectionChangeEvent>>
     {

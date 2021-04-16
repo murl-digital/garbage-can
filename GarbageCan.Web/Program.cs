@@ -8,7 +8,7 @@ using Serilog;
 using System;
 using System.Threading.Tasks;
 
-namespace GarbageCan.WebTest
+namespace GarbageCan.Web
 {
     public class Program
     {

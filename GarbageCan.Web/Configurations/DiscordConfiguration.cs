@@ -1,6 +1,6 @@
 ﻿using GarbageCan.Application.Common.Interfaces;
 
-namespace GarbageCan.WebTest.Configurations
+namespace GarbageCan.Web.Configurations
 {
     internal class DiscordConfiguration : IDiscordConfiguration
     {

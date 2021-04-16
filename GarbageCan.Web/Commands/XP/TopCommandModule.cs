@@ -3,7 +3,7 @@ using DSharpPlus.CommandsNext.Attributes;
 using GarbageCan.Application.XP.Commands.PrintTopUsersByXp;
 using System.Threading.Tasks;
 
-namespace GarbageCan.WebTest.Commands.XP
+namespace GarbageCan.Web.Commands.XP
 {
     public class TopCommandModule : MediatorCommandModule
     {

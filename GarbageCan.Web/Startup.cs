@@ -6,9 +6,9 @@ using GarbageCan.Domain.Entities;
 using GarbageCan.Domain.Enums;
 using GarbageCan.Domain.Events;
 using GarbageCan.Infrastructure;
-using GarbageCan.WebTest.Commands;
-using GarbageCan.WebTest.Configurations;
-using GarbageCan.WebTest.Extensions;
+using GarbageCan.Web.Commands;
+using GarbageCan.Web.Configurations;
+using GarbageCan.Web.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -20,7 +20,7 @@ using System;
 using System.Reflection;
 using DiscordConfiguration = DSharpPlus.DiscordConfiguration;
 
-namespace GarbageCan.WebTest
+namespace GarbageCan.Web
 {
     public class Startup
     {
@@ -37,7 +37,7 @@ namespace GarbageCan.WebTest
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "GarbageCan.WebTest", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "GarbageCan.Web", Version = "v1" });
             });
 
             services.AddApplication(typeof(Startup).Assembly);
@@ -128,7 +128,7 @@ namespace GarbageCan.WebTest
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "GarbageCan.WebTest v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "GarbageCan.Web v1"));
             }
 
             app.UseHttpsRedirection();

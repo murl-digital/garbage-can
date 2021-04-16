@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Quartz;
 using System.Threading.Tasks;
 
-namespace GarbageCan.WebTest.Jobs
+namespace GarbageCan.Web.Jobs
 {
     [DisallowConcurrentExecution]
     public class ExampleDiscordJob : IJob

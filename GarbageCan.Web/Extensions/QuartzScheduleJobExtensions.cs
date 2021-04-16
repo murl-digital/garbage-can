@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace GarbageCan.WebTest.Extensions
+namespace GarbageCan.Web.Extensions
 {
     public static class QuartzScheduleJobExtensions
     {

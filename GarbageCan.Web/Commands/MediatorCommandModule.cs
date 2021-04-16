@@ -1,6 +1,6 @@
 ﻿using DSharpPlus.CommandsNext;
 
-namespace GarbageCan.WebTest.Commands
+namespace GarbageCan.Web.Commands
 {
     public abstract class MediatorCommandModule : BaseCommandModule
     {

@@ -3,7 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
-namespace GarbageCan.WebTest.Controllers
+namespace GarbageCan.Web.Controllers
 {
     [ApiController]
     [Route("[controller]")]

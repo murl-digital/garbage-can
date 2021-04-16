@@ -7,7 +7,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace GarbageCan.WebTest.Commands
+namespace GarbageCan.Web.Commands
 {
     public class CommandMediator
     {

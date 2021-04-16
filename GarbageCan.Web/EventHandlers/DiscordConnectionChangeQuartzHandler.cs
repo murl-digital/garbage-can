@@ -1,8 +1,8 @@
 ﻿using GarbageCan.Application.Common.Models;
 using GarbageCan.Domain.Enums;
 using GarbageCan.Domain.Events;
-using GarbageCan.WebTest.Extensions;
-using GarbageCan.WebTest.Jobs;
+using GarbageCan.Web.Extensions;
+using GarbageCan.Web.Jobs;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -10,7 +10,7 @@ using Quartz;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace GarbageCan.WebTest.EventHandlers
+namespace GarbageCan.Web.EventHandlers
 {
     public class DiscordConnectionChangeQuartzHandler : INotificationHandler<DomainEventNotification<DiscordConnectionChangeEvent>>
     {
