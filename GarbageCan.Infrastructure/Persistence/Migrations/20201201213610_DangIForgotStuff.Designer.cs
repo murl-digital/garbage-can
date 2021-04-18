@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GarbageCan.Infrastructure.Persistence.Migrations
 {
-    [DbContext(typeof(Context))]
+    [DbContext(typeof(ApplicationDbContext))]
     [Migration("20201201213610_DangIForgotStuff")]
     partial class DangIForgotStuff
     {

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GarbageCan.Infrastructure.Persistence.Migrations
 {
-    [DbContext(typeof(Context))]
+    [DbContext(typeof(ApplicationDbContext))]
     [Migration("20210110163102_LessDumbColumnNames")]
     partial class LessDumbColumnNames
     {
@@ -18,7 +18,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64)
                 .HasAnnotation("ProductVersion", "5.0.0");
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.Boosters.EntityActiveBooster", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.Boosters.EntityActiveBooster", b =>
                 {
                     b.Property<int>("id")
                         .HasColumnType("int");
@@ -34,7 +34,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("xp_active_boosters");
                 });
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.Boosters.EntityAvailableSlot", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.Boosters.EntityAvailableSlot", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
@@ -48,7 +48,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("xp_available_slots");
                 });
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.Boosters.EntityQueuedBooster", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.Boosters.EntityQueuedBooster", b =>
                 {
                     b.Property<int>("position")
                         .HasColumnType("int");
@@ -64,7 +64,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("xp_queued_boosters");
                 });
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.Boosters.EntityUserBooster", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.Boosters.EntityUserBooster", b =>
                 {
                     b.Property<string>("id")
                         .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
@@ -83,7 +83,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("xp_user_boosters");
                 });
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.Moderation.EntityActionLog", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.Moderation.EntityActionLog", b =>
                 {
                     b.Property<string>("comments")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
@@ -103,7 +103,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("moderation_warnings");
                 });
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.Moderation.EntityActiveChannelRestrict", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.Moderation.EntityActiveChannelRestrict", b =>
                 {
                     b.Property<ulong>("channelId")
                         .HasColumnType("bigint unsigned");
@@ -117,7 +117,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("moderation_active_channel_restricts");
                 });
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.Moderation.EntityActiveMute", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.Moderation.EntityActiveMute", b =>
                 {
                     b.Property<DateTime>("expirationDate")
                         .HasColumnType("datetime");
@@ -128,7 +128,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("moderation_active_mutes");
                 });
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.XP.EntityExcludedChannel", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.XP.EntityExcludedChannel", b =>
                 {
                     b.Property<ulong>("channelId")
                         .HasColumnType("bigint unsigned");
@@ -136,7 +136,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("xp_excluded_channels");
                 });
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.XP.EntityLevelRole", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.XP.EntityLevelRole", b =>
                 {
                     b.Property<ulong>("id")
                         .HasColumnType("bigint unsigned");
@@ -150,7 +150,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("xp_level_roles");
                 });
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.XP.EntityUser", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.XP.EntityUser", b =>
                 {
                     b.Property<ulong>("id")
                         .HasColumnType("bigint unsigned");
@@ -166,9 +166,9 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("xp_users");
                 });
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.Boosters.EntityActiveBooster", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.Boosters.EntityActiveBooster", b =>
                 {
-                    b.HasOne("GarbageCan.Data.Entities.Boosters.EntityAvailableSlot", "slot")
+                    b.HasOne("GarbageCan.Domain.Entities.Boosters.EntityAvailableSlot", "slot")
                         .WithMany()
                         .HasForeignKey("id")
                         .OnDelete(DeleteBehavior.Cascade)

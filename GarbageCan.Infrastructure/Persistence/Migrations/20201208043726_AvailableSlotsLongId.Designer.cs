@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GarbageCan.Infrastructure.Persistence.Migrations
 {
-    [DbContext(typeof(Context))]
+    [DbContext(typeof(ApplicationDbContext))]
     [Migration("20201208043726_AvailableSlotsLongId")]
     partial class AvailableSlotsLongId
     {
