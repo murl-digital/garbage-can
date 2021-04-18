@@ -9,7 +9,9 @@ namespace GarbageCan.Infrastructure.Persistence.Configurations
         public void Configure(EntityTypeBuilder<EntityUser> builder)
         {
             builder.HasKey(t => t.Id);
-            builder.Property(t => t.Id).ValueGeneratedNever();
+            builder.Property(t => t.Id).ValueGeneratedNever().HasColumnName("id");
+            builder.Property(t => t.XP).HasColumnName("xp");
+            builder.Property(t => t.Lvl).HasColumnName("lvl");
             builder.ToTable("xpUsers");
         }
     }
