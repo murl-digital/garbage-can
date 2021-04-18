@@ -8,6 +8,7 @@ namespace GarbageCan.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<EntityConditionalRole> builder)
         {
+            builder.HasKey(t => t.id);
             builder.ToTable("conditionalRoles");
         }
     }

@@ -8,6 +8,8 @@ namespace GarbageCan.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<EntityActiveMute> builder)
         {
+            builder.HasKey(t => t.id);
+            builder.Property(x => x.expirationDate).HasColumnType("datetime");
             builder.ToTable("moderationActiveMutes");
         }
     }

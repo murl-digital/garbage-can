@@ -8,6 +8,7 @@ namespace GarbageCan.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<EntityConfig> builder)
         {
+            builder.HasKey(t => t.key);
             builder.ToTable("config");
         }
     }

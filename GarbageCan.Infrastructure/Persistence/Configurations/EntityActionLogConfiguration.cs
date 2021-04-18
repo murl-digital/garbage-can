@@ -8,6 +8,8 @@ namespace GarbageCan.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<EntityActionLog> builder)
         {
+            builder.HasKey(t => t.id);
+            builder.Property(x => x.issuedDate).HasColumnType("datetime");
             builder.ToTable("moderationActionLogs");
         }
     }
