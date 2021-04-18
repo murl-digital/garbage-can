@@ -4,7 +4,10 @@ using System;
 
 namespace GarbageCan.Infrastructure.Persistence.Migrations
 {
+#pragma warning disable IDE1006 // Naming Styles
+
     public partial class init : Migration
+#pragma warning restore IDE1006 // Naming Styles
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
