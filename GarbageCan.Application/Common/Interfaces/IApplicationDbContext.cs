@@ -11,25 +11,21 @@ namespace GarbageCan.Application.Common.Interfaces
 {
     public interface IApplicationDbContext
     {
-        public DbSet<EntityConfig> config { get; set; }
-
+        public DbSet<EntityConditionalRole> ConditionalRoles { get; set; }
+        public DbSet<EntityConfig> Config { get; set; }
+        public DbSet<EntityJoinRole> JoinRoles { get; set; }
+        public DbSet<EntityWatchedUser> JoinWatchlist { get; set; }
+        public DbSet<EntityLevelRole> LevelRoles { get; set; }
+        public DbSet<EntityActionLog> ModerationActionLogs { get; set; }
+        public DbSet<EntityActiveChannelRestrict> ModerationActiveChannelRestricts { get; set; }
+        public DbSet<EntityActiveMute> ModerationActiveMutes { get; set; }
+        public DbSet<EntityReactionRole> ReactionRoles { get; set; }
+        public DbSet<EntityActiveBooster> XPActiveBoosters { get; set; }
+        public DbSet<EntityAvailableSlot> XPAvailableSlots { get; set; }
+        public DbSet<EntityExcludedChannel> XPExcludedChannels { get; set; }
+        public DbSet<EntityQueuedBooster> XPQueuedBoosters { get; set; }
+        public DbSet<EntityUserBooster> XPUserBoosters { get; set; }
         public DbSet<EntityUser> XPUsers { get; set; }
-        public DbSet<EntityExcludedChannel> xpExcludedChannels { get; set; }
-        public DbSet<EntityQueuedBooster> xpQueuedBoosters { get; set; }
-        public DbSet<EntityAvailableSlot> xpAvailableSlots { get; set; }
-        public DbSet<EntityActiveBooster> xpActiveBoosters { get; set; }
-        public DbSet<EntityUserBooster> xpUserBoosters { get; set; }
-
-        public DbSet<EntityActionLog> moderationActionLogs { get; set; }
-        public DbSet<EntityActiveMute> moderationActiveMutes { get; set; }
-        public DbSet<EntityActiveChannelRestrict> moderationActiveChannelRestricts { get; set; }
-
-        public DbSet<EntityWatchedUser> joinWatchlist { get; set; }
-        public DbSet<EntityJoinRole> joinRoles { get; set; }
-        public DbSet<EntityReactionRole> reactionRoles { get; set; }
-
-        public DbSet<EntityConditionalRole> conditionalRoles { get; set; }
-        public DbSet<EntityLevelRole> levelRoles { get; set; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }

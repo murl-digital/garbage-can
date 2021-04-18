@@ -9,6 +9,7 @@ namespace GarbageCan.Infrastructure.Persistence.Configurations
         public void Configure(EntityTypeBuilder<EntityExcludedChannel> builder)
         {
             builder.HasNoKey();
+            builder.ToTable("xpExcludedChannels");
         }
     }
 }

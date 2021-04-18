@@ -21,7 +21,7 @@ namespace GarbageCan.Application.UnitTests.Shared
             setDbSet.Setup(x => x.FindAsync(It.IsAny<Guid>())).Returns(() => new ValueTask<EntityUser>(Task.FromResult(XPUsers.First())));
 
             MockContext.Setup(x => x.XPUsers).Returns(() => setDbSet.Object);
-            MockContext.Setup(x => x.reactionRoles).Returns(() => ReactionRoles.AsQueryable().BuildMockDbSet().Object);
+            MockContext.Setup(x => x.ReactionRoles).Returns(() => ReactionRoles.AsQueryable().BuildMockDbSet().Object);
         }
 
         public Mock<IApplicationDbContext> MockContext { get; }

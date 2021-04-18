@@ -31,7 +31,7 @@ namespace GarbageCan.Infrastructure.Persistence
                     XP = 5440
                 });
 
-                await context.reactionRoles.AddAsync(new EntityReactionRole()
+                await context.ReactionRoles.AddAsync(new EntityReactionRole()
                 {
                     channelId = 26121,
                     emoteId = "12545",

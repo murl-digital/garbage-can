@@ -37,7 +37,7 @@ namespace GarbageCan.Application.Roles.Commands.AlterRole
 
         public async Task<bool> Handle(AlterRoleCommand request, CancellationToken cancellationToken)
         {
-            var roles = await _context.reactionRoles
+            var roles = await _context.ReactionRoles
                 .Where(x => x.channelId == request.ChannelId && x.messageId == request.MessageId)
                 .ToListAsync(cancellationToken);
 
