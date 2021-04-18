@@ -16,7 +16,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64)
                 .HasAnnotation("ProductVersion", "5.0.0");
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.Boosters.EntityActiveBooster", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.Boosters.EntityActiveBooster", b =>
                 {
                     b.Property<int>("id")
                         .HasColumnType("int");
@@ -32,7 +32,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("xpActiveBoosters");
                 });
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.Boosters.EntityAvailableSlot", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.Boosters.EntityAvailableSlot", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
@@ -46,7 +46,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("xpAvailableSlots");
                 });
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.Boosters.EntityQueuedBooster", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.Boosters.EntityQueuedBooster", b =>
                 {
                     b.Property<int>("position")
                         .HasColumnType("int");
@@ -62,7 +62,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("xpQueuedBoosters");
                 });
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.Boosters.EntityUserBooster", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.Boosters.EntityUserBooster", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
@@ -82,7 +82,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("xpUserBoosters");
                 });
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.Config.EntityConfig", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.Config.EntityConfig", b =>
                 {
                     b.Property<string>("key")
                         .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
@@ -95,7 +95,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("config");
                 });
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.Moderation.EntityActionLog", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.Moderation.EntityActionLog", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
@@ -121,7 +121,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("moderationActionLogs");
                 });
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.Moderation.EntityActiveChannelRestrict", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.Moderation.EntityActiveChannelRestrict", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
@@ -141,7 +141,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("moderationActiveChannelRestricts");
                 });
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.Moderation.EntityActiveMute", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.Moderation.EntityActiveMute", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
@@ -158,7 +158,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("moderationActiveMutes");
                 });
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.Roles.EntityConditionalRole", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.Roles.EntityConditionalRole", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
@@ -178,7 +178,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("conditionalRoles");
                 });
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.Roles.EntityJoinRole", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.Roles.EntityJoinRole", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
@@ -192,7 +192,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("joinRoles");
                 });
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.Roles.EntityLevelRole", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.Roles.EntityLevelRole", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
@@ -212,7 +212,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("levelRoles");
                 });
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.Roles.EntityReactionRole", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.Roles.EntityReactionRole", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
@@ -235,7 +235,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("reactionRoles");
                 });
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.Roles.EntityWatchedUser", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.Roles.EntityWatchedUser", b =>
                 {
                     b.Property<ulong>("id")
                         .ValueGeneratedOnAdd()
@@ -246,7 +246,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("joinWatchlist");
                 });
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.XP.EntityExcludedChannel", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.XP.EntityExcludedChannel", b =>
                 {
                     b.Property<ulong>("channelId")
                         .HasColumnType("bigint unsigned");
@@ -254,7 +254,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("xpExcludedChannels");
                 });
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.XP.EntityUser", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.XP.EntityUser", b =>
                 {
                     b.Property<ulong>("id")
                         .HasColumnType("bigint unsigned");
@@ -270,9 +270,9 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("xpUsers");
                 });
 
-            modelBuilder.Entity("GarbageCan.Data.Entities.Boosters.EntityActiveBooster", b =>
+            modelBuilder.Entity("GarbageCan.Domain.Entities.Boosters.EntityActiveBooster", b =>
                 {
-                    b.HasOne("GarbageCan.Data.Entities.Boosters.EntityAvailableSlot", "slot")
+                    b.HasOne("GarbageCan.Domain.Entities.Boosters.EntityAvailableSlot", "slot")
                         .WithMany()
                         .HasForeignKey("id")
                         .OnDelete(DeleteBehavior.Cascade)
