@@ -1,12 +1,10 @@
 ﻿using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Domain.Entities.Roles;
 using GarbageCan.Domain.Entities.XP;
-using MockQueryable.Moq;
-using Moq;
-using System;
+using MockQueryable.NSubstitute;
+using NSubstitute;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace GarbageCan.Application.UnitTests.Shared
 {
@@ -14,19 +12,15 @@ namespace GarbageCan.Application.UnitTests.Shared
     {
         public DbContextFixture()
         {
-            MockContext = new Mock<IApplicationDbContext>();
+            MockContext = Substitute.For<IApplicationDbContext>();
 
-            var setDbSet = XPUsers.AsQueryable().BuildMockDbSet();
-
-            setDbSet.Setup(x => x.FindAsync(It.IsAny<Guid>())).Returns(() => new ValueTask<EntityUser>(Task.FromResult(XPUsers.First())));
-
-            MockContext.Setup(x => x.XPUsers).Returns(() => setDbSet.Object);
-            MockContext.Setup(x => x.ReactionRoles).Returns(() => ReactionRoles.AsQueryable().BuildMockDbSet().Object);
+            MockContext.XPUsers.ReturnsForAnyArgs(_ => XPUsers.AsQueryable().BuildMockDbSet());
+            MockContext.reactionRoles.ReturnsForAnyArgs(_ => ReactionRoles.AsQueryable().BuildMockDbSet());
         }
 
-        public Mock<IApplicationDbContext> MockContext { get; }
+        public IApplicationDbContext MockContext { get; }
 
-        public List<EntityUser> XPUsers { get; set; } = new List<EntityUser>();
         public List<EntityReactionRole> ReactionRoles { get; set; } = new List<EntityReactionRole>();
+        public List<EntityUser> XPUsers { get; set; } = new List<EntityUser>();
     }
 }

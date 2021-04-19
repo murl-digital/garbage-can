@@ -9,22 +9,23 @@ namespace GarbageCan.Application.UnitTests.Shared
 {
     public class MediatorFixture
     {
+        public EventHandler<IServiceCollection> OnConfigureServices { get; set; }
         public ServiceProvider Provider { get; private set; }
 
         protected ServiceCollection Services { get; } = new ServiceCollection();
 
-        public EventHandler<IServiceCollection> OnConfigureServices { get; set; }
-
-        public MockedILogger<T> GetMockedLogger<T>()
+        public SubstituteLogger GetLogger<T>()
         {
-            return Provider.GetMockedLogger<T>();
+            var mockedLoggerFactory = Provider.GetService<SubstituteLoggerFactory>();
+            var mockLogger = mockedLoggerFactory.GetLogger<T>();
+            return mockLogger;
         }
 
         public async Task<T> SendAsync<T>(IRequest<T> request)
         {
             if (Provider == null)
             {
-                Services.AddMockedLogging();
+                Services.AddSubstitutedLogging();
                 OnConfigureServices?.Invoke(this, Services);
                 Provider = Services.BuildServiceProvider();
             }

@@ -5,7 +5,7 @@ using GarbageCan.Application.UnitTests.Shared;
 using GarbageCan.Application.XP.Queries.GetTopUsersByXP;
 using GarbageCan.Domain.Entities.XP;
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
+using NSubstitute;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,19 +17,19 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
     {
         private DbContextFixture _dbContext;
         private ApplicationFixture _fixture;
-        private Mock<IDiscordGuildService> _mock;
+        private IDiscordGuildService _guildService;
 
         [SetUp]
         public void Setup()
         {
-            _mock = new Mock<IDiscordGuildService>();
+            _guildService = Substitute.For<IDiscordGuildService>();
 
             _fixture = new ApplicationFixture();
             _dbContext = new DbContextFixture();
             _fixture.OnConfigureServices += (_, services) =>
             {
-                services.AddSingleton(_mock.Object);
-                services.AddSingleton(_dbContext.MockContext.Object);
+                services.AddSingleton(_guildService);
+                services.AddSingleton(_dbContext.MockContext);
             };
         }
 
@@ -39,7 +39,7 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
             ulong currentUserId = 90;
             var displayName = "TEST";
             var currentUser = new EntityUser { Id = currentUserId, Lvl = 100, XP = 20 };
-            SetupDisplayNameReturn(displayName, currentUserId);
+            _guildService.GetMemberDisplayNameAsync(currentUserId).Returns(displayName);
             _dbContext.XPUsers.Add(currentUser);
 
             var command = new GetTopUsersByXPQuery
@@ -53,7 +53,7 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
             var first = result.TopTenUsers.First();
             first.User.Should().BeEquivalentTo(currentUser);
             first.DisplayName.Should().Be(displayName);
-            _mock.Verify(x => x.GetMemberDisplayNameAsync(currentUserId), Times.Once);
+            await _guildService.Received(1).GetMemberDisplayNameAsync(currentUserId);
         }
 
         [Test]
@@ -62,7 +62,7 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
             ulong currentUserId = 90;
             var displayName = "TEST";
             var currentUser = new EntityUser { Id = currentUserId, Lvl = 100, XP = 20 };
-            SetupDisplayNameReturn(displayName, currentUserId);
+            _guildService.GetMemberDisplayNameAsync(currentUserId).Returns(displayName);
             _dbContext.XPUsers.Add(currentUser);
 
             var command = new GetTopUsersByXPQuery
@@ -84,7 +84,7 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
             ulong currentUserId = 90;
             var displayName = "TEST";
             var currentUser = new EntityUser { Id = currentUserId, Lvl = 100, XP = 20 };
-            SetupDisplayNameReturn(displayName, currentUserId);
+            _guildService.GetMemberDisplayNameAsync(currentUserId).Returns(displayName);
             _dbContext.XPUsers.Add(currentUser);
 
             var command = new GetTopUsersByXPQuery
@@ -104,7 +104,7 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
         public async Task ShouldReturnTopCountUsers_WhenMoreUsersExistThanAreRequestFromTheCount()
         {
             var users = GenerateUsers(34);
-            users.ForEach(x => SetupDisplayNameReturn("TEST", x.Id));
+            users.ForEach(x => _guildService.GetMemberDisplayNameAsync(x.Id).Returns("TEST"));
 
             _dbContext.XPUsers.AddRange(users);
 
@@ -131,11 +131,6 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
                 .RuleFor(x => x.XP, f => f.Random.Double(0, 10000));
 
             return faker.Generate(count).ToList();
-        }
-
-        private void SetupDisplayNameReturn(string displayName, ulong userId)
-        {
-            _mock.Setup(x => x.GetMemberDisplayNameAsync(userId)).ReturnsAsync(displayName);
         }
     }
 }

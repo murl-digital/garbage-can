@@ -21,8 +21,9 @@ namespace GarbageCan.Application.Common.Behaviors
         {
             var requestName = typeof(TRequest).Name;
             var userId = _currentUserService.UserId ?? string.Empty;
+            var displayName = _currentUserService.DisplayName ?? string.Empty;
 
-            _logger.LogDebug("GarbageCan Request: {Name} {@UserId} {@UserName} {@Request}", requestName, userId, userId, request);
+            _logger.LogDebug("GarbageCan Request: {Name} {@UserId} {@DisplayName} {@Request}", requestName, userId, displayName, request);
             return Task.CompletedTask;
         }
     }

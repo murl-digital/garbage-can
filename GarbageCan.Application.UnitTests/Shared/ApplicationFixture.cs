@@ -1,6 +1,6 @@
 ﻿using GarbageCan.Application.Common.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
+using NSubstitute;
 
 namespace GarbageCan.Application.UnitTests.Shared
 {
@@ -13,8 +13,8 @@ namespace GarbageCan.Application.UnitTests.Shared
                 services.AddApplication();
 
                 // Mock Infrastructure provided implementations
-                services.AddSingleton(Mock.Of<ICurrentUserService>());
-                services.AddSingleton(Mock.Of<IDomainEventService>());
+                services.AddSingleton(Substitute.For<ICurrentUserService>());
+                services.AddSingleton(Substitute.For<IDomainEventService>());
             };
         }
     }
