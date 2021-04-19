@@ -7,7 +7,8 @@ using GarbageCan.Domain.Entities;
 using GarbageCan.Domain.Entities.Roles;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
@@ -18,20 +19,21 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
     {
         private DbContextFixture _dbContext;
         private ApplicationFixture _fixture;
-        private Mock<IDiscordGuildRoleService> _mock;
+        private IDiscordGuildRoleService _roleService;
+        private SubstituteLogger logger => _fixture.GetLogger<AlterRoleCommandHandler>();
 
         [SetUp]
         public void Setup()
         {
-            _mock = new Mock<IDiscordGuildRoleService>();
+            _roleService = Substitute.For<IDiscordGuildRoleService>();
 
             _dbContext = new DbContextFixture();
             _fixture = new ApplicationFixture();
 
             _fixture.OnConfigureServices += (_, services) =>
             {
-                services.AddSingleton(_mock.Object);
-                services.AddSingleton(_dbContext.MockContext.Object);
+                services.AddSingleton(_roleService);
+                services.AddSingleton(_dbContext.MockContext);
             };
         }
 
@@ -50,15 +52,16 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
 
             var command = CreateCommand(channelId, messageId, emojiId, "TEST");
 
-            _mock.Setup(x => x.GrantRoleAsync(command.GuildId, (ulong)badRoleId, command.UserId, "reaction role")).Throws<Exception>();
+            _roleService.GrantRoleAsync(command.GuildId, (ulong)badRoleId, command.UserId, "reaction role").Throws<Exception>();
 
             var result = await _fixture.SendAsync(command);
 
             result.Should().BeTrue();
-            _mock.Verify(x => x.GrantRoleAsync(command.GuildId, (ulong)goodRoleId, command.UserId, "reaction role"), Times.Once);
+            await _roleService.Received(1).GrantRoleAsync(command.GuildId, (ulong)goodRoleId, command.UserId, "reaction role");
 
-            GetMockedLogger().VerifyLogging(LogLevel.Error, Times.Once);
-            _mock.Verify(x => x.RevokeRoleAsync(It.IsAny<ulong>(), It.IsAny<ulong>(), It.IsAny<ulong>(), It.IsAny<string>()), Times.Never);
+            logger.Received().Log(Arg.Is<LogLevel>(x => x == LogLevel.Error), Arg.Any<string>());
+
+            await _roleService.DidNotReceive().RevokeRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
         }
 
         [Test]
@@ -76,11 +79,11 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             var result = await _fixture.SendAsync(command);
 
             result.Should().BeTrue();
-            _mock.Verify(x => x.GrantRoleAsync(command.GuildId, 500, command.UserId, "reaction role"), Times.Once);
-            _mock.Verify(x => x.GrantRoleAsync(command.GuildId, 6944, command.UserId, "reaction role"), Times.Once);
+            await _roleService.Received(1).GrantRoleAsync(command.GuildId, 500, command.UserId, "reaction role");
+            await _roleService.Received(1).GrantRoleAsync(command.GuildId, 6944, command.UserId, "reaction role");
 
-            GetMockedLogger().VerifyLogging(LogLevel.Error, Times.Never);
-            _mock.Verify(x => x.RevokeRoleAsync(It.IsAny<ulong>(), It.IsAny<ulong>(), It.IsAny<ulong>(), It.IsAny<string>()), Times.Never);
+            logger.DidNotReceive().Log(Arg.Is<LogLevel>(x => x == LogLevel.Error), Arg.Any<string>());
+            await _roleService.DidNotReceive().RevokeRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
         }
 
         [Theory]
@@ -101,10 +104,10 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             var result = await _fixture.SendAsync(command);
 
             result.Should().BeTrue();
-            _mock.Verify(x => x.GrantRoleAsync(command.GuildId, reactionRole.roleId, command.UserId, "reaction role"), Times.Once);
+            await _roleService.Received(1).GrantRoleAsync(command.GuildId, reactionRole.roleId, command.UserId, "reaction role");
+            await _roleService.DidNotReceive().RevokeRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
 
-            GetMockedLogger().VerifyLogging(LogLevel.Error, Times.Never);
-            _mock.Verify(x => x.RevokeRoleAsync(It.IsAny<ulong>(), It.IsAny<ulong>(), It.IsAny<ulong>(), It.IsAny<string>()), Times.Never);
+            logger.DidNotReceive().Log(Arg.Is<LogLevel>(x => x == LogLevel.Error), Arg.Any<string>());
         }
 
         [Theory]
@@ -127,10 +130,10 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             var result = await _fixture.SendAsync(command);
 
             result.Should().BeTrue();
-            _mock.Verify(x => x.GrantRoleAsync(It.IsAny<ulong>(), It.IsAny<ulong>(), It.IsAny<ulong>(), It.IsAny<string>()), Times.Never);
+            await _roleService.DidNotReceive().GrantRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
+            await _roleService.DidNotReceive().RevokeRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
 
-            GetMockedLogger().VerifyLogging(LogLevel.Error, Times.Never);
-            _mock.Verify(x => x.RevokeRoleAsync(It.IsAny<ulong>(), It.IsAny<ulong>(), It.IsAny<ulong>(), It.IsAny<string>()), Times.Never);
+            logger.DidNotReceive().Log(Arg.Is<LogLevel>(x => x == LogLevel.Error), Arg.Any<string>());
         }
 
         [Theory]
@@ -153,10 +156,10 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             var result = await _fixture.SendAsync(command);
 
             result.Should().BeTrue();
-            _mock.Verify(x => x.RevokeRoleAsync(It.IsAny<ulong>(), It.IsAny<ulong>(), It.IsAny<ulong>(), It.IsAny<string>()), Times.Never);
+            await _roleService.DidNotReceive().RevokeRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
+            await _roleService.DidNotReceive().GrantRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
 
-            GetMockedLogger().VerifyLogging(LogLevel.Error, Times.Never);
-            _mock.Verify(x => x.GrantRoleAsync(It.IsAny<ulong>(), It.IsAny<ulong>(), It.IsAny<ulong>(), It.IsAny<string>()), Times.Never);
+            logger.DidNotReceive().Log(Arg.Is<LogLevel>(x => x == LogLevel.Error), Arg.Any<string>());
         }
 
         [Test]
@@ -174,15 +177,16 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
 
             var command = CreateCommand(channelId, messageId, emojiId, "TEST", false);
 
-            _mock.Setup(x => x.RevokeRoleAsync(command.GuildId, (ulong)badRoleId, command.UserId, "reaction role")).Throws<Exception>();
+            _roleService.RevokeRoleAsync(command.GuildId, (ulong)badRoleId, command.UserId, "reaction role").Throws<Exception>();
 
             var result = await _fixture.SendAsync(command);
 
             result.Should().BeTrue();
-            _mock.Verify(x => x.RevokeRoleAsync(command.GuildId, (ulong)goodRoleId, command.UserId, "reaction role"), Times.Once);
 
-            GetMockedLogger().VerifyLogging(LogLevel.Error, Times.Once);
-            _mock.Verify(x => x.GrantRoleAsync(It.IsAny<ulong>(), It.IsAny<ulong>(), It.IsAny<ulong>(), It.IsAny<string>()), Times.Never);
+            await _roleService.Received(1).RevokeRoleAsync(command.GuildId, (ulong)goodRoleId, command.UserId, "reaction role");
+            await _roleService.DidNotReceive().GrantRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
+
+            logger.Received(1).Log(Arg.Is<LogLevel>(x => x == LogLevel.Error), Arg.Any<string>());
         }
 
         [Test]
@@ -200,11 +204,12 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             var result = await _fixture.SendAsync(command);
 
             result.Should().BeTrue();
-            _mock.Verify(x => x.RevokeRoleAsync(command.GuildId, 500, command.UserId, "reaction role"), Times.Once);
-            _mock.Verify(x => x.RevokeRoleAsync(command.GuildId, 6944, command.UserId, "reaction role"), Times.Once);
+            await _roleService.Received(1).RevokeRoleAsync(command.GuildId, 500, command.UserId, "reaction role");
+            await _roleService.Received(1).RevokeRoleAsync(command.GuildId, 6944, command.UserId, "reaction role");
 
-            GetMockedLogger().VerifyLogging(LogLevel.Error, Times.Never);
-            _mock.Verify(x => x.GrantRoleAsync(It.IsAny<ulong>(), It.IsAny<ulong>(), It.IsAny<ulong>(), It.IsAny<string>()), Times.Never);
+            await _roleService.DidNotReceive().GrantRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
+
+            logger.DidNotReceive().Log(Arg.Is<LogLevel>(x => x == LogLevel.Error), Arg.Any<string>());
         }
 
         [Theory]
@@ -225,10 +230,10 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             var result = await _fixture.SendAsync(command);
 
             result.Should().BeTrue();
-            _mock.Verify(x => x.RevokeRoleAsync(command.GuildId, reactionRole.roleId, command.UserId, "reaction role"), Times.Once);
+            await _roleService.Received(1).RevokeRoleAsync(command.GuildId, reactionRole.roleId, command.UserId, "reaction role");
+            await _roleService.DidNotReceive().GrantRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
 
-            GetMockedLogger().VerifyLogging(LogLevel.Error, Times.Never);
-            _mock.Verify(x => x.GrantRoleAsync(It.IsAny<ulong>(), It.IsAny<ulong>(), It.IsAny<ulong>(), It.IsAny<string>()), Times.Never);
+            logger.DidNotReceive().Log(Arg.Is<LogLevel>(x => x == LogLevel.Error), Arg.Any<string>());
         }
 
         private static AlterRoleCommand CreateCommand(int commandChannelId, int commandMessageId, int commandEmojiId, string commandEmojiName, bool add = true)
@@ -258,11 +263,6 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
                 emoteId = emojiId.ToString(),
                 messageId = (ulong)messageId,
             };
-        }
-
-        private MockedILogger<AlterRoleCommandHandler> GetMockedLogger()
-        {
-            return _fixture.Provider.GetMockedLogger<AlterRoleCommandHandler>();
         }
     }
 }

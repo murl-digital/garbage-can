@@ -3,27 +3,27 @@ using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Application.Fun.Commands.OobifyText;
 using GarbageCan.Application.UnitTests.Shared;
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
 using NUnit.Framework;
 using System.Threading.Tasks;
+using NSubstitute;
 
 namespace GarbageCan.Application.UnitTests.Fun.Commands
 {
     public class OobifyTextCommandTests
     {
         private ApplicationFixture _fixture;
-        private Mock<IDiscordResponseService> _mock;
+        private IDiscordResponseService _mock;
 
         [SetUp]
         public void Setup()
         {
-            _mock = new Mock<IDiscordResponseService>();
+            _mock = Substitute.For<IDiscordResponseService>();
 
             _fixture = new ApplicationFixture();
 
             _fixture.OnConfigureServices += (_, services) =>
             {
-                services.AddSingleton(_mock.Object);
+                services.AddSingleton(_mock);
             };
         }
 
@@ -63,8 +63,8 @@ namespace GarbageCan.Application.UnitTests.Fun.Commands
 
             result.Should().BeTrue();
 
-            _mock.Verify(x => x.RespondAsync(expected, false, false), Times.Once);
-            _mock.Verify(x => x.RespondAsync(It.IsNotIn(expected), It.IsAny<bool>(), It.IsAny<bool>()), Times.Never);
+            await _mock.Received(1).RespondAsync(expected, false, false);
+            await _mock.DidNotReceive().RespondAsync(Arg.Is<string>(x => x != expected), Arg.Any<bool>(), Arg.Any<bool>());
         }
     }
 }
