@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GarbageCan.Infrastructure.Persistence.Configurations
 {
-    public class EntityExcludedChannelConfiguration : IEntityTypeConfiguration<EntityExcludedChannel>
+    public class ExcludedChannelConfiguration : IEntityTypeConfiguration<ExcludedChannel>
     {
-        public void Configure(EntityTypeBuilder<EntityExcludedChannel> builder)
+        public void Configure(EntityTypeBuilder<ExcludedChannel> builder)
         {
             builder.HasNoKey();
             builder.ToTable("xpExcludedChannels");

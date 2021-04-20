@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GarbageCan.Infrastructure.Persistence.Configurations
 {
-    public class EntityReactionRoleConfiguration : IEntityTypeConfiguration<EntityReactionRole>
+    public class ReactionRoleConfiguration : IEntityTypeConfiguration<ReactionRole>
     {
-        public void Configure(EntityTypeBuilder<EntityReactionRole> builder)
+        public void Configure(EntityTypeBuilder<ReactionRole> builder)
         {
             builder.ToTable("reactionRoles");
         }

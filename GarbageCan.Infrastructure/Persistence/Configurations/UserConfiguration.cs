@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GarbageCan.Infrastructure.Persistence.Configurations
 {
-    public class EntityUserConfiguration : IEntityTypeConfiguration<EntityUser>
+    public class UserConfiguration : IEntityTypeConfiguration<User>
     {
-        public void Configure(EntityTypeBuilder<EntityUser> builder)
+        public void Configure(EntityTypeBuilder<User> builder)
         {
             builder.HasKey(t => t.Id);
             builder.Property(t => t.Id).ValueGeneratedNever().HasColumnName("id");

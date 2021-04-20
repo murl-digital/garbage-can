@@ -2,7 +2,7 @@ using System;
 
 namespace GarbageCan.Domain.Entities.Moderation
 {
-    public class EntityActiveMute
+    public class ActiveMute
     {
         public int id { get; set; }
         public ulong uId { get; init; }

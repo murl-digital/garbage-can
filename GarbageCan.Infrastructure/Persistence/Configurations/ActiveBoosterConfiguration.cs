@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GarbageCan.Infrastructure.Persistence.Configurations
 {
-    public class EntityActiveBoosterConfiguration : IEntityTypeConfiguration<EntityActiveBooster>
+    public class ActiveBoosterConfiguration : IEntityTypeConfiguration<ActiveBooster>
     {
-        public void Configure(EntityTypeBuilder<EntityActiveBooster> builder)
+        public void Configure(EntityTypeBuilder<ActiveBooster> builder)
         {
             // Creates a shadow property for the foriegn key relationship
             // https://docs.microsoft.com/en-us/ef/core/modeling/relationships?tabs=fluent-api%2Cfluent-api-simple-key%2Csimple-key#shadow-foreign-key

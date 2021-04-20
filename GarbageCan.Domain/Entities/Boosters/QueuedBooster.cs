@@ -1,9 +1,9 @@
 ﻿namespace GarbageCan.Domain.Entities.Boosters
 {
-    public class EntityUserBooster
+    public class QueuedBooster
     {
-        public int id { get; set; }
-        public ulong userId { get; set; }
+        public int position { get; set; }
+
         public float multiplier { get; set; }
         public long durationInSeconds { get; set; }
     }

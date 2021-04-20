@@ -2,9 +2,9 @@
 
 namespace GarbageCan.Domain.Entities.Boosters
 {
-    public class EntityActiveBooster
+    public class ActiveBooster
     {
-        public virtual EntityAvailableSlot slot { get; set; } = new EntityAvailableSlot();
+        public virtual AvailableSlot slot { get; set; } = new AvailableSlot();
         public DateTime expirationDate { get; set; }
         public float multipler { get; set; }
     }

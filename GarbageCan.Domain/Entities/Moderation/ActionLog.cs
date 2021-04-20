@@ -3,7 +3,7 @@ using System;
 
 namespace GarbageCan.Domain.Entities.Moderation
 {
-    public class EntityActionLog
+    public class ActionLog
     {
         public int id { get; set; }
         public ulong uId { get; init; }

@@ -1,6 +1,6 @@
 namespace GarbageCan.Domain.Entities.XP
 {
-    public class EntityExcludedChannel
+    public class ExcludedChannel
     {
         public ulong channelId { get; set; }
     }

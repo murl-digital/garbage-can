@@ -4,7 +4,7 @@ namespace GarbageCan.Application.XP.Queries.GetTopUsersByXP
 {
     public class GetTopUsersByXPQueryVmUser
     {
-        public GetTopUsersByXPQueryVmUser(EntityUser u, int index)
+        public GetTopUsersByXPQueryVmUser(User u, int index)
         {
             User = u;
             Place = index + 1;
@@ -12,6 +12,6 @@ namespace GarbageCan.Application.XP.Queries.GetTopUsersByXP
 
         public int Place { get; set; }
         public string DisplayName { get; set; }
-        public EntityUser User { get; set; }
+        public User User { get; set; }
     }
 }

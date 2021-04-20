@@ -1,6 +1,6 @@
 namespace GarbageCan.Domain.Entities.Roles
 {
-    public class EntityConditionalRole
+    public class ConditionalRole
     {
         public int id { get; set; }
         public ulong requiredRoleId { get; set; }

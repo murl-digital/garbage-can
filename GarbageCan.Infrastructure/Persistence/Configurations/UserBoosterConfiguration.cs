@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GarbageCan.Infrastructure.Persistence.Configurations
 {
-    public class EntityAvailableSlotConfiguration : IEntityTypeConfiguration<EntityAvailableSlot>
+    public class UserBoosterConfiguration : IEntityTypeConfiguration<UserBooster>
     {
-        public void Configure(EntityTypeBuilder<EntityAvailableSlot> builder)
+        public void Configure(EntityTypeBuilder<UserBooster> builder)
         {
             builder.HasKey(t => t.id);
-            builder.ToTable("xpAvailableSlots");
+            builder.ToTable("xpUserBoosters");
         }
     }
 }

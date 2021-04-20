@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GarbageCan.Infrastructure.Persistence.Configurations
 {
-    public class EntityWatchedUserConfiguration : IEntityTypeConfiguration<EntityWatchedUser>
+    public class LevelRoleConfiguration : IEntityTypeConfiguration<LevelRole>
     {
-        public void Configure(EntityTypeBuilder<EntityWatchedUser> builder)
+        public void Configure(EntityTypeBuilder<LevelRole> builder)
         {
             builder.HasKey(t => t.id);
-            builder.ToTable("joinWatchlist");
+            builder.ToTable("levelRoles");
         }
     }
 }

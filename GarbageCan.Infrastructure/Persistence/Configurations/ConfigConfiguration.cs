@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GarbageCan.Infrastructure.Persistence.Configurations
 {
-    public class EntityConfigConfiguration : IEntityTypeConfiguration<EntityConfig>
+    public class ConfigConfiguration : IEntityTypeConfiguration<Config>
     {
-        public void Configure(EntityTypeBuilder<EntityConfig> builder)
+        public void Configure(EntityTypeBuilder<Config> builder)
         {
             builder.HasKey(t => t.key);
             builder.ToTable("config");

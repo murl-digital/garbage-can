@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GarbageCan.Infrastructure.Persistence.Configurations
 {
-    public class EntityActiveChannelRestrictConfiguration : IEntityTypeConfiguration<EntityActiveChannelRestrict>
+    public class ActiveChannelRestrictConfiguration : IEntityTypeConfiguration<ActiveChannelRestrict>
     {
-        public void Configure(EntityTypeBuilder<EntityActiveChannelRestrict> builder)
+        public void Configure(EntityTypeBuilder<ActiveChannelRestrict> builder)
         {
             builder.HasKey(t => t.id);
             builder.Property(x => x.expirationDate).HasColumnType("datetime");

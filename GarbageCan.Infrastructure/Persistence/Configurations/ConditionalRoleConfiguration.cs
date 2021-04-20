@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GarbageCan.Infrastructure.Persistence.Configurations
 {
-    public class EntityLevelRoleConfiguration : IEntityTypeConfiguration<EntityLevelRole>
+    public class ConditionalRoleConfiguration : IEntityTypeConfiguration<ConditionalRole>
     {
-        public void Configure(EntityTypeBuilder<EntityLevelRole> builder)
+        public void Configure(EntityTypeBuilder<ConditionalRole> builder)
         {
             builder.HasKey(t => t.id);
-            builder.ToTable("levelRoles");
+            builder.ToTable("conditionalRoles");
         }
     }
 }

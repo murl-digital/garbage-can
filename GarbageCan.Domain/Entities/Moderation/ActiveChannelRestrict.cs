@@ -2,7 +2,7 @@ using System;
 
 namespace GarbageCan.Domain.Entities.Moderation
 {
-    public class EntityActiveChannelRestrict
+    public class ActiveChannelRestrict
     {
         public int id { get; set; }
         public ulong uId { get; init; }

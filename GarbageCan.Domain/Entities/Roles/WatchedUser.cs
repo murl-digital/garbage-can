@@ -1,6 +1,6 @@
 namespace GarbageCan.Domain.Entities.Roles
 {
-    public class EntityWatchedUser
+    public class WatchedUser
     {
         public ulong id { get; set; }
     }

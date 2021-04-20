@@ -11,21 +11,21 @@ namespace GarbageCan.Application.Common.Interfaces
 {
     public interface IApplicationDbContext
     {
-        public DbSet<EntityConditionalRole> ConditionalRoles { get; set; }
-        public DbSet<EntityConfig> Config { get; set; }
-        public DbSet<EntityJoinRole> JoinRoles { get; set; }
-        public DbSet<EntityWatchedUser> JoinWatchlist { get; set; }
-        public DbSet<EntityLevelRole> LevelRoles { get; set; }
-        public DbSet<EntityActionLog> ModerationActionLogs { get; set; }
-        public DbSet<EntityActiveChannelRestrict> ModerationActiveChannelRestricts { get; set; }
-        public DbSet<EntityActiveMute> ModerationActiveMutes { get; set; }
-        public DbSet<EntityReactionRole> ReactionRoles { get; set; }
-        public DbSet<EntityActiveBooster> XPActiveBoosters { get; set; }
-        public DbSet<EntityAvailableSlot> XPAvailableSlots { get; set; }
-        public DbSet<EntityExcludedChannel> XPExcludedChannels { get; set; }
-        public DbSet<EntityQueuedBooster> XPQueuedBoosters { get; set; }
-        public DbSet<EntityUserBooster> XPUserBoosters { get; set; }
-        public DbSet<EntityUser> XPUsers { get; set; }
+        public DbSet<ConditionalRole> ConditionalRoles { get; set; }
+        public DbSet<Config> Config { get; set; }
+        public DbSet<JoinRole> JoinRoles { get; set; }
+        public DbSet<WatchedUser> JoinWatchlist { get; set; }
+        public DbSet<LevelRole> LevelRoles { get; set; }
+        public DbSet<ActionLog> ModerationActionLogs { get; set; }
+        public DbSet<ActiveChannelRestrict> ModerationActiveChannelRestricts { get; set; }
+        public DbSet<ActiveMute> ModerationActiveMutes { get; set; }
+        public DbSet<ReactionRole> ReactionRoles { get; set; }
+        public DbSet<ActiveBooster> XPActiveBoosters { get; set; }
+        public DbSet<AvailableSlot> XPAvailableSlots { get; set; }
+        public DbSet<ExcludedChannel> XPExcludedChannels { get; set; }
+        public DbSet<QueuedBooster> XPQueuedBoosters { get; set; }
+        public DbSet<UserBooster> XPUserBoosters { get; set; }
+        public DbSet<User> XPUsers { get; set; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }

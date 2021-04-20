@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GarbageCan.Infrastructure.Persistence.Configurations
 {
-    public class EntityActionLogConfiguration : IEntityTypeConfiguration<EntityActionLog>
+    public class ActionLogConfiguration : IEntityTypeConfiguration<ActionLog>
     {
-        public void Configure(EntityTypeBuilder<EntityActionLog> builder)
+        public void Configure(EntityTypeBuilder<ActionLog> builder)
         {
             builder.HasKey(t => t.id);
             builder.Property(x => x.issuedDate).HasColumnType("datetime");
