@@ -15,12 +15,12 @@ namespace GarbageCan.Application.UnitTests.Shared
             MockContext = Substitute.For<IApplicationDbContext>();
 
             MockContext.XPUsers.ReturnsForAnyArgs(_ => XPUsers.AsQueryable().BuildMockDbSet());
-            MockContext.reactionRoles.ReturnsForAnyArgs(_ => ReactionRoles.AsQueryable().BuildMockDbSet());
+            MockContext.ReactionRoles.ReturnsForAnyArgs(_ => ReactionRoles.AsQueryable().BuildMockDbSet());
         }
 
         public IApplicationDbContext MockContext { get; }
 
-        public List<EntityReactionRole> ReactionRoles { get; set; } = new List<EntityReactionRole>();
-        public List<EntityUser> XPUsers { get; set; } = new List<EntityUser>();
+        public List<ReactionRole> ReactionRoles { get; set; } = new List<ReactionRole>();
+        public List<User> XPUsers { get; set; } = new List<User>();
     }
 }

@@ -38,7 +38,7 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
         {
             ulong currentUserId = 90;
             var displayName = "TEST";
-            var currentUser = new EntityUser { Id = currentUserId, Lvl = 100, XP = 20 };
+            var currentUser = new User { Id = currentUserId, Lvl = 100, XP = 20 };
             _guildService.GetMemberDisplayNameAsync(currentUserId).Returns(displayName);
             _dbContext.XPUsers.Add(currentUser);
 
@@ -61,7 +61,7 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
         {
             ulong currentUserId = 90;
             var displayName = "TEST";
-            var currentUser = new EntityUser { Id = currentUserId, Lvl = 100, XP = 20 };
+            var currentUser = new User { Id = currentUserId, Lvl = 100, XP = 20 };
             _guildService.GetMemberDisplayNameAsync(currentUserId).Returns(displayName);
             _dbContext.XPUsers.Add(currentUser);
 
@@ -83,7 +83,7 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
         {
             ulong currentUserId = 90;
             var displayName = "TEST";
-            var currentUser = new EntityUser { Id = currentUserId, Lvl = 100, XP = 20 };
+            var currentUser = new User { Id = currentUserId, Lvl = 100, XP = 20 };
             _guildService.GetMemberDisplayNameAsync(currentUserId).Returns(displayName);
             _dbContext.XPUsers.Add(currentUser);
 
@@ -122,9 +122,9 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
             result.TopTenUsers.First().User.XP.Should().Be(users.Max(x => x.XP));
         }
 
-        private static List<EntityUser> GenerateUsers(int count)
+        private static List<User> GenerateUsers(int count)
         {
-            var faker = new Faker<EntityUser>();
+            var faker = new Faker<User>();
             faker
                 .RuleFor(x => x.Id, f => (ulong)f.IndexFaker + 1)
                 .RuleFor(x => x.Lvl, f => f.Random.Int(0, 100))

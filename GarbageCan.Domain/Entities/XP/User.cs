@@ -2,7 +2,7 @@
 
 namespace GarbageCan.Domain.Entities.XP
 {
-    public class EntityUser
+    public class User
     {
         private double _xp;
 

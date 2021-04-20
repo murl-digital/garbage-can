@@ -1,6 +1,6 @@
 namespace GarbageCan.Domain.Entities.Roles
 {
-    public class EntityReactionRole
+    public class ReactionRole
     {
         public int id { get; set; }
         public ulong messageId { get; set; }
