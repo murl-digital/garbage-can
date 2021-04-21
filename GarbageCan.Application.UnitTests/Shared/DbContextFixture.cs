@@ -1,6 +1,7 @@
 ﻿using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Domain.Entities.Roles;
 using GarbageCan.Domain.Entities.XP;
+using Microsoft.EntityFrameworkCore;
 using MockQueryable.NSubstitute;
 using NSubstitute;
 using System.Collections.Generic;
@@ -10,19 +11,19 @@ namespace GarbageCan.Application.UnitTests.Shared
 {
     public class DbContextFixture
     {
+        private DbSet<User> _userDbSet;
+
         public DbContextFixture()
         {
             MockContext = Substitute.For<IApplicationDbContext>();
 
-            var dbSet = XPUsers.AsQueryable().BuildMockDbSet();
-            MockContext.XPUsers.Returns(x => dbSet);
-            
-            MockContext.ReactionRoles.ReturnsForAnyArgs(_ => ReactionRoles.AsQueryable().BuildMockDbSet());
+            MockContext.XPUsers.Returns(x => UserDbSet);
+            MockContext.ReactionRoles.Returns(_ => ReactionRoles.AsQueryable().BuildMockDbSet());
         }
 
         public IApplicationDbContext MockContext { get; }
-
         public List<ReactionRole> ReactionRoles { get; set; } = new List<ReactionRole>();
         public List<User> XPUsers { get; set; } = new List<User>();
+        private DbSet<User> UserDbSet => _userDbSet ??= XPUsers.AsQueryable().BuildMockDbSet();
     }
 }
