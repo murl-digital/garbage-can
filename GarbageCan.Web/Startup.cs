@@ -83,7 +83,7 @@ namespace GarbageCan.Web
 
                 client.MessageCreated += async (sender, args) =>
                 {
-                    await PublishScopedEvent(provider, new DiscordGuildMessageCreatedEvent
+                    await PublishScopedEvent(provider, new DiscordMessageCreatedEvent
                     {
                         AuthorId = args.Author.Id,
                         GuildId = args.Guild.Id,

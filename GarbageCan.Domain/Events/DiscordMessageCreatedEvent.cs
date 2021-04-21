@@ -2,7 +2,7 @@
 
 namespace GarbageCan.Domain.Events
 {
-    public class DiscordGuildMessageCreatedEvent : DomainEvent
+    public class DiscordMessageCreatedEvent : DomainEvent
     {
         public ulong GuildId { get; set; }
         public ulong ChannelId { get; set; }
