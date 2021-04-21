@@ -253,9 +253,9 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             };
         }
 
-        private static EntityReactionRole CreateReactionRole(int channelId, int emojiId, int messageId, int roleId = 102)
+        private static ReactionRole CreateReactionRole(int channelId, int emojiId, int messageId, int roleId = 102)
         {
-            return new EntityReactionRole
+            return new ReactionRole
             {
                 id = 2,
                 roleId = (ulong)roleId,

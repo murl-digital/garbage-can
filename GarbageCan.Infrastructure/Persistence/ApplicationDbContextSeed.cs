@@ -12,26 +12,26 @@ namespace GarbageCan.Infrastructure.Persistence
             // Seed, if necessary
             if (!context.XPUsers.Any())
             {
-                await context.XPUsers.AddAsync(new EntityUser
+                await context.XPUsers.AddAsync(new User
                 {
                     Id = 39,
                     Lvl = 394,
                     XP = 483
                 });
-                await context.XPUsers.AddAsync(new EntityUser
+                await context.XPUsers.AddAsync(new User
                 {
                     Id = 80,
                     Lvl = 5,
                     XP = 9000
                 });
-                await context.XPUsers.AddAsync(new EntityUser
+                await context.XPUsers.AddAsync(new User
                 {
                     Id = 726179402278371358,
                     Lvl = 5,
                     XP = 5440
                 });
 
-                await context.reactionRoles.AddAsync(new EntityReactionRole()
+                await context.ReactionRoles.AddAsync(new ReactionRole()
                 {
                     channelId = 26121,
                     emoteId = "12545",
