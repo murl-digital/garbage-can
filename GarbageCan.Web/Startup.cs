@@ -73,7 +73,7 @@ namespace GarbageCan.Web
 
                 commands.RegisterCommands(Assembly.GetExecutingAssembly());
 
-                client.Ready += async (sender, args) =>
+                client.Ready += async (_, _) =>
                 {
                     await PublishScopedEvent(provider, new DiscordConnectionChangeEvent
                     {
@@ -81,7 +81,7 @@ namespace GarbageCan.Web
                     });
                 };
 
-                client.MessageCreated += async (sender, args) =>
+                client.MessageCreated += async (_, args) =>
                 {
                     await PublishScopedEvent(provider, new DiscordMessageCreatedEvent
                     {
@@ -93,7 +93,7 @@ namespace GarbageCan.Web
                     });
                 };
 
-                client.MessageReactionAdded += async (sender, args) =>
+                client.MessageReactionAdded += async (_, args) =>
                 {
                     await PublishScopedEvent(provider, new DiscordMessageReactionAddedEvent
                     {
@@ -109,7 +109,7 @@ namespace GarbageCan.Web
                     });
                 };
 
-                client.MessageReactionRemoved += async (sender, args) =>
+                client.MessageReactionRemoved += async (_, args) =>
                 {
                     await PublishScopedEvent(provider, new DiscordMessageReactionRemovedEvent
                     {
