@@ -14,7 +14,9 @@ namespace GarbageCan.Application.UnitTests.Shared
         {
             MockContext = Substitute.For<IApplicationDbContext>();
 
-            MockContext.XPUsers.ReturnsForAnyArgs(_ => XPUsers.AsQueryable().BuildMockDbSet());
+            var dbSet = XPUsers.AsQueryable().BuildMockDbSet();
+            MockContext.XPUsers.Returns(x => dbSet);
+            
             MockContext.ReactionRoles.ReturnsForAnyArgs(_ => ReactionRoles.AsQueryable().BuildMockDbSet());
         }
 
