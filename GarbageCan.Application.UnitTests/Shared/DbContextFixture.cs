@@ -11,19 +11,16 @@ namespace GarbageCan.Application.UnitTests.Shared
 {
     public class DbContextFixture
     {
-        private DbSet<User> _userDbSet;
-
         public DbContextFixture()
         {
             MockContext = Substitute.For<IApplicationDbContext>();
 
-            MockContext.XPUsers.Returns(x => UserDbSet);
+            MockContext.XPUsers.Returns(x => XPUsers.AsQueryable().BuildMockDbSet());
             MockContext.ReactionRoles.Returns(_ => ReactionRoles.AsQueryable().BuildMockDbSet());
         }
 
         public IApplicationDbContext MockContext { get; }
         public List<ReactionRole> ReactionRoles { get; set; } = new List<ReactionRole>();
         public List<User> XPUsers { get; set; } = new List<User>();
-        private DbSet<User> UserDbSet => _userDbSet ??= XPUsers.AsQueryable().BuildMockDbSet();
     }
 }

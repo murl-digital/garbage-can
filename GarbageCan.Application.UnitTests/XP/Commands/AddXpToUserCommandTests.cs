@@ -14,7 +14,6 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
     public class AddXpToUserCommandTests
     {
         private ApplicationFixture _appFixture;
-        private DbContextFixture _contextFixture;
         private IApplicationDbContext _dbContext;
         private IXpCalculatorService _calculator;
 
@@ -22,17 +21,15 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
         public void Setup()
         {
             _appFixture = new ApplicationFixture();
-            _contextFixture = new DbContextFixture();
-            _dbContext = _contextFixture.MockContext;
             _calculator = Substitute.For<IXpCalculatorService>();
-
+            _dbContext = Substitute.For<IApplicationDbContext>();
             _appFixture.OnConfigureServices += (_, services) =>
             {
                 var service = services
                     .First(descriptor => descriptor.ServiceType == typeof(IXpCalculatorService));
                 services.Remove(service);
                 services.AddSingleton(_calculator);
-                services.AddSingleton(_contextFixture.MockContext);
+                services.AddSingleton(_dbContext);
             };
         }
 
@@ -48,7 +45,7 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
                 XP = 0
             };
 
-            _contextFixture.XPUsers.Add(user);
+            _dbContext.ConfigureAsMock(x => x.XPUsers, user);
             _calculator.XpEarned(message).Returns(20.0);
 
             var command = new AddXpToUserCommand
@@ -59,7 +56,7 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
 
             await _appFixture.SendAsync(command);
 
-            _contextFixture.XPUsers.First().XP.Should().Be(20);
+            _dbContext.XPUsers.First().XP.Should().Be(20);
             _calculator.Received(1).XpEarned(message);
 
             await _dbContext.Received(1).SaveChangesAsync(default);
@@ -74,7 +71,8 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
             _calculator.XpEarned(message).Returns(0);
 
             User addedUser = null;
-            _dbContext.XPUsers.When(x => x.Add(Arg.Any<User>())).Do(x => addedUser = x.Arg<User>());
+            var mockDbSet = _dbContext.ConfigureAsMock(x => x.XPUsers);
+            mockDbSet.When(x => x.Add(Arg.Any<User>())).Do(x => addedUser = x.Arg<User>());
 
             var command = new AddXpToUserCommand
             {
