@@ -3,6 +3,8 @@ using GarbageCan.Application.Common.Behaviors;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using GarbageCan.Application.Common.Interfaces;
+using GarbageCan.Application.XP.Services;
 
 namespace GarbageCan.Application
 {
@@ -21,6 +23,8 @@ namespace GarbageCan.Application
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(PerformanceBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehavior<,>));
+
+            services.AddTransient<IXpCalculatorService, XpCalculatorService>();
 
             return services;
         }
