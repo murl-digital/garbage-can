@@ -81,6 +81,18 @@ namespace GarbageCan.Web
                     });
                 };
 
+                client.MessageCreated += async (sender, args) =>
+                {
+                    await PublishScopedEvent(provider, new DiscordGuildMessageCreatedEvent
+                    {
+                        AuthorId = args.Author.Id,
+                        GuildId = args.Guild.Id,
+                        ChannelId = args.Channel.Id,
+                        MessageId = args.Message.Id,
+                        Content = args.Message.Content
+                    });
+                };
+
                 client.MessageReactionAdded += async (sender, args) =>
                 {
                     await PublishScopedEvent(provider, new DiscordMessageReactionAddedEvent
