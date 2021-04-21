@@ -7,7 +7,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
-using GarbageCan.Infrastructure.Xp;
 
 namespace GarbageCan.Infrastructure
 {
@@ -39,8 +38,6 @@ namespace GarbageCan.Infrastructure
             services.AddTransient<IDiscordGuildRoleService, DiscordGuildRoleService>();
             services.AddScoped<DiscordCommandContextService>();
             services.AddSingleton<DiscordEmojiProviderService>();
-
-            services.AddTransient<IXpCalculatorService, XpCalculatorService>();
 
             return services;
         }

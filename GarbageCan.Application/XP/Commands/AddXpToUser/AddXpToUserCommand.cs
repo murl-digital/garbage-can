@@ -31,7 +31,7 @@ namespace GarbageCan.Application.XP.Commands.AddXpToUser
 
             if (user == null)
             {
-                user = new EntityUser
+                user = new User
                 {
                     Id = request.UserId,
                     Lvl = 0,

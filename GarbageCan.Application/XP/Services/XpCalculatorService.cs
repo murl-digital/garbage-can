@@ -1,7 +1,7 @@
 ﻿using System;
 using GarbageCan.Application.Common.Interfaces;
 
-namespace GarbageCan.Infrastructure.Xp
+namespace GarbageCan.Application.XP.Services
 {
     public class XpCalculatorService : IXpCalculatorService
     {
