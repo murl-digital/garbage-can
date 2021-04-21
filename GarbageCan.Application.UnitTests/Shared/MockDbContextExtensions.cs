@@ -17,7 +17,7 @@ namespace GarbageCan.Application.UnitTests.Shared
         /// <param name="setFunc"></param>
         /// <param name="context"></param>
         /// <returns>The Mocked Db Set</returns>
-        public static DbSet<T> ConfigureAsMock<T>(this IApplicationDbContext context,
+        public static DbSet<T> ConfigureMockDbSet<T>(this IApplicationDbContext context,
             Func<IApplicationDbContext, DbSet<T>> setFunc) where T : class
         {
             var mockDbSet = Array.Empty<T>().AsQueryable().BuildMockDbSet();
@@ -33,7 +33,7 @@ namespace GarbageCan.Application.UnitTests.Shared
         /// <param name="context"></param>
         /// <param name="populatedDbSetItems">Items to be put into the mock DB set</param>
         /// <returns>The Mocked Db Set</returns>
-        public static DbSet<T> ConfigureAsMock<T>(this IApplicationDbContext context,
+        public static DbSet<T> ConfigureMockDbSet<T>(this IApplicationDbContext context,
             Func<IApplicationDbContext, DbSet<T>> setFunc,
             IEnumerable<T> populatedDbSetItems) where T : class
         {
@@ -50,7 +50,7 @@ namespace GarbageCan.Application.UnitTests.Shared
         /// <param name="item">Item to be put into the mock DB set</param>
         /// <param name="context"></param>
         /// <returns>The Mocked Db Set</returns>
-        public static DbSet<T> ConfigureAsMock<T>(this IApplicationDbContext context,
+        public static DbSet<T> ConfigureMockDbSet<T>(this IApplicationDbContext context,
             Func<IApplicationDbContext, DbSet<T>> setFunc,
             T item) where T : class
         {

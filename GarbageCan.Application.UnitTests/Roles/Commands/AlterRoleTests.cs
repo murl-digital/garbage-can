@@ -17,23 +17,23 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
 {
     public class AlterRoleTests
     {
-        private DbContextFixture _dbContext;
         private ApplicationFixture _fixture;
         private IDiscordGuildRoleService _roleService;
+        private IApplicationDbContext _dbContext;
         private SubstituteLogger logger => _fixture.GetLogger<AlterRoleCommandHandler>();
 
         [SetUp]
         public void Setup()
         {
             _roleService = Substitute.For<IDiscordGuildRoleService>();
+            _dbContext = Substitute.For<IApplicationDbContext>();
 
-            _dbContext = new DbContextFixture();
             _fixture = new ApplicationFixture();
 
             _fixture.OnConfigureServices += (_, services) =>
             {
                 services.AddSingleton(_roleService);
-                services.AddSingleton(_dbContext.MockContext);
+                services.AddSingleton(_dbContext);
             };
         }
 
@@ -47,8 +47,12 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             var badRoleId = 500;
             var goodRoleId = 6944;
 
-            _dbContext.ReactionRoles.Add(CreateReactionRole(channelId, emojiId, messageId, badRoleId));
-            _dbContext.ReactionRoles.Add(CreateReactionRole(channelId, emojiId, messageId, goodRoleId));
+            _dbContext.ConfigureMockDbSet(x => x.ReactionRoles,
+                new[]
+                {
+                    CreateReactionRole(channelId, emojiId, messageId, badRoleId),
+                    CreateReactionRole(channelId, emojiId, messageId, goodRoleId)
+                });
 
             var command = CreateCommand(channelId, messageId, emojiId, "TEST");
 
@@ -71,8 +75,12 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             var messageId = 394;
             var emojiId = 29;
 
-            _dbContext.ReactionRoles.Add(CreateReactionRole(channelId, emojiId, messageId, 500));
-            _dbContext.ReactionRoles.Add(CreateReactionRole(channelId, emojiId, messageId, 6944));
+            _dbContext.ConfigureMockDbSet(x => x.ReactionRoles,
+                new[]
+                {
+                    CreateReactionRole(channelId, emojiId, messageId, 500),
+                    CreateReactionRole(channelId, emojiId, messageId, 6944)
+                });
 
             var command = CreateCommand(channelId, messageId, emojiId, "TEST");
 
@@ -97,7 +105,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
 
             var reactionRole = CreateReactionRole(channelId, emojiId, messageId);
 
-            _dbContext.ReactionRoles.Add(reactionRole);
+            _dbContext.ConfigureMockDbSet(x => x.ReactionRoles, reactionRole);
 
             var command = CreateCommand(commandChannelId, commandMessageId, commandEmojiId, commandEmojiName);
 
@@ -123,7 +131,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
 
             var reactionRole = CreateReactionRole(channelId, emojiId, messageId);
 
-            _dbContext.ReactionRoles.Add(reactionRole);
+            _dbContext.ConfigureMockDbSet(x => x.ReactionRoles, reactionRole);
 
             var command = CreateCommand(commandChannelId, commandMessageId, commandEmojiId, commandEmojiName);
 
@@ -149,7 +157,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
 
             var reactionRole = CreateReactionRole(channelId, emojiId, messageId);
 
-            _dbContext.ReactionRoles.Add(reactionRole);
+            _dbContext.ConfigureMockDbSet(x => x.ReactionRoles, reactionRole);
 
             var command = CreateCommand(commandChannelId, commandMessageId, commandEmojiId, commandEmojiName, false);
 
@@ -172,8 +180,12 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             var badRoleId = 500;
             var goodRoleId = 6944;
 
-            _dbContext.ReactionRoles.Add(CreateReactionRole(channelId, emojiId, messageId, badRoleId));
-            _dbContext.ReactionRoles.Add(CreateReactionRole(channelId, emojiId, messageId, goodRoleId));
+            _dbContext.ConfigureMockDbSet(x => x.ReactionRoles,
+                new[]
+                {
+                    CreateReactionRole(channelId, emojiId, messageId, badRoleId),
+                    CreateReactionRole(channelId, emojiId, messageId, goodRoleId)
+                });
 
             var command = CreateCommand(channelId, messageId, emojiId, "TEST", false);
 
@@ -196,8 +208,12 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             var messageId = 394;
             var emojiId = 29;
 
-            _dbContext.ReactionRoles.Add(CreateReactionRole(channelId, emojiId, messageId, 500));
-            _dbContext.ReactionRoles.Add(CreateReactionRole(channelId, emojiId, messageId, 6944));
+            _dbContext.ConfigureMockDbSet(x => x.ReactionRoles,
+                new[]
+                {
+                    CreateReactionRole(channelId, emojiId, messageId, 500),
+                    CreateReactionRole(channelId, emojiId, messageId, 6944)
+                });
 
             var command = CreateCommand(channelId, messageId, emojiId, "TEST", false);
 
@@ -223,7 +239,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
 
             var reactionRole = CreateReactionRole(channelId, emojiId, messageId);
 
-            _dbContext.ReactionRoles.Add(reactionRole);
+            _dbContext.ConfigureMockDbSet(x => x.ReactionRoles, reactionRole);
 
             var command = CreateCommand(commandChannelId, commandMessageId, commandEmojiId, commandEmojiName, false);
 

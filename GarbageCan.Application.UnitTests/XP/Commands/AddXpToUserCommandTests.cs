@@ -45,7 +45,7 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
                 XP = 0
             };
 
-            _dbContext.ConfigureAsMock(x => x.XPUsers, user);
+            _dbContext.ConfigureMockDbSet(x => x.XPUsers, user);
             _calculator.XpEarned(message).Returns(20.0);
 
             var command = new AddXpToUserCommand
@@ -71,7 +71,7 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
             _calculator.XpEarned(message).Returns(0);
 
             User addedUser = null;
-            var mockDbSet = _dbContext.ConfigureAsMock(x => x.XPUsers);
+            var mockDbSet = _dbContext.ConfigureMockDbSet(x => x.XPUsers);
             mockDbSet.When(x => x.Add(Arg.Any<User>())).Do(x => addedUser = x.Arg<User>());
 
             var command = new AddXpToUserCommand

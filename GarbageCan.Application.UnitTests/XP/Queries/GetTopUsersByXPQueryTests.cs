@@ -15,21 +15,21 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
 {
     public class GetTopUsersByXPQueryTests
     {
-        private DbContextFixture _dbContext;
         private ApplicationFixture _fixture;
         private IDiscordGuildService _guildService;
+        private IApplicationDbContext _dbContext;
 
         [SetUp]
         public void Setup()
         {
             _guildService = Substitute.For<IDiscordGuildService>();
+            _dbContext = Substitute.For<IApplicationDbContext>();
 
             _fixture = new ApplicationFixture();
-            _dbContext = new DbContextFixture();
             _fixture.OnConfigureServices += (_, services) =>
             {
                 services.AddSingleton(_guildService);
-                services.AddSingleton(_dbContext.MockContext);
+                services.AddSingleton(_dbContext);
             };
         }
 
@@ -40,7 +40,8 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
             var displayName = "TEST";
             var currentUser = new User { Id = currentUserId, Lvl = 100, XP = 20 };
             _guildService.GetMemberDisplayNameAsync(currentUserId).Returns(displayName);
-            _dbContext.XPUsers.Add(currentUser);
+
+            _dbContext.ConfigureMockDbSet(x => x.XPUsers, currentUser);
 
             var command = new GetTopUsersByXPQuery
             {
@@ -63,7 +64,8 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
             var displayName = "TEST";
             var currentUser = new User { Id = currentUserId, Lvl = 100, XP = 20 };
             _guildService.GetMemberDisplayNameAsync(currentUserId).Returns(displayName);
-            _dbContext.XPUsers.Add(currentUser);
+
+            _dbContext.ConfigureMockDbSet(x => x.XPUsers, currentUser);
 
             var command = new GetTopUsersByXPQuery
             {
@@ -85,7 +87,8 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
             var displayName = "TEST";
             var currentUser = new User { Id = currentUserId, Lvl = 100, XP = 20 };
             _guildService.GetMemberDisplayNameAsync(currentUserId).Returns(displayName);
-            _dbContext.XPUsers.Add(currentUser);
+
+            _dbContext.ConfigureMockDbSet(x => x.XPUsers, currentUser);
 
             var command = new GetTopUsersByXPQuery
             {
@@ -106,7 +109,7 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
             var users = GenerateUsers(34);
             users.ForEach(x => _guildService.GetMemberDisplayNameAsync(x.Id).Returns("TEST"));
 
-            _dbContext.XPUsers.AddRange(users);
+            _dbContext.ConfigureMockDbSet(x => x.XPUsers, users);
 
             var count = 10;
             var command = new GetTopUsersByXPQuery
