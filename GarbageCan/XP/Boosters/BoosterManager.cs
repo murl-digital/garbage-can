@@ -9,6 +9,7 @@ using DSharpPlus.Entities;
 using GarbageCan.Data;
 using GarbageCan.Data.Entities.Boosters;
 using GarbageCan.Data.Models.Boosters;
+using MathNet.Numerics.Random;
 using Z.EntityFramework.Plus;
 
 namespace GarbageCan.XP.Boosters
@@ -21,7 +22,11 @@ namespace GarbageCan.XP.Boosters
 
         private static int _nitroBoosterCount;
 
-        private static readonly Timer BoosterTimer = new(5000);
+        private static readonly Timer ExpirationTimer = new(5000);
+        private static readonly Timer RandomBoosterTimer = new(TimeSpan.FromHours(1).TotalMilliseconds);
+
+        private static readonly Random Random = new();
+        
         public static ReadOnlyCollection<ActiveBooster> activeBoosters => ActiveBoosters.AsReadOnly();
         public static ReadOnlyCollection<QueuedBooster> queuedBoosters => _queuedBoosters.ToList().AsReadOnly();
         public static ReadOnlyCollection<AvailableSlot> availableSlots => _availableSlots.AsReadOnly();
@@ -41,9 +46,16 @@ namespace GarbageCan.XP.Boosters
                 {
                     await Task.Run(Ready);
 
-                    BoosterTimer.Elapsed += Tick;
+                    ExpirationTimer.Elapsed += Tick;
+                    RandomBoosterTimer.Elapsed += (_, _) =>
+                    {
+                        if (Random.NextBoolean())
+                        {
+                            AddBooster(0.5f, TimeSpan.FromMinutes(30), false);
+                        }
+                    };
 
-                    BoosterTimer.Enabled = true;
+                    ExpirationTimer.Enabled = true;
                 });
 
                 return Task.CompletedTask;
@@ -71,7 +83,7 @@ namespace GarbageCan.XP.Boosters
         public void Cleanup()
         {
             using var context = new Context();
-            BoosterTimer.Enabled = false;
+            ExpirationTimer.Enabled = false;
             foreach (var booster in ActiveBoosters.Where(booster =>
                 !context.xpActiveBoosters.Any(x => x.slot.id == booster.slot.id)))
                 context.xpActiveBoosters.Add(new EntityActiveBooster

@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DSharpPlus.Entities;
+using DSharpPlus.Exceptions;
 using GarbageCan.Web.Filters;
 using GarbageCan.Web.Models;
 using GarbageCan.XP;
@@ -51,7 +53,15 @@ namespace GarbageCan.Web.Controllers
         [SwaggerResponse(400, "Requested member is a bot account")]
         public async Task<IActionResult> Get(ulong id)
         {
-            var member = await GarbageCan.Client.Guilds[GarbageCan.OperatingGuildId].GetMemberAsync(id);
+            DiscordMember member;
+            try
+            {
+                member = await GarbageCan.Client.Guilds[GarbageCan.OperatingGuildId].GetMemberAsync(id);
+            }
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
             if (member == null) return NotFound();
             if (member.IsBot) return BadRequest();
             var user = await XpManager.GetUser(id);
