@@ -56,10 +56,10 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
 
             await _appFixture.SendAsync(command);
 
+            await _dbContext.Received(1).SaveChangesAsync(default);
+            
             _dbContext.XPUsers.First().XP.Should().Be(20);
             _calculator.Received(1).XpEarned(message);
-
-            await _dbContext.Received(1).SaveChangesAsync(default);
         }
 
         [Test]
