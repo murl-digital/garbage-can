@@ -8,6 +8,7 @@ using NSubstitute;
 using NUnit.Framework;
 using System.Linq;
 using System.Threading.Tasks;
+using GarbageCan.Domain.Events;
 
 namespace GarbageCan.Application.UnitTests.XP.Commands
 {
@@ -57,6 +58,8 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
             await _appFixture.SendAsync(command);
 
             await _dbContext.Received(1).SaveChangesAsync(default);
+            await _appFixture.Provider.GetRequiredService<IDomainEventService>().Received(1)
+                .Publish(Arg.Is<XpAddedToUserEvent>(e => e.UserId == userId && e.OldXp == 0 && e.NewXp == 20));
             
             _dbContext.XPUsers.First().XP.Should().Be(20);
             _calculator.Received(1).XpEarned(message);
@@ -84,6 +87,8 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
 
             _dbContext.XPUsers.Received(1).Add(Arg.Any<User>());
             await _dbContext.Received(1).SaveChangesAsync(default);
+            await _appFixture.Provider.GetRequiredService<IDomainEventService>().Received(1)
+                .Publish(Arg.Is<XpAddedToUserEvent>(e => e.UserId == userId && e.OldXp == 0 && e.NewXp == 0));
 
             addedUser.Should().NotBeNull();
             addedUser.Id.Should().Be(90);
