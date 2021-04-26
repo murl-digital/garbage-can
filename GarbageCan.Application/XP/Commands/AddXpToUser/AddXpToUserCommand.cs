@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Domain.Entities.XP;
+using GarbageCan.Domain.Events;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,12 +17,14 @@ namespace GarbageCan.Application.XP.Commands.AddXpToUser
     public class AddXpToUserCommandHandler : IRequestHandler<AddXpToUserCommand>
     {
         private readonly IApplicationDbContext _context;
+        private readonly IDomainEventService _provider;
         private readonly IXpCalculatorService _calculator;
 
-        public AddXpToUserCommandHandler(IApplicationDbContext context, IXpCalculatorService calculator)
+        public AddXpToUserCommandHandler(IApplicationDbContext context, IDomainEventService provider, IXpCalculatorService calculator)
         {
             _context = context;
             _calculator = calculator;
+            _provider = provider;
         }
 
         public async Task<Unit> Handle(AddXpToUserCommand request, CancellationToken cancellationToken)
@@ -41,9 +44,17 @@ namespace GarbageCan.Application.XP.Commands.AddXpToUser
                 _context.XPUsers.Add(user);
             }
 
+            var oldXP = user.XP;
             user.XP += _calculator.XpEarned(request.Message);
 
             await _context.SaveChangesAsync(cancellationToken);
+
+            await _provider.Publish(new XpAddedToUserEvent
+            {
+                UserId = user.Id,
+                OldXp = oldXP,
+                NewXp = user.XP
+            });
 
             return new Unit();
         }
