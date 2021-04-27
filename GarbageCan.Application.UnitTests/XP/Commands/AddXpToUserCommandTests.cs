@@ -58,9 +58,7 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
             await _appFixture.SendAsync(command);
 
             await _dbContext.Received(1).SaveChangesAsync(default);
-            await _appFixture.Provider.GetRequiredService<IDomainEventService>().Received(1)
-                .Publish(Arg.Is<XpAddedToUserEvent>(e => e.UserId == userId && e.OldXp == 0 && e.NewXp == 20));
-            
+
             _dbContext.XPUsers.First().XP.Should().Be(20);
             _calculator.Received(1).XpEarned(message);
         }
@@ -87,13 +85,62 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
 
             _dbContext.XPUsers.Received(1).Add(Arg.Any<User>());
             await _dbContext.Received(1).SaveChangesAsync(default);
-            await _appFixture.Provider.GetRequiredService<IDomainEventService>().Received(1)
-                .Publish(Arg.Is<XpAddedToUserEvent>(e => e.UserId == userId && e.OldXp == 0 && e.NewXp == 0));
 
             addedUser.Should().NotBeNull();
             addedUser.Id.Should().Be(90);
             addedUser.Lvl.Should().Be(0);
             addedUser.XP.Should().Be(0);
+        }
+
+        [Test]
+        public async Task ShouldPublishXpAddedEvent_WhenUserExists()
+        {
+            ulong userId = 90;
+            var message = "TEST";
+            var user = new User
+            {
+                Id = userId,
+                Lvl = 0,
+                XP = 0
+            };
+
+            _dbContext.ConfigureMockDbSet(x => x.XPUsers, user);
+            _calculator.XpEarned(message).Returns(20.0);
+
+            var command = new AddXpToUserCommand
+            {
+                UserId = userId,
+                Message = message
+            };
+
+            await _appFixture.SendAsync(command);
+            
+            await _appFixture.Provider.GetRequiredService<IDomainEventService>().Received(1)
+                .Publish(Arg.Is<XpAddedToUserEvent>(e => e.UserId == userId && e.OldXp == 0 && e.NewXp == 20));   
+        }
+
+        [Test]
+        public async Task ShouldPublishXpAddedEvent_WhenUserDoesNotExist()
+        {
+            ulong userId = 90;
+            var message = "TEST";
+
+            _calculator.XpEarned(message).Returns(0);
+
+            User addedUser = null;
+            var mockDbSet = _dbContext.ConfigureMockDbSet(x => x.XPUsers);
+            mockDbSet.When(x => x.Add(Arg.Any<User>())).Do(x => addedUser = x.Arg<User>());
+
+            var command = new AddXpToUserCommand
+            {
+                UserId = userId,
+                Message = message
+            };
+
+            await _appFixture.SendAsync(command);
+            
+            await _appFixture.Provider.GetRequiredService<IDomainEventService>().Received(1)
+                .Publish(Arg.Is<XpAddedToUserEvent>(e => e.UserId == userId && e.OldXp == 0 && e.NewXp == 0));
         }
     }
 }
