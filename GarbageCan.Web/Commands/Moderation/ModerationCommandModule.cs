@@ -23,7 +23,6 @@ namespace GarbageCan.Web.Commands.Moderation
             {
                 GuildId = ctx.Guild.Id,
                 UserId = member.Id,
-                MemberId = member.Id,
                 Reason = reason,
                 UserDisplayName = member.DisplayName
             }, ctx);

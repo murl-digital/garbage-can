@@ -10,10 +10,9 @@ namespace GarbageCan.Application.Moderation.Commands.Ban
     public class BanCommand : IRequest
     {
         public ulong GuildId { get; set; }
-        public ulong MemberId { get; set; }
-        public string Reason { get; set; }
-        public string UserDisplayName { get; set; }
         public ulong UserId { get; set; }
+        public string UserDisplayName { get; set; }
+        public string Reason { get; set; }
     }
 
     public class BanCommandHandler : IRequestHandler<BanCommand>
@@ -22,13 +21,19 @@ namespace GarbageCan.Application.Moderation.Commands.Ban
         private readonly IApplicationDbContext _dbContext;
         private readonly IDiscordModerationService _moderationService;
         private readonly IDiscordResponseService _responseService;
+        private readonly ICurrentUserService _currentUserService;
 
-        public BanCommandHandler(IDiscordModerationService moderationService, IDiscordResponseService responseService, IDateTime dateTime, IApplicationDbContext dbContext)
+        public BanCommandHandler(IDiscordModerationService moderationService,
+            IDiscordResponseService responseService,
+            IDateTime dateTime,
+            IApplicationDbContext dbContext,
+            ICurrentUserService currentUserService)
         {
             _moderationService = moderationService;
             _responseService = responseService;
             _dateTime = dateTime;
             _dbContext = dbContext;
+            _currentUserService = currentUserService;
         }
 
         public async Task<Unit> Handle(BanCommand request, CancellationToken cancellationToken)
@@ -38,7 +43,7 @@ namespace GarbageCan.Application.Moderation.Commands.Ban
             var log = new ActionLog
             {
                 uId = request.UserId,
-                mId = request.MemberId,
+                mId = ulong.Parse(_currentUserService.UserId),
                 issuedDate = _dateTime.Now.ToUniversalTime(),
                 punishmentLevel = PunishmentLevel.Ban,
                 comments = request.Reason

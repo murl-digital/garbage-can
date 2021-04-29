@@ -21,6 +21,8 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
         private IApplicationDbContext _dbContext;
         private IDiscordModerationService _moderationService;
         private IDiscordResponseService _responseService;
+        private ICurrentUserService _currentUserService;
+        private ulong _currentUserId;
 
         [SetUp]
         public void Setup()
@@ -30,13 +32,17 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
             _dbContext = Substitute.For<IApplicationDbContext>();
             _responseService = Substitute.For<IDiscordResponseService>();
             _dateTime = Substitute.For<IDateTime>();
+            _currentUserService = Substitute.For<ICurrentUserService>();
             _actionLogMock = _dbContext.ConfigureMockDbSet(x => x.ModerationActionLogs);
+            _currentUserId = 14245;
+            _currentUserService.UserId.Returns(_currentUserId.ToString());
             _appFixture.OnConfigureServices += (_, services) =>
             {
                 services.AddSingleton(_moderationService);
                 services.AddSingleton(_dbContext);
                 services.AddSingleton(_responseService);
                 services.AddSingleton(_dateTime);
+                services.AddSingleton(_currentUserService);
             };
         }
 
@@ -47,7 +53,6 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
             {
                 GuildId = 70650,
                 UserId = 90,
-                MemberId = 14245,
                 Reason = "You're Annoying",
                 UserDisplayName = "TestUser"
             };
@@ -71,7 +76,6 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
             {
                 GuildId = 70650,
                 UserId = 90,
-                MemberId = 14245,
                 Reason = "You're Annoying",
                 UserDisplayName = "TestUser"
             };
@@ -83,7 +87,7 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
             await _dbContext.ModerationActionLogs.ReceivedWithAnyArgs(1).AddAsync(default);
 
             addedLog.Should().NotBeNull();
-            addedLog.mId.Should().Be(command.MemberId);
+            addedLog.mId.Should().Be(_currentUserId);
             addedLog.uId.Should().Be(command.UserId);
             addedLog.issuedDate.Should().Be(now.ToUniversalTime());
             addedLog.punishmentLevel.Should().Be(PunishmentLevel.Ban);
@@ -97,7 +101,6 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
             {
                 GuildId = 70650,
                 UserId = 90,
-                MemberId = 14245,
                 Reason = "You're Annoying",
                 UserDisplayName = "TestUser"
             };
