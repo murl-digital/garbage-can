@@ -6,6 +6,7 @@ using GarbageCan.Application.Moderation.Commands.Ban;
 using GarbageCan.Application.Moderation.Commands.LogTalk;
 using GarbageCan.Application.Moderation.Commands.LogWarning;
 using GarbageCan.Application.Moderation.Commands.Mute;
+using GarbageCan.Application.Moderation.Commands.Restrict;
 using System;
 using System.Threading.Tasks;
 
@@ -69,7 +70,40 @@ namespace GarbageCan.Web.Commands.Moderation
                 UserId = member.Id,
                 UserDisplayName = member.DisplayName,
                 TimeSpan = TimeSpan.FromHours(1),
-                GuildId = ctx.Guild.Id
+                GuildId = ctx.Guild.Id,
+            }, ctx);
+        }
+
+        [Command("restrict")]
+        [RequireRoles(RoleCheckMode.All, "Staff")]
+        public async Task Restrict(CommandContext ctx, DiscordMember member, DiscordChannel channel, TimeSpan span, [RemainingText] string comments)
+        {
+            await Mediator.Send(new RestrictChannelCommand
+            {
+                Comments = comments,
+                UserId = member.Id,
+                UserDisplayName = member.DisplayName,
+                TimeSpan = span,
+                GuildId = ctx.Guild.Id,
+                ChannelId = channel.Id,
+                ChannelName = channel.Name,
+                ChannelMention = channel.Mention,
+            }, ctx);
+        }
+
+        [Command("restrict")]
+        public async Task RestrictDefault(CommandContext ctx, DiscordMember member, DiscordChannel channel, [RemainingText] string comments)
+        {
+            await Mediator.Send(new RestrictChannelCommand
+            {
+                Comments = comments,
+                UserId = member.Id,
+                UserDisplayName = member.DisplayName,
+                TimeSpan = TimeSpan.FromHours(24),
+                GuildId = ctx.Guild.Id,
+                ChannelId = channel.Id,
+                ChannelName = channel.Name,
+                ChannelMention = channel.Mention,
             }, ctx);
         }
     }
