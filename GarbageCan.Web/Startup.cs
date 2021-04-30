@@ -1,6 +1,7 @@
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using GarbageCan.Application;
+using GarbageCan.Application.Common.Configuration;
 using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Domain.Common;
 using GarbageCan.Domain.Entities;
@@ -49,6 +50,7 @@ namespace GarbageCan.Web
 
             services.Configure<IDiscordClientConfiguration, DiscordClientConfiguration>(Configuration.GetSection("Discord:Client"));
             services.Configure<IDiscordConfiguration, Configurations.DiscordConfiguration>(Configuration.GetSection("Discord"));
+            services.Configure<IRoleConfiguration, RoleConfiguration>(Configuration.GetSection("Roles"));
 
             services.AddTransient<CommandMediator>();
 
