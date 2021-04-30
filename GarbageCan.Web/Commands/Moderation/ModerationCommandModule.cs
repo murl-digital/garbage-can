@@ -5,6 +5,8 @@ using DSharpPlus.Entities;
 using GarbageCan.Application.Moderation.Commands.Ban;
 using GarbageCan.Application.Moderation.Commands.LogTalk;
 using GarbageCan.Application.Moderation.Commands.LogWarning;
+using GarbageCan.Application.Moderation.Commands.Mute;
+using System;
 using System.Threading.Tasks;
 
 namespace GarbageCan.Web.Commands.Moderation
@@ -42,6 +44,33 @@ namespace GarbageCan.Web.Commands.Moderation
         public async Task LogWarning(CommandContext ctx, DiscordMember member, [RemainingText] string comments)
         {
             await Mediator.Send(new LogWarningCommand { Comments = comments, UserId = member.Id }, ctx);
+        }
+
+        [Command("mute")]
+        [RequireRoles(RoleCheckMode.All, "Staff")]
+        public async Task Mute(CommandContext ctx, DiscordMember member, TimeSpan span, [RemainingText] string comments)
+        {
+            await Mediator.Send(new MuteCommand
+            {
+                Comments = comments,
+                UserId = member.Id,
+                UserDisplayName = member.DisplayName,
+                TimeSpan = span,
+                GuildId = ctx.Guild.Id
+            }, ctx);
+        }
+
+        [Command("mute")]
+        public async Task MuteDefault(CommandContext ctx, DiscordMember member, [RemainingText] string comments)
+        {
+            await Mediator.Send(new MuteCommand
+            {
+                Comments = comments,
+                UserId = member.Id,
+                UserDisplayName = member.DisplayName,
+                TimeSpan = TimeSpan.FromHours(1),
+                GuildId = ctx.Guild.Id
+            }, ctx);
         }
     }
 }
