@@ -56,11 +56,12 @@ namespace GarbageCan.Web
 
             services.AddSingleton<DiscordClient>(provider =>
             {
-                var config = provider.GetRequiredService<IDiscordClientConfiguration>();
+                var clientConfiguration = provider.GetRequiredService<IDiscordClientConfiguration>();
+                var configuration = provider.GetRequiredService<IDiscordConfiguration>();
                 var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
                 var client = new DiscordClient(new DiscordConfiguration
                 {
-                    Token = config.Token,
+                    Token = clientConfiguration.Token,
                     TokenType = TokenType.Bot,
                     LoggerFactory = loggerFactory,
                     MinimumLogLevel = LogLevel.Debug,
@@ -69,7 +70,7 @@ namespace GarbageCan.Web
 
                 var commands = client.UseCommandsNext(new CommandsNextConfiguration
                 {
-                    StringPrefixes = new[] { config.CommandPrefix },
+                    StringPrefixes = new[] { configuration.CommandPrefix },
                     Services = provider
                 });
 
