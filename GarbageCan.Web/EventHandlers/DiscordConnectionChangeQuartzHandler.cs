@@ -31,6 +31,7 @@ namespace GarbageCan.Web.EventHandlers
             {
                 _logger.LogInformation("Starting scheduled jobs");
                 _scheduler.ConfigureJobWithCronSchedule<UnRestrictExpiredChannelRestrictionsJob>(_logger, _configuration, "BackgroundTasks:UnRestrictChannelsCronExpression");
+                _scheduler.ConfigureJobWithCronSchedule<UnMuteExpiredMutesJob>(_logger, _configuration, "BackgroundTasks:UnMuteCronExpression");
             }
 
             return Task.CompletedTask;
