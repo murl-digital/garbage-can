@@ -112,7 +112,7 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
 
             await _moderationService.ReceivedWithAnyArgs(secondsFromNowArray.Count(x => x <= 0)).RestoreChannelAccess(default, default, default);
 
-            foreach (var restrict in channelRestricts.Where(x => x.expirationDate <= now))
+            foreach (var restrict in channelRestricts.Where(x => x.expirationDate <= now.ToUniversalTime()))
             {
                 await _moderationService.Received(1).RestoreChannelAccess(_guildId, restrict.uId, restrict.channelId, "channel restrict expired");
             }
