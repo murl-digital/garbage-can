@@ -31,6 +31,7 @@ namespace GarbageCan.Web.EventHandlers
             {
                 _logger.LogInformation("Starting scheduled jobs");
                 _scheduler.ConfigureJobWithCronSchedule<ExampleDiscordJob>(_logger, _configuration, "BackgroundTasks:ExampleJobCronExpression");
+                _scheduler.ConfigureJobWithCronSchedule<UnRestrictExpiredChannelRestrictionsJob>(_logger, _configuration, "BackgroundTasks:UnRestrictChannelsCronExpression");
             }
 
             return Task.CompletedTask;
