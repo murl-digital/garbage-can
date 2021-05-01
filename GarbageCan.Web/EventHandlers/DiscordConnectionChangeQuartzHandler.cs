@@ -30,7 +30,6 @@ namespace GarbageCan.Web.EventHandlers
             if (notification.DomainEvent.Status == DiscordConnectionStatus.Ready)
             {
                 _logger.LogInformation("Starting scheduled jobs");
-                _scheduler.ConfigureJobWithCronSchedule<ExampleDiscordJob>(_logger, _configuration, "BackgroundTasks:ExampleJobCronExpression");
                 _scheduler.ConfigureJobWithCronSchedule<UnRestrictExpiredChannelRestrictionsJob>(_logger, _configuration, "BackgroundTasks:UnRestrictChannelsCronExpression");
             }
 
