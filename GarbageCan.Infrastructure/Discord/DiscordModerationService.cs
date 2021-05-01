@@ -21,19 +21,23 @@ namespace GarbageCan.Infrastructure.Discord
             await member.BanAsync(reason: reason);
         }
 
-        public async Task RestrictChannelAccess(ulong guildId, ulong userId, ulong channelId)
-        {
-            var member = await GetRole(guildId, userId);
-            var channel = await _client.GetChannelAsync(channelId);
-            await channel.AddOverwriteAsync(member, Permissions.None, Permissions.AccessChannels);
-        }
-
         public async Task RestoreChannelAccess(ulong guildId, ulong userId, ulong channelId, string reason = null)
         {
             var member = await GetRole(guildId, userId);
             var channel = await _client.GetChannelAsync(channelId);
 
-            await channel.PermissionOverwrites.First(o => o.Id == member.Id).DeleteAsync("channel restrict expired");
+            var permissionOverwrites = channel.PermissionOverwrites.FirstOrDefault(o => o.Id == member.Id);
+            if (permissionOverwrites != null)
+            {
+                await permissionOverwrites.DeleteAsync("channel restrict expired");
+            }
+        }
+
+        public async Task RestrictChannelAccess(ulong guildId, ulong userId, ulong channelId)
+        {
+            var member = await GetRole(guildId, userId);
+            var channel = await _client.GetChannelAsync(channelId);
+            await channel.AddOverwriteAsync(member, Permissions.None, Permissions.AccessChannels);
         }
 
         private async Task<DiscordMember> GetRole(ulong guildId, ulong userId)
