@@ -1,6 +1,8 @@
 ﻿using DSharpPlus;
+using DSharpPlus.Entities;
 using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Infrastructure.Discord.Exceptions;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace GarbageCan.Infrastructure.Discord
@@ -36,6 +38,22 @@ namespace GarbageCan.Infrastructure.Discord
             }
 
             await _contextService.CommandContext.RespondAsync(content);
+        }
+
+        public async Task RespondWithFileAsync(string fileName, Stream image, ulong? replyMessageId = null, bool replyMention = false)
+        {
+            if (_contextService.CommandContext == null)
+            {
+                throw new CommandContextMissingException();
+            }
+
+            var messageBuilder = new DiscordMessageBuilder().WithFile(fileName, image);
+            if (replyMessageId.HasValue)
+            {
+                messageBuilder.WithReply(replyMessageId.Value, replyMention);
+            }
+
+            await _contextService.CommandContext.RespondAsync(messageBuilder);
         }
     }
 }

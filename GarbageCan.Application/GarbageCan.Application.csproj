@@ -13,14 +13,13 @@
 		<PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.3" />
 		<PackageReference Include="Humanizer.Core" Version="2.8.26" />
+		<PackageReference Include="SixLabors.Fonts" Version="1.0.0-beta0013" />
+		<PackageReference Include="SixLabors.ImageSharp" Version="1.0.3" />
+		<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta11" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\GarbageCan.Domain\GarbageCan.Domain.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Common\Models\" />
 	</ItemGroup>
 
 </Project>

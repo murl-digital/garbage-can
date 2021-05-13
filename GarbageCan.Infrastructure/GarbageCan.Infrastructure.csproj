@@ -5,6 +5,18 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="Assets\LvlCommandFont.ttf" />
+	  <None Remove="Assets\LvlCommandFontBold.ttf" />
+	  <None Remove="Assets\LvlCommandTemplate.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="Assets\LvlCommandFont.ttf" />
+	  <EmbeddedResource Include="Assets\LvlCommandFontBold.ttf" />
+	  <EmbeddedResource Include="Assets\LvlCommandTemplate.png" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-rc3" />
 		<PackageReference Include="MediatR" Version="9.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.ApiAuthorization.IdentityServer" Version="5.0.3" />

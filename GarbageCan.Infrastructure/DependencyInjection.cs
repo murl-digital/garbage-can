@@ -42,6 +42,9 @@ namespace GarbageCan.Infrastructure
             services.AddScoped<DiscordCommandContextService>();
             services.AddSingleton<DiscordEmojiProviderService>();
 
+            services.AddSingleton<ITemplateFileProvider>(new TemplateFileProvider());
+            services.AddSingleton<IFontProvider>(new FontProvider());
+
             return services;
         }
 
