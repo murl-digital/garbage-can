@@ -12,13 +12,11 @@ namespace GarbageCan.Infrastructure.Discord
     public class DiscordMessageService : IDiscordMessageService
     {
         private readonly DiscordCommandContextService _contextService;
-        private readonly DiscordClient _client;
         private readonly ILogger<DiscordMessageService> _logger;
 
-        public DiscordMessageService(DiscordCommandContextService contextService, DiscordClient client, ILogger<DiscordMessageService> logger)
+        public DiscordMessageService(DiscordCommandContextService contextService, ILogger<DiscordMessageService> logger)
         {
             _contextService = contextService;
-            _client = client;
             _logger = logger;
         }
 
@@ -34,13 +32,21 @@ namespace GarbageCan.Infrastructure.Discord
             try
             {
                 var msg = await guild.GetChannel(channelId).GetMessageAsync(messageId);
-                await msg.CreateReactionAsync(DiscordEmoji.FromName(_client, emoji.Name));
+                var client = _contextService.CommandContext.Client;
+                await msg.CreateReactionAsync(GetEmoji(emoji, client));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Couldn't create reaction for message: {messageId} Channel: {channelId} Guild: {@guild}", messageId, channelId, new { guild.Id, guild.Name });
                 throw;
             }
+        }
+
+        private static DiscordEmoji GetEmoji(Emoji emoji, DiscordClient client)
+        {
+            return emoji.Id == 0
+                ? DiscordEmoji.FromUnicode(client, emoji.Name)
+                : DiscordEmoji.FromGuildEmote(client, emoji.Id);
         }
     }
 }
