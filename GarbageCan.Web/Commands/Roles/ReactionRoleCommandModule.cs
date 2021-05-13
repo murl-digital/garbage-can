@@ -3,6 +3,7 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using GarbageCan.Application.Roles.Commands.PrintReactionRoles;
+using GarbageCan.Application.Roles.Commands.RemoveReactionRole;
 using System.Threading.Tasks;
 
 namespace GarbageCan.Web.Commands.Roles
@@ -29,7 +30,7 @@ namespace GarbageCan.Web.Commands.Roles
         [RequirePermissions(Permissions.Administrator)]
         public async Task RemoveReactionRole(CommandContext ctx, int id)
         {
-            await Task.Delay(300);
+            await Mediator.Send(new RemoveReactionRoleCommand { Id = id }, ctx);
         }
     }
 }
