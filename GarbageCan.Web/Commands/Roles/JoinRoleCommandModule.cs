@@ -4,6 +4,7 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using GarbageCan.Application.Roles.Commands.AddJoinRole;
 using GarbageCan.Application.Roles.Commands.PrintJoinRoles;
+using GarbageCan.Application.Roles.Commands.RemoveJoinRole;
 using System.Threading.Tasks;
 
 namespace GarbageCan.Web.Commands.Roles
@@ -28,9 +29,9 @@ namespace GarbageCan.Web.Commands.Roles
 
         [Command("remove")]
         [RequirePermissions(Permissions.Administrator)]
-        public Task RemoveJoinRole(CommandContext ctx, int id)
+        public async Task RemoveJoinRole(CommandContext ctx, int id)
         {
-            return Task.CompletedTask;
+            await Mediator.Send(new RemoveJoinRoleCommand { Id = id }, ctx);
         }
     }
 }

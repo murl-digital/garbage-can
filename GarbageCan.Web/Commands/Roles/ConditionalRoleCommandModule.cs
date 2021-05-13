@@ -4,6 +4,7 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using GarbageCan.Application.Roles.Commands.AddConditionalRole;
 using GarbageCan.Application.Roles.Commands.PrintConditionalRoles;
+using GarbageCan.Application.Roles.Commands.RemoveConditionalRole;
 using System.Threading.Tasks;
 
 namespace GarbageCan.Web.Commands.Roles
@@ -33,9 +34,9 @@ namespace GarbageCan.Web.Commands.Roles
 
         [Command("remove")]
         [RequirePermissions(Permissions.Administrator)]
-        public Task RemoveConditionalRole(CommandContext ctx, int id)
+        public async Task RemoveConditionalRole(CommandContext ctx, int id)
         {
-            return Task.CompletedTask;
+            await Mediator.Send(new RemoveConditionalRoleCommand { Id = id }, ctx);
         }
     }
 }
