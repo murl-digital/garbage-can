@@ -19,6 +19,36 @@ namespace GarbageCan.Infrastructure.Discord
             _logger = logger;
         }
 
+        public Task<Dictionary<ulong, string>> GetChannelNamesById(IEnumerable<ulong> channelIds)
+        {
+            if (_contextService.CommandContext == null)
+            {
+                throw new CommandContextMissingException();
+            }
+
+            var roleDictionary = new Dictionary<ulong, string>();
+
+            var guild = _contextService.CommandContext.Guild;
+            try
+            {
+                foreach (var id in channelIds.Distinct())
+                {
+                    var channelName = guild.GetChannel(id)?.Name;
+                    if (!string.IsNullOrWhiteSpace(channelName))
+                    {
+                        roleDictionary.Add(id, channelName);
+                    }
+                }
+
+                return Task.FromResult(roleDictionary);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Couldn't Role Id Names. Guild: {@guild} RoleIds: {ChannelIds} ", channelIds, new { guild.Id, guild.Name });
+                throw;
+            }
+        }
+
         public async Task<string> GetMemberDisplayNameAsync(ulong userId)
         {
             if (_contextService.CommandContext == null)
