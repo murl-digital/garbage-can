@@ -1,9 +1,10 @@
-﻿using System.Threading.Tasks;
-using DSharpPlus;
+﻿using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using GarbageCan.Application.Roles.Commands.AddConditionalRole;
 using GarbageCan.Application.Roles.Commands.PrintConditionalRoles;
+using System.Threading.Tasks;
 
 namespace GarbageCan.Web.Commands.Roles
 {
@@ -13,9 +14,14 @@ namespace GarbageCan.Web.Commands.Roles
     {
         [Command("add")]
         [RequirePermissions(Permissions.Administrator)]
-        public Task AddConditionalRole(CommandContext ctx, DiscordRole required, DiscordRole result, bool remain)
+        public async Task AddConditionalRole(CommandContext ctx, DiscordRole required, DiscordRole result, bool remain)
         {
-            return Task.CompletedTask;
+            await Mediator.Send(new AddConditionalRoleCommand
+            {
+                RequiredRoleId = required.Id,
+                ResultRoleId = result.Id,
+                Remain = remain
+            }, ctx);
         }
 
         [Command("list")]

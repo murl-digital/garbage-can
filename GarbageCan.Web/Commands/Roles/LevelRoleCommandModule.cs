@@ -2,6 +2,7 @@
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using GarbageCan.Application.Roles.Commands.AddLevelRole;
 using GarbageCan.Application.Roles.Commands.PrintLevelRoles;
 using System.Threading.Tasks;
 
@@ -13,9 +14,14 @@ namespace GarbageCan.Web.Commands.Roles
     {
         [Command("add")]
         [RequirePermissions(Permissions.Administrator)]
-        public Task AddLevelRole(CommandContext ctx, int lvl, DiscordRole role, bool remain)
+        public async Task AddLevelRole(CommandContext ctx, int lvl, DiscordRole role, bool remain)
         {
-            return Task.CompletedTask;
+            await Mediator.Send(new AddLevelRoleCommand
+            {
+                RoleId = role.Id,
+                Level = lvl,
+                Remain = remain
+            }, ctx);
         }
 
         [Command("list")]

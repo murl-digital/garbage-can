@@ -1,9 +1,10 @@
-﻿using System.Threading.Tasks;
-using DSharpPlus;
+﻿using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using GarbageCan.Application.Roles.Commands.AddJoinRole;
 using GarbageCan.Application.Roles.Commands.PrintJoinRoles;
+using System.Threading.Tasks;
 
 namespace GarbageCan.Web.Commands.Roles
 {
@@ -13,9 +14,9 @@ namespace GarbageCan.Web.Commands.Roles
     {
         [Command("add")]
         [RequirePermissions(Permissions.Administrator)]
-        public Task AddJoinRole(CommandContext ctx, DiscordRole role)
+        public async Task AddJoinRole(CommandContext ctx, DiscordRole role)
         {
-            return Task.CompletedTask;
+            await Mediator.Send(new AddJoinRoleCommand { RoleId = role.Id }, ctx);
         }
 
         [Command("list")]
