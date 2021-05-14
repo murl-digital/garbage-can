@@ -56,15 +56,6 @@ namespace GarbageCan.Application.XP.Queries.GetXPImageStream
         {
             var fonts = await _fontProvider.GetFontsAsync();
 
-            int BarDifference = 1199;
-            var test = (float)(20 + BarDifference * request.Progress);
-            var barPoints = new[]
-            {
-                new PointF(20, 1229),
-                new PointF(20, 1258),
-                new PointF(Math.Clamp(test, 20, 1190), 1258),
-                new PointF(test, 1229)
-            };
             var result = new MemoryStream();
 
             var templateFile = await _templateFileProvider.GetTemplateFile();
@@ -94,12 +85,7 @@ namespace GarbageCan.Application.XP.Queries.GetXPImageStream
 
             image.Mutate(i => i.DrawText(Options, $"{request.Xp:N0}/{request.Required:N0}", fonts.Normal, Primary, XpPos));
 
-            var path = new PathBuilder()
-                .AddLine(barPoints[0], barPoints[1])
-                .AddLine(barPoints[1], barPoints[2])
-                .AddLine(barPoints[2], barPoints[3])
-                .AddLine(barPoints[3], barPoints[0])
-                .Build();
+            var path = GetProgressBarPath(request.Progress);
 
             image.Mutate(i => i.Fill(BarColor, path));
 
@@ -110,6 +96,26 @@ namespace GarbageCan.Application.XP.Queries.GetXPImageStream
             result.Seek(0, SeekOrigin.Begin);
 
             return result;
+        }
+
+        private static IPath GetProgressBarPath(double progress)
+        {
+            int BarDifference = 1199;
+            var progressLocation = (float)(20 + BarDifference * progress);
+            var xLocation = Math.Clamp(progressLocation, 20, 1190);
+
+            var topLeftPoint = new PointF(20, 1229);
+            var bottomLeftPoint = new PointF(20, 1258);
+            var topRightPoint = new PointF(xLocation, 1229);
+            var bottomRightPoint = new PointF(xLocation, 1258);
+
+            var path = new PathBuilder()
+                .AddLine(topLeftPoint, bottomLeftPoint)
+                .AddLine(bottomLeftPoint, bottomRightPoint)
+                .AddLine(bottomRightPoint, topRightPoint)
+                .AddLine(topRightPoint, topLeftPoint)
+                .Build();
+            return path;
         }
     }
 
