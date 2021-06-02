@@ -127,6 +127,15 @@ namespace GarbageCan.Web
                         UserId = args.User.Id
                     });
                 };
+                
+                client.GuildMemberAdded += async (_, args) =>
+                {
+                    await PublishScopedEvent(provider, new DiscordGuildMemberAdded
+                    {
+                        UserId = args.Member.Id,
+                        IsBot = args.Member.IsBot
+                    });
+                };
 
                 return client;
             });
