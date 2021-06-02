@@ -32,30 +32,29 @@ namespace GarbageCan.Application.Roles.Commands.ApplyConiditionalRoles
                 .GroupBy(r => r.resultRoleId)
                 .ToDictionary(r => r.Key, r => r.Select(x => x.requiredRoleId).ToList());
 
-            var keySet = conditionalRoles.Keys;
+            var resultingRolesWithNoRemain = conditionalRolesEntity
+                .Where(r => !r.remain)
+                .Select(r => r.resultRoleId)
+                .ToArray();
 
-            var taskList = new List<Task>();
-
-            foreach (var member in request.Members)
+            foreach (var (memberId, roles) in request.Members)
             {
-                foreach (var role in member.Value.Intersect(keySet)
-                    .Where(r => !member.Value.Intersect(conditionalRoles[r]).Any()))
+                foreach (var role in roles
+                    .Intersect(resultingRolesWithNoRemain)
+                    .Where(r => !roles.Intersect(conditionalRoles[r]).Any()))
                 {
-                    // if (conditionalRolesEntity.First(r => r.resultRoleId == role.Id).remain) continue;
-                    await _roleService.RevokeRoleAsync(request.GuildId, role, member.Key, "conditional roles");
+                    await _roleService.RevokeRoleAsync(request.GuildId, role, memberId, "conditional roles");
                 }
 
                 foreach (var (resultingRole, _) in conditionalRoles
-                    .Where(r => !member.Value.Contains(r.Key))
-                    .Where(r => member.Value.Intersect(r.Value).Any()))
+                    .Where(r => !roles.Contains(r.Key))
+                    .Where(r => roles.Intersect(r.Value).Any()))
                 {
-                    await _roleService.GrantRoleAsync(request.GuildId, resultingRole, member.Key, "conditional roles");
+                    await _roleService.GrantRoleAsync(request.GuildId, resultingRole, memberId, "conditional roles");
                 }
             }
 
-            await Task.WhenAll(taskList);
-
-            return await Task.FromResult(Unit.Value);
+            return Unit.Value;
         }
     }
 }
