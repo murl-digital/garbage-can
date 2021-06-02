@@ -4,13 +4,34 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
+using GarbageCan.Application.Common.Models;
+using GarbageCan.Domain.Common;
+using GarbageCan.Domain.Events;
 
 namespace GarbageCan.Application.UnitTests.Shared
 {
     public class MediatorFixture
     {
+        private ServiceProvider _provider;
         public EventHandler<IServiceCollection> OnConfigureServices { get; set; }
-        public ServiceProvider Provider { get; private set; }
+
+        public ServiceProvider Provider
+        {
+            get
+            {
+                if (_provider != null)
+                {
+                    return _provider;
+                }
+
+                Services.AddSubstitutedLogging();
+                OnConfigureServices?.Invoke(this, Services);
+                Provider = Services.BuildServiceProvider();
+
+                return _provider;
+            }
+            private set => _provider = value;
+        }
 
         protected ServiceCollection Services { get; } = new ServiceCollection();
 
@@ -23,13 +44,6 @@ namespace GarbageCan.Application.UnitTests.Shared
 
         public async Task<T> SendAsync<T>(IRequest<T> request)
         {
-            if (Provider == null)
-            {
-                Services.AddSubstitutedLogging();
-                OnConfigureServices?.Invoke(this, Services);
-                Provider = Services.BuildServiceProvider();
-            }
-
             var mediator = Provider.GetService<IMediator>();
 
             if (mediator == null)
@@ -38,6 +52,23 @@ namespace GarbageCan.Application.UnitTests.Shared
             }
 
             return await mediator.Send(request);
+        }
+
+        public async Task Publish(INotification notification)
+        {
+            var mediator = Provider.GetService<IMediator>();
+
+            if (mediator == null)
+            {
+                throw new MediatorFixtureConfigurationException();
+            }
+
+            await mediator.Publish(notification);
+        }
+
+        public async Task Publish<T>(T notification) where T : DomainEvent
+        {
+            await Publish(new DomainEventNotification<T>(notification));
         }
     }
 }
