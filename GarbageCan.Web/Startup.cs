@@ -137,6 +137,11 @@ namespace GarbageCan.Web
                     });
                 };
 
+                client.GuildDownloadCompleted += async (_, _) =>
+                {
+                    await PublishScopedEvent(provider, new DiscordGuildDownloadCompleteEvent());
+                };
+
                 return client;
             });
         }
