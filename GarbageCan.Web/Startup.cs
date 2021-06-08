@@ -92,7 +92,10 @@ namespace GarbageCan.Web
                         GuildId = args.Guild.Id,
                         ChannelId = args.Channel.Id,
                         MessageId = args.Message.Id,
-                        Content = args.Message.Content
+                        Content = args.Message.Content,
+                        AuthorIsBot = args.Author.IsBot,
+                        AuthorIsSystem = args.Author.IsSystem ?? false,
+                        ChannelIsPrivate = args.Channel.IsPrivate
                     });
                 };
 

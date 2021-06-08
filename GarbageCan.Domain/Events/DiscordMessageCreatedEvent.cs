@@ -9,5 +9,8 @@ namespace GarbageCan.Domain.Events
         public ulong MessageId { get; set; }
         public ulong AuthorId { get; set; }
         public string Content { get; set; }
+        public bool AuthorIsBot { get; set; }
+        public bool AuthorIsSystem { get; set; }
+        public bool ChannelIsPrivate { get; set; }
     }
 }
