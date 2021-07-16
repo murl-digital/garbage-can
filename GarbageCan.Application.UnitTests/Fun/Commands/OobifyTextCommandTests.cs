@@ -28,28 +28,28 @@ namespace GarbageCan.Application.UnitTests.Fun.Commands
         }
 
         [Theory]
-        [TestCase("test", "tooboobbst")]
+        [TestCase("test", "toobst")]
         public async Task ShouldRespondWithOobifyedMessage_WhenFullWordIsPassed(string text, string expected)
         {
             await PerformOobifyTest(text, expected);
         }
 
         [Theory]
-        [TestCase("test 5 test", "tooboobbst 5 tooboobbst")]
+        [TestCase("test 5 test", "toobst 5 toobst")]
         public async Task ShouldRespondWithOobifyedMessage_WhenMultipleWordsArePassed(string text, string expected)
         {
             await PerformOobifyTest(text, expected);
         }
 
         [Theory]
-        [TestCase("a", "ooboobb")]
-        [TestCase("e", "ooboobb")]
-        [TestCase("i", "ooboobb")]
+        [TestCase("a", "oob")]
+        [TestCase("e", "oob")]
+        [TestCase("i", "oob")]
         [TestCase("o", "oob")]
         [TestCase("u", "oob")]
-        [TestCase("A", "Oobob")]
-        [TestCase("E", "Oobob")]
-        [TestCase("I", "Oobob")]
+        [TestCase("A", "Oob")]
+        [TestCase("E", "Oob")]
+        [TestCase("I", "Oob")]
         [TestCase("O", "Oob")]
         [TestCase("U", "Oob")]
         public async Task ShouldRespondWithOobifyedMessage_WhenSingleValidLetterIsPassed(string text, string expected)
