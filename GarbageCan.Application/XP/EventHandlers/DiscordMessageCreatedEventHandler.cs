@@ -1,4 +1,6 @@
-﻿using GarbageCan.Application.Common.Interfaces;
+﻿using System;
+using System.Linq;
+using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Application.Common.Models;
 using GarbageCan.Application.XP.Commands.AddXpToUser;
 using GarbageCan.Domain.Events;
@@ -8,20 +10,29 @@ using System.Threading.Tasks;
 
 namespace GarbageCan.Application.XP.EventHandlers
 {
-    public class DiscordMessageCreatedEventHandler : INotificationHandler<DomainEventNotification<DiscordMessageCreatedEvent>>
+    public class
+        DiscordMessageCreatedEventHandler : INotificationHandler<DomainEventNotification<DiscordMessageCreatedEvent>>
     {
         private readonly IMediator _mediator;
         private readonly IDiscordConfiguration _configuration;
+        private readonly IApplicationDbContext _context;
 
-        public DiscordMessageCreatedEventHandler(IMediator mediator, IDiscordConfiguration configuration)
+        public DiscordMessageCreatedEventHandler(IMediator mediator, IDiscordConfiguration configuration,
+            IApplicationDbContext context)
         {
             _mediator = mediator;
             _configuration = configuration;
+            _context = context;
         }
 
-        public async Task Handle(DomainEventNotification<DiscordMessageCreatedEvent> notification, CancellationToken cancellationToken)
+        public async Task Handle(DomainEventNotification<DiscordMessageCreatedEvent> notification,
+            CancellationToken cancellationToken)
         {
-            if (notification.DomainEvent.Content.StartsWith(_configuration.CommandPrefix))
+            if (notification.DomainEvent.AuthorIsBot ||
+                notification.DomainEvent.AuthorIsSystem ||
+                notification.DomainEvent.ChannelIsPrivate ||
+                notification.DomainEvent.Content.StartsWith(_configuration.CommandPrefix) ||
+                _context.XPExcludedChannels.Any(c => c.channelId == notification.DomainEvent.ChannelId))
             {
                 return;
             }

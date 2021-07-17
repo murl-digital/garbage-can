@@ -1,4 +1,6 @@
-﻿using DSharpPlus;
+﻿using System.Collections.Generic;
+using System.Linq;
+using DSharpPlus;
 using DSharpPlus.Entities;
 using GarbageCan.Application.Common.Interfaces;
 using System.Threading.Tasks;
@@ -24,6 +26,18 @@ namespace GarbageCan.Infrastructure.Discord
         {
             var (member, role) = await GetRoleAndMember(guildId, roleId, userId);
             await member.RevokeRoleAsync(role, reason);
+        }
+
+        public Task<Dictionary<ulong, Dictionary<ulong, ulong[]>>> GetAllMembersAndRoles()
+        {
+            var guildWithMembersAndRolesDictionary = _client.Guilds.Values.Select(x => new
+                {
+                    GuildId = x.Id,
+                    MembersWithRoles = x.Members
+                        .ToDictionary(k => k.Key, v => v.Value.Roles.Select(r => r.Id).ToArray())
+                })
+                .ToDictionary(x => x.GuildId, y => y.MembersWithRoles);
+            return Task.FromResult(guildWithMembersAndRolesDictionary);
         }
 
         private async Task<(DiscordMember member, DiscordRole role)> GetRoleAndMember(ulong guildId, ulong roleId, ulong userId)

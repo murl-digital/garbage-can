@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace GarbageCan.Application.Common.Interfaces
 {
@@ -7,5 +8,7 @@ namespace GarbageCan.Application.Common.Interfaces
         Task GrantRoleAsync(ulong guildId, ulong roleId, ulong userId, string reason = null);
 
         Task RevokeRoleAsync(ulong guildId, ulong roleId, ulong userId, string reason = null);
+
+        Task<Dictionary<ulong, Dictionary<ulong, ulong[]>>> GetAllMembersAndRoles();
     }
 }

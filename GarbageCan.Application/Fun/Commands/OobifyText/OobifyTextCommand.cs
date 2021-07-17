@@ -22,15 +22,15 @@ namespace GarbageCan.Application.Fun.Commands.OobifyText
         public async Task<bool> Handle(OobifyTextCommand request, CancellationToken cancellationToken)
         {
             var result = request.Text
+                .Replace("o", "oob")
                 .Replace("a", "oob")
                 .Replace("e", "oob")
                 .Replace("i", "oob")
-                .Replace("o", "oob")
                 .Replace("u", "oob")
+                .Replace("O", "Oob")
                 .Replace("A", "Oob")
                 .Replace("E", "Oob")
                 .Replace("I", "Oob")
-                .Replace("O", "Oob")
                 .Replace("U", "Oob");
 
             await _responseService.RespondAsync(result);

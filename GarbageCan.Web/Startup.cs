@@ -40,7 +40,7 @@ namespace GarbageCan.Web
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "GarbageCan.Web", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo {Title = "GarbageCan.Web", Version = "v1"});
             });
 
             services.AddApplication(typeof(Startup).Assembly);
@@ -48,8 +48,10 @@ namespace GarbageCan.Web
 
             services.ConfigureQuartz(Configuration);
 
-            services.Configure<IDiscordClientConfiguration, DiscordClientConfiguration>(Configuration.GetSection("Discord:Client"));
-            services.Configure<IDiscordConfiguration, Configurations.DiscordConfiguration>(Configuration.GetSection("Discord"));
+            services.Configure<IDiscordClientConfiguration, DiscordClientConfiguration>(
+                Configuration.GetSection("Discord:Client"));
+            services.Configure<IDiscordConfiguration, Configurations.DiscordConfiguration>(
+                Configuration.GetSection("Discord"));
             services.Configure<IRoleConfiguration, RoleConfiguration>(Configuration.GetSection("Roles"));
 
             services.AddTransient<CommandMediator>();
@@ -70,7 +72,7 @@ namespace GarbageCan.Web
 
                 var commands = client.UseCommandsNext(new CommandsNextConfiguration
                 {
-                    StringPrefixes = new[] { configuration.CommandPrefix },
+                    StringPrefixes = new[] {configuration.CommandPrefix},
                     Services = provider
                 });
 
@@ -92,7 +94,10 @@ namespace GarbageCan.Web
                         GuildId = args.Guild.Id,
                         ChannelId = args.Channel.Id,
                         MessageId = args.Message.Id,
-                        Content = args.Message.Content
+                        Content = args.Message.Content,
+                        AuthorIsBot = args.Author.IsBot,
+                        AuthorIsSystem = args.Author.IsSystem ?? false,
+                        ChannelIsPrivate = args.Channel.IsPrivate
                     });
                 };
 
@@ -127,7 +132,7 @@ namespace GarbageCan.Web
                         UserId = args.User.Id
                     });
                 };
-                
+
                 client.GuildMemberAdded += async (_, args) =>
                 {
                     await PublishScopedEvent(provider, new DiscordGuildMemberAdded
@@ -137,12 +142,18 @@ namespace GarbageCan.Web
                     });
                 };
 
+                client.GuildDownloadCompleted += async (_, _) =>
+                {
+                    await PublishScopedEvent(provider, new DiscordGuildDownloadCompleteEvent());
+                };
+
                 return client;
             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime applicationLifetime)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env,
+            IHostApplicationLifetime applicationLifetime)
         {
             if (env.IsDevelopment())
             {
@@ -157,10 +168,7 @@ namespace GarbageCan.Web
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
             applicationLifetime.ApplicationStopped.Register(() =>
             {
@@ -168,7 +176,8 @@ namespace GarbageCan.Web
                 var logger = app.ApplicationServices.GetService<ILogger<Startup>>();
 
                 logger.LogInformation("SHUTTING DOWN");
-                service?.Publish(new DiscordConnectionChangeEvent { Status = DiscordConnectionStatus.Shutdown }).GetAwaiter().GetResult();
+                service?.Publish(new DiscordConnectionChangeEvent {Status = DiscordConnectionStatus.Shutdown})
+                    .GetAwaiter().GetResult();
 
                 var client = app.ApplicationServices.GetService<DiscordClient>();
                 client?.DisconnectAsync().GetAwaiter().GetResult();

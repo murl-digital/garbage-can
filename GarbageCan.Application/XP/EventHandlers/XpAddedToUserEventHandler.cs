@@ -33,7 +33,7 @@ namespace GarbageCan.Application.XP.EventHandlers
                 // may implement a ghost level up event in the future
             }
 
-            if (oldLevel == user.Lvl)
+            if (oldLevel < user.Lvl)
             {
                 await _context.SaveChangesAsync(cancellationToken);
 
