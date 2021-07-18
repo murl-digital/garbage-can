@@ -68,6 +68,23 @@ namespace GarbageCan.Application.UnitTests.Roles.EventHandlers
         }
 
         [Test]
+        public async Task ShouldDoNothing_WhenUserIsABot()
+        {
+            ulong userId = 90;
+            ulong otherUserId = 95;
+            _dbContext.ConfigureMockDbSet(x => x.JoinWatchlist, new WatchedUser { id = otherUserId });
+
+            await _appFixture.Publish(new DiscordGuildMemberUpdated
+            {
+                IsBot = true,
+                UserId = userId
+            });
+
+            await _dbContext.DidNotReceiveWithAnyArgs().SaveChangesAsync(default);
+            await _roleService.DidNotReceiveWithAnyArgs().GrantRoleAsync(default, default, default);
+        }
+
+        [Test]
         public async Task ShouldRemoveFromWatchList_WhenUserIsInWatchList()
         {
             ulong userId = 90;
