@@ -24,7 +24,7 @@ namespace GarbageCan.Application.XP.EventHandlers
 
         public async Task Handle(DomainEventNotification<XpAddedToUserEvent> notification, CancellationToken cancellationToken)
         {
-            var user = await _context.XPUsers.FirstOrDefaultAsync(u => u.Id == notification.DomainEvent.UserId, cancellationToken);
+            var user = await _context.XPUsers.FirstOrDefaultAsync(u => u.UserId == notification.DomainEvent.UserId, cancellationToken);
 
             var oldLevel = user.Lvl;
             while (user.XP > _calculator.TotalXpRequired(user.Lvl))

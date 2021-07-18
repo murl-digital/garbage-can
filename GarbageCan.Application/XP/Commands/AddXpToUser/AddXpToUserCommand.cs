@@ -10,6 +10,7 @@ namespace GarbageCan.Application.XP.Commands.AddXpToUser
 {
     public class AddXpToUserCommand : IRequest
     {
+        public ulong GuildId { get; set; }
         public ulong UserId { get; set; }
         public string Message { get; set; }
     }
@@ -30,13 +31,13 @@ namespace GarbageCan.Application.XP.Commands.AddXpToUser
         public async Task<Unit> Handle(AddXpToUserCommand request, CancellationToken cancellationToken)
         {
             var user = await _context.XPUsers
-                .FirstOrDefaultAsync(u => u.Id == request.UserId, cancellationToken);
+                .FirstOrDefaultAsync(u => u.UserId == request.UserId, cancellationToken);
 
             if (user == null)
             {
                 user = new User
                 {
-                    Id = request.UserId,
+                    UserId = request.UserId,
                     Lvl = 0,
                     XP = 0
                 };
@@ -51,7 +52,7 @@ namespace GarbageCan.Application.XP.Commands.AddXpToUser
 
             await _provider.Publish(new XpAddedToUserEvent
             {
-                UserId = user.Id,
+                UserId = user.UserId,
                 OldXp = oldXP,
                 NewXp = user.XP
             });

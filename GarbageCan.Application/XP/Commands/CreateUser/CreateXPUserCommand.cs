@@ -29,14 +29,14 @@ namespace GarbageCan.Application.XP.Commands.CreateUser
                 return Unit.Value;
             }
 
-            if (await _context.XPUsers.AnyAsync(x => x.Id == request.UserId, cancellationToken))
+            if (await _context.XPUsers.AnyAsync(x => x.UserId == request.UserId, cancellationToken))
             {
                 return Unit.Value;
             }
 
             await _context.XPUsers.AddAsync(new User
             {
-                Id = request.UserId,
+                UserId = request.UserId,
             }, cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);

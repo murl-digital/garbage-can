@@ -41,10 +41,10 @@ namespace GarbageCan.Application.XP.Queries.GetTopUsersByXP
 
             foreach (var user in topUsers)
             {
-                user.DisplayName = await GetMemberDisplayNameAsync(user.User.Id);
+                user.DisplayName = await GetMemberDisplayNameAsync(user.User.UserId);
             }
 
-            var contextUser = users.First(x => x.User.Id == request.CurrentUserId);
+            var contextUser = users.First(x => x.User.UserId == request.CurrentUserId);
 
             return new GetTopUsersByXPQueryVm
             {

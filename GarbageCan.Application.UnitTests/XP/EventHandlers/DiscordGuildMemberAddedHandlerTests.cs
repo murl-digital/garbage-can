@@ -43,7 +43,7 @@ namespace GarbageCan.Application.UnitTests.XP.EventHandlers
             await _dbContext.Received(1).SaveChangesAsync(default);
 
             savedUser.Should().NotBeNull();
-            savedUser.Id.Should().Be(userId);
+            savedUser.UserId.Should().Be(userId);
             savedUser.Lvl.Should().Be(0);
             savedUser.XP.Should().Be(0);
         }

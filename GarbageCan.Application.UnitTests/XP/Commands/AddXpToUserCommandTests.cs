@@ -41,7 +41,7 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
             var message = "TEST";
             var user = new User
             {
-                Id = userId,
+                UserId = userId,
                 Lvl = 0,
                 XP = 0
             };
@@ -87,7 +87,7 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
             await _dbContext.Received(1).SaveChangesAsync(default);
 
             addedUser.Should().NotBeNull();
-            addedUser.Id.Should().Be(90);
+            addedUser.UserId.Should().Be(90);
             addedUser.Lvl.Should().Be(0);
             addedUser.XP.Should().Be(0);
         }
@@ -99,7 +99,7 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
             var message = "TEST";
             var user = new User
             {
-                Id = userId,
+                UserId = userId,
                 Lvl = 0,
                 XP = 0
             };

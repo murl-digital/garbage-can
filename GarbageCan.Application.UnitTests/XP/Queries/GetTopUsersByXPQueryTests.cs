@@ -38,7 +38,7 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
         {
             ulong currentUserId = 90;
             var displayName = "TEST";
-            var currentUser = new User { Id = currentUserId, Lvl = 100, XP = 20 };
+            var currentUser = new User { UserId = currentUserId, Lvl = 100, XP = 20 };
             _guildService.GetMemberDisplayNameAsync(currentUserId).Returns(displayName);
 
             _dbContext.ConfigureMockDbSet(x => x.XPUsers, currentUser);
@@ -62,7 +62,7 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
         {
             ulong currentUserId = 90;
             var displayName = "TEST";
-            var currentUser = new User { Id = currentUserId, Lvl = 100, XP = 20 };
+            var currentUser = new User { UserId = currentUserId, Lvl = 100, XP = 20 };
             _guildService.GetMemberDisplayNameAsync(currentUserId).Returns(displayName);
 
             _dbContext.ConfigureMockDbSet(x => x.XPUsers, currentUser);
@@ -85,7 +85,7 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
         {
             ulong currentUserId = 90;
             var displayName = "TEST";
-            var currentUser = new User { Id = currentUserId, Lvl = 100, XP = 20 };
+            var currentUser = new User { UserId = currentUserId, Lvl = 100, XP = 20 };
             _guildService.GetMemberDisplayNameAsync(currentUserId).Returns(displayName);
 
             _dbContext.ConfigureMockDbSet(x => x.XPUsers, currentUser);
@@ -107,14 +107,14 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
         public async Task ShouldReturnTopCountUsers_WhenMoreUsersExistThanAreRequestFromTheCount()
         {
             var users = GenerateUsers(34);
-            users.ForEach(x => _guildService.GetMemberDisplayNameAsync(x.Id).Returns("TEST"));
+            users.ForEach(x => _guildService.GetMemberDisplayNameAsync(x.UserId).Returns("TEST"));
 
             _dbContext.ConfigureMockDbSet(x => x.XPUsers, users);
 
             var count = 10;
             var command = new GetTopUsersByXPQuery
             {
-                CurrentUserId = users.First().Id,
+                CurrentUserId = users.First().UserId,
                 Count = count
             };
 
@@ -129,7 +129,7 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
         {
             var faker = new Faker<User>();
             faker
-                .RuleFor(x => x.Id, f => (ulong)f.IndexFaker + 1)
+                .RuleFor(x => x.UserId, f => (ulong)f.IndexFaker + 1)
                 .RuleFor(x => x.Lvl, f => f.Random.Int(0, 100))
                 .RuleFor(x => x.XP, f => f.Random.Double(0, 10000));
 
