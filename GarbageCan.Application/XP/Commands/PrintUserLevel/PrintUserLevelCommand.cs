@@ -41,11 +41,11 @@ namespace GarbageCan.Application.XP.Commands.PrintUserLevel
         public async Task<Unit> Handle(PrintUserLevelCommand request, CancellationToken cancellationToken)
         {
             var users = await _context.XPUsers.OrderByDescending(x => x.XP)
-                .Select(u => u.Id)
+                .Select(u => u.UserId)
                 .ToListAsync(cancellationToken);
 
             var user = await _context.XPUsers.OrderByDescending(x => x.XP)
-                           .FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken) ??
+                           .FirstOrDefaultAsync(x => x.UserId == request.UserId, cancellationToken) ??
                        new User();
 
             var placement = users.FindIndex(u => u == request.UserId) + 1;

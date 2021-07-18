@@ -6,7 +6,11 @@ namespace GarbageCan.Domain.Entities.XP
     {
         private double _xp;
 
-        public ulong Id { get; set; }
+        public int Id { get; set; }
+        
+        public ulong GuildId { get; set; }
+        
+        public ulong UserId { get; set; }
 
         public int Lvl { get; set; }
 

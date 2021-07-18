@@ -14,19 +14,22 @@ namespace GarbageCan.Infrastructure.Persistence
             {
                 await context.XPUsers.AddAsync(new User
                 {
-                    Id = 39,
+                    GuildId = 1,
+                    UserId = 39,
                     Lvl = 394,
                     XP = 483
                 });
                 await context.XPUsers.AddAsync(new User
                 {
-                    Id = 80,
+                    GuildId = 1,
+                    UserId = 80,
                     Lvl = 5,
                     XP = 9000
                 });
                 await context.XPUsers.AddAsync(new User
                 {
-                    Id = 726179402278371358,
+                    GuildId = 1,
+                    UserId = 726179402278371358,
                     Lvl = 5,
                     XP = 5440
                 });

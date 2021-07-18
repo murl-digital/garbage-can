@@ -45,7 +45,7 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
             await _dbContext.Received(1).SaveChangesAsync(default);
 
             savedUser.Should().NotBeNull();
-            savedUser.Id.Should().Be(userId);
+            savedUser.UserId.Should().Be(userId);
             savedUser.Lvl.Should().Be(0);
             savedUser.XP.Should().Be(0);
         }
@@ -56,7 +56,7 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
             ulong userId = 90;
             _dbContext.ConfigureMockDbSet(x => x.XPUsers, new User
             {
-                Id = userId
+                UserId = userId
             });
 
             var command = new CreateXPUserCommand

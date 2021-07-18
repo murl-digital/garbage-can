@@ -39,6 +39,7 @@ namespace GarbageCan.Application.XP.EventHandlers
 
             await _mediator.Send(new AddXpToUserCommand
             {
+                GuildId = notification.DomainEvent.GuildId,
                 UserId = notification.DomainEvent.AuthorId,
                 Message = notification.DomainEvent.Content
             }, cancellationToken);

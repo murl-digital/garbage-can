@@ -39,17 +39,6 @@ namespace GarbageCan.Application.Roles.Commands.ApplyLevelRoles
                 await _roleService.GrantRoleAsync(request.GuildId, roleId, request.MemberId, "level roles");
             }
 
-            /*var roles = context.levelRoles.OrderBy(r => r.lvl).Where(r => !r.remain).ToArray();
-            for (var i = 0; i < roles.Length - 1; i++)
-            {
-                if (roles[i].lvl > lvlArgs.lvl) break;
-                if (!memberRoles.Contains(roles[i].roleId)) continue;
-                if (lvlArgs.lvl >= roles[i].lvl && lvlArgs.lvl < roles[i + 1].lvl) continue;
-
-                var role = member.Guild.GetRole(roles[i].roleId);
-                tasks.Add(member.RevokeRoleAsync(role, "level roles"));
-            }*/
-
             var groups = levelRoles
                 .Where(r => !r.remain)
                 .GroupBy(r => r.lvl)
