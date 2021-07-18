@@ -11,12 +11,12 @@ using Microsoft.Extensions.Logging;
 
 namespace GarbageCan.Application.Roles.EventHandlers
 {
-    public class DiscordGuildMemberAddedWatchListHandler : INotificationHandler<DomainEventNotification<DiscordGuildMemberAdded>>
+    public class DiscordGuildMemberAddedHandler : INotificationHandler<DomainEventNotification<DiscordGuildMemberAdded>>
     {
         private readonly IApplicationDbContext _context;
-        private readonly ILogger<DiscordGuildMemberAddedWatchListHandler> _logger;
+        private readonly ILogger<DiscordGuildMemberAddedHandler> _logger;
 
-        public DiscordGuildMemberAddedWatchListHandler(IApplicationDbContext context, ILogger<DiscordGuildMemberAddedWatchListHandler> logger)
+        public DiscordGuildMemberAddedHandler(IApplicationDbContext context, ILogger<DiscordGuildMemberAddedHandler> logger)
         {
             _context = context;
             _logger = logger;

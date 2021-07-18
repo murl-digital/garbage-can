@@ -12,7 +12,7 @@ using NUnit.Framework;
 
 namespace GarbageCan.Application.UnitTests.Roles.EventHandlers
 {
-    public class DiscordGuildMemberAddedWatchListHandlerTests
+    public class DiscordGuildMemberAddedHandlerTests
     {
         private ApplicationFixture _appFixture;
         private IApplicationDbContext _dbContext;
@@ -78,7 +78,7 @@ namespace GarbageCan.Application.UnitTests.Roles.EventHandlers
                 UserId = userId
             });
 
-            var logger = _appFixture.GetLogger<DiscordGuildMemberAddedWatchListHandler>();
+            var logger = _appFixture.GetLogger<DiscordGuildMemberAddedHandler>();
             logger.ReceivedWithAnyArgs(1).Log(default, default);
         }
     }
