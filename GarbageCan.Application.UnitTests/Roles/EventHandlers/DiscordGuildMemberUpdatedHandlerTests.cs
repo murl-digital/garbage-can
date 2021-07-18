@@ -16,13 +16,20 @@ namespace GarbageCan.Application.UnitTests.Roles.EventHandlers
     {
         private ApplicationFixture _appFixture;
         private IApplicationDbContext _dbContext;
+        private IDiscordGuildRoleService _discordGuildRoleService;
 
         [SetUp]
         public void Setup()
         {
             _appFixture = new ApplicationFixture();
             _dbContext = Substitute.For<IApplicationDbContext>();
-            _appFixture.OnConfigureServices += (_, services) => { services.AddSingleton(_dbContext); };
+            _dbContext = Substitute.For<IApplicationDbContext>();
+            _discordGuildRoleService = Substitute.For<IDiscordGuildRoleService>();
+            _appFixture.OnConfigureServices += (_, services) =>
+            {
+                services.AddSingleton(_dbContext);
+                services.AddSingleton(_discordGuildRoleService);
+            };
         }
 
 
@@ -30,16 +37,16 @@ namespace GarbageCan.Application.UnitTests.Roles.EventHandlers
         public async Task ShouldLogError_WhenAnExceptionIsThrown()
         {
             ulong userId = 90;
-            var mockDbSet = _dbContext.ConfigureMockDbSet(x => x.JoinWatchlist);
-            mockDbSet.When(x => x.AddAsync(Arg.Any<WatchedUser>())).Throw(new Exception("Test Exception"));
+            var mockDbSet = _dbContext.ConfigureMockDbSet(x => x.JoinWatchlist, new WatchedUser { id = userId });
+            mockDbSet.When(x => x.Remove(Arg.Any<WatchedUser>())).Throw(new Exception("Test Exception"));
 
-            await _appFixture.Publish(new DiscordGuildMemberAdded
+            await _appFixture.Publish(new DiscordGuildMemberUpdated
             {
                 IsBot = false,
                 UserId = userId
             });
 
-            var logger = _appFixture.GetLogger<DiscordGuildMemberAddedWatchListHandler>();
+            var logger = _appFixture.GetLogger<DiscordGuildMemberUpdatedHandler>();
             logger.ReceivedWithAnyArgs(1).Log(default, default);
         }
     }
