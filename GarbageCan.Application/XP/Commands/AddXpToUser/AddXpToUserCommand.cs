@@ -37,6 +37,7 @@ namespace GarbageCan.Application.XP.Commands.AddXpToUser
             {
                 user = new User
                 {
+                    GuildId = request.GuildId,
                     UserId = request.UserId,
                     Lvl = 0,
                     XP = 0
@@ -52,6 +53,7 @@ namespace GarbageCan.Application.XP.Commands.AddXpToUser
 
             await _provider.Publish(new XpAddedToUserEvent
             {
+                GuildId = user.GuildId,
                 UserId = user.UserId,
                 OldXp = oldXP,
                 NewXp = user.XP

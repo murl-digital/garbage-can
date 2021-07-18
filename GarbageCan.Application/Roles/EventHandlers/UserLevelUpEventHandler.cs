@@ -18,6 +18,7 @@ namespace GarbageCan.Application.Roles.EventHandlers
 
             await _mediator.Send(new ApplyLevelRolesCommand
             {
+                GuildId = notification.DomainEvent.GuildId,
                 MemberId = notification.DomainEvent.UserId,
                 Level = notification.DomainEvent.NewLvl
             });

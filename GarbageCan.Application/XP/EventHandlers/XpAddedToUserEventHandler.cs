@@ -39,6 +39,7 @@ namespace GarbageCan.Application.XP.EventHandlers
 
                 await _provider.Publish(new UserLevelUpEvent
                 {
+                    GuildId = notification.DomainEvent.GuildId,
                     UserId = notification.DomainEvent.UserId,
                     OldLvl = oldLevel,
                     NewLvl = user.Lvl
