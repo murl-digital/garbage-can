@@ -142,6 +142,16 @@ namespace GarbageCan.Web
                     });
                 };
 
+                client.GuildMemberUpdated += async (_, args) =>
+                {
+                    await PublishScopedEvent(provider, new DiscordGuildMemberUpdated
+                    {
+                        GuildId = args.Guild.Id,
+                        UserId = args.Member.Id,
+                        IsBot = args.Member.IsBot
+                    });
+                };
+
                 client.GuildDownloadCompleted += async (_, _) =>
                 {
                     await PublishScopedEvent(provider, new DiscordGuildDownloadCompleteEvent());
