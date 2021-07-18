@@ -148,7 +148,8 @@ namespace GarbageCan.Web
                     {
                         GuildId = args.Guild.Id,
                         UserId = args.Member.Id,
-                        IsBot = args.Member.IsBot
+                        IsBot = args.Member.IsBot,
+                        IsPending = args.Member.IsPending
                     });
                 };
 

@@ -7,5 +7,6 @@ namespace GarbageCan.Domain.Events
         public ulong UserId { get; set; }
         public ulong GuildId { get; set; }
         public bool IsBot { get; set; }
+        public bool? IsPending { get; set; }
     }
 }

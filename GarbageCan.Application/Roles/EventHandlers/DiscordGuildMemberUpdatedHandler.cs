@@ -17,7 +17,9 @@ namespace GarbageCan.Application.Roles.EventHandlers
         private readonly IDiscordGuildRoleService _roleService;
         private readonly ILogger<DiscordGuildMemberUpdatedHandler> _logger;
 
-        public DiscordGuildMemberUpdatedHandler(IApplicationDbContext context, IDiscordGuildRoleService roleService, ILogger<DiscordGuildMemberUpdatedHandler> logger)
+        public DiscordGuildMemberUpdatedHandler(IApplicationDbContext context,
+            IDiscordGuildRoleService roleService,
+            ILogger<DiscordGuildMemberUpdatedHandler> logger)
         {
             _context = context;
             _roleService = roleService;
@@ -26,7 +28,7 @@ namespace GarbageCan.Application.Roles.EventHandlers
 
         public async Task Handle(DomainEventNotification<DiscordGuildMemberUpdated> notification, CancellationToken cancellationToken)
         {
-            if (notification.DomainEvent.IsBot)
+            if (notification.DomainEvent.IsBot || (notification.DomainEvent.IsPending ?? true))
             {
                 return;
             }

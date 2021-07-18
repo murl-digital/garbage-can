@@ -43,7 +43,8 @@ namespace GarbageCan.Application.UnitTests.Roles.EventHandlers
             await _appFixture.Publish(new DiscordGuildMemberUpdated
             {
                 IsBot = false,
-                UserId = userId
+                UserId = userId,
+                IsPending = false
             });
 
             var logger = _appFixture.GetLogger<DiscordGuildMemberUpdatedHandler>();
@@ -84,6 +85,27 @@ namespace GarbageCan.Application.UnitTests.Roles.EventHandlers
             await _roleService.DidNotReceiveWithAnyArgs().GrantRoleAsync(default, default, default);
         }
 
+
+        [Test]
+        [TestCase(true)]
+        [TestCase(null)]
+        public async Task ShouldDoNothing_WhenUserIsPendingOrNull(bool? pending)
+        {
+            ulong userId = 90;
+            var user = new WatchedUser { id = userId };
+            _dbContext.ConfigureMockDbSet(x => x.JoinWatchlist, user);
+            
+            await _appFixture.Publish(new DiscordGuildMemberUpdated
+            {
+                IsBot = false,
+                IsPending = pending,
+                UserId = userId
+            });
+
+            await _dbContext.DidNotReceiveWithAnyArgs().SaveChangesAsync(default);
+            await _roleService.DidNotReceiveWithAnyArgs().GrantRoleAsync(default, default, default);
+        }
+
         [Test]
         public async Task ShouldRemoveFromWatchList_WhenUserIsInWatchList()
         {
@@ -94,7 +116,8 @@ namespace GarbageCan.Application.UnitTests.Roles.EventHandlers
             await _appFixture.Publish(new DiscordGuildMemberUpdated
             {
                 IsBot = false,
-                UserId = userId
+                UserId = userId,
+                IsPending = false
             });
 
             _dbContext.JoinWatchlist.Received(1).Remove(user);
@@ -116,7 +139,8 @@ namespace GarbageCan.Application.UnitTests.Roles.EventHandlers
             {
                 IsBot = false,
                 UserId = userId,
-                GuildId = guildId
+                GuildId = guildId,
+                IsPending = false
             });
 
             foreach (var joinRole in roles)
