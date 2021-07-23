@@ -9,11 +9,11 @@
 	<ItemGroup>
 		<PackageReference Include="DSharpPlus" Version="4.0.1" />
 		<PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.1" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.6">
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.8">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.6" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.8" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.4" />
 		<PackageReference Include="Quartz" Version="3.3.2" />
 		<PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.3.2" />
