@@ -17,6 +17,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="AspNet.Security.OAuth.Discord" Version="5.0.8" />
+		<PackageReference Include="AspNet.Security.OAuth.Validation" Version="2.0.0" />
 		<PackageReference Include="DSharpPlus" Version="4.0.1" />
 		<PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.1" />
 		<PackageReference Include="MediatR" Version="9.0.0" />
@@ -29,6 +31,10 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.8" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.8">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="OpenIddict" Version="3.1.0" />
 		<PackageReference Include="OpenIddict.AspNetCore" Version="3.1.0" />
 		<PackageReference Include="OpenIddict.EntityFrameworkCore" Version="3.1.0" />

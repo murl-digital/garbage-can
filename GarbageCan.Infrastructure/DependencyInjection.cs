@@ -7,27 +7,81 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace GarbageCan.Infrastructure
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services,
+            IConfiguration configuration)
         {
-            if (configuration.GetValue<bool>("UseInMemoryDatabase"))
+            services.AddDbContext<ApplicationDbContext>(options =>
             {
-                services.AddDbContext<ApplicationDbContext>(options => options.UseInMemoryDatabase("GarbageCanDbContext"));
-            }
-            else
-            {
-                var connectionString = configuration.GetConnectionString("DefaultConnection");
-                services.AddDbContext<ApplicationDbContext>(options =>
+                if (configuration.GetValue<bool>("UseInMemoryDatabase"))
                 {
+                    options.UseInMemoryDatabase("GarbageCanDbContext");
+                }
+                else
+                {
+                    var connectionString = configuration.GetConnectionString("DefaultConnection");
                     options.UseMySql(
                         connectionString, ServerVersion.AutoDetect(connectionString),
                         b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName));
+                }
+
+                options.UseOpenIddict();
+            });
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie()
+                .AddDiscord(options =>
+                {
+                    options.ClientId = configuration.GetValue<string>("Discord:Client:ClientId");
+                    options.ClientSecret =
+                        configuration.GetValue<string>(configuration.GetValue<string>("Discord:Client:ClientSecret"));
+
+                    options.Scope.Add("identify");
+                })
+                .AddOAuthValidation();
+
+            services.AddOpenIddict()
+                .AddCore(options =>
+                {
+                    options.UseEntityFrameworkCore()
+                        .UseDbContext<ApplicationDbContext>();
+                })
+                .AddServer(options =>
+                {
+                    options
+                        .SetAuthorizationEndpointUris(configuration.GetValue<string>("Auth:AuthEndpointUri"))
+                        .SetTokenEndpointUris(configuration.GetValue<string>("Auth:TokenEndpointUri"));
+
+                    options
+                        .AllowAuthorizationCodeFlow()
+                        .RequireProofKeyForCodeExchange();
+
+                    // TODO: get proper keys in here
+                    options
+                        .AddEphemeralEncryptionKey()
+                        .AddEphemeralSigningKey();
+
+                    options
+                        .UseAspNetCore()
+                        .EnableTokenEndpointPassthrough()
+                        .EnableAuthorizationEndpointPassthrough();
+                })
+                .AddValidation(options =>
+                {
+                    options.UseLocalServer();
+                    options.UseAspNetCore();
+
+                    options
+                        .EnableAuthorizationEntryValidation()
+                        .EnableTokenEntryValidation();
                 });
-            }
+
+
             services.AddTransient<IApplicationDbContext, ApplicationDbContext>();
             services.AddTransient<IDomainEventService, DomainEventService>();
             services.AddTransient<IDateTime, DateTimeService>();
@@ -55,6 +109,7 @@ namespace GarbageCan.Infrastructure
             {
                 await context.Database.MigrateAsync();
             }
+
             await ApplicationDbContextSeed.SeedSampleDataAsync(context);
             return provider;
         }
