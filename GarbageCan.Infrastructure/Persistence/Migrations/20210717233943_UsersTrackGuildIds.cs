@@ -15,15 +15,11 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                 defaultValue: 0ul);
 
             migrationBuilder.Sql("UPDATE xpUsers SET userId = id");
-            
-            migrationBuilder.AlterColumn<int>(
-                name: "id",
-                table: "xpUsers",
-                type: "int",
-                nullable: false,
-                oldClrType: typeof(ulong),
-                oldType: "bigint unsigned")
-                .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn);
+            migrationBuilder.DropColumn(
+                name: "id", 
+                table: "xpUsers");
+
+            migrationBuilder.Sql("ALTER TABLE xpUsers ADD id int AUTO_INCREMENT PRIMARY KEY");
 
             migrationBuilder.AddColumn<ulong>(
                 name: "guildId",
