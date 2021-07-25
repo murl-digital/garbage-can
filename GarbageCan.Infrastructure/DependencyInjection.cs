@@ -38,8 +38,7 @@ namespace GarbageCan.Infrastructure
                 .AddDiscord(options =>
                 {
                     options.ClientId = configuration.GetValue<string>("Discord:Client:ClientId");
-                    options.ClientSecret =
-                        configuration.GetValue<string>(configuration.GetValue<string>("Discord:Client:ClientSecret"));
+                    options.ClientSecret = configuration.GetValue<string>("Discord:Client:ClientSecret");
 
                     options.Scope.Add("identify");
                 })
