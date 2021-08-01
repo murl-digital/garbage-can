@@ -52,8 +52,20 @@ namespace GarbageCan.Web.Controllers
             
             if (request.IsAuthorizationCodeGrantType())
             {
-                principal = (await HttpContext.AuthenticateAsync(
-                    OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)).Principal;
+                var result = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+
+                // from what ive read this shouldn't happen but better safe than sorry
+                if (!result.Succeeded)
+                {
+                    return Forbid(new AuthenticationProperties(new Dictionary<string, string?>
+                    {
+                        [OpenIddictServerAspNetCoreConstants.Properties.Error] =
+                            OpenIddictConstants.Errors.AccessDenied,
+                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = ""
+                    }));
+                }
+
+                principal = result.Principal;
             }
             else
             {
