@@ -11,7 +11,12 @@ namespace GarbageCan.Application.Roles.EventHandlers
 {
     public class UserLevelUpEventHandler : INotificationHandler<DomainEventNotification<UserLevelUpEvent>>
     {
-        private IMediator _mediator;
+        private readonly IMediator _mediator;
+
+        public UserLevelUpEventHandler(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
 
         public async Task Handle(DomainEventNotification<UserLevelUpEvent> notification, CancellationToken cancellationToken)
         {
