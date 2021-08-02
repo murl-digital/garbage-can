@@ -1,7 +1,7 @@
-﻿using GarbageCan.Domain.Entities.Roles;
-using GarbageCan.Domain.Entities.XP;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
+using GarbageCan.Domain.Entities.Roles;
+using GarbageCan.Domain.Entities.XP;
 
 namespace GarbageCan.Infrastructure.Persistence
 {
@@ -34,13 +34,13 @@ namespace GarbageCan.Infrastructure.Persistence
                     XP = 5440
                 });
 
-                await context.ReactionRoles.AddAsync(new ReactionRole()
+                await context.ReactionRoles.AddAsync(new ReactionRole
                 {
-                    channelId = 26121,
-                    emoteId = "12545",
-                    id = 1,
-                    messageId = 4512,
-                    roleId = 1242
+                    ChannelId = 26121,
+                    EmoteId = "12545",
+                    Id = 1,
+                    MessageId = 4512,
+                    RoleId = 1242
                 });
 
                 await context.SaveChangesAsync();

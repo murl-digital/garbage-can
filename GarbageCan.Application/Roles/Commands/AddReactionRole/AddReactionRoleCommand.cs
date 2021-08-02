@@ -1,17 +1,18 @@
-﻿using GarbageCan.Application.Common.Interfaces;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Domain.Entities;
 using GarbageCan.Domain.Entities.Roles;
 using MediatR;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace GarbageCan.Application.Roles.Commands.AddReactionRole
 {
     public class AddReactionRoleCommand : IRequest
     {
+        public ulong GuildId { get; set; }
         public ulong ChannelId { get; set; }
-        public Emoji Emoji { get; set; }
         public ulong MessageId { get; set; }
+        public Emoji Emoji { get; set; }
         public ulong RoleId { get; set; }
     }
 
@@ -21,7 +22,8 @@ namespace GarbageCan.Application.Roles.Commands.AddReactionRole
         private readonly IDiscordMessageService _messageService;
         private readonly IDiscordResponseService _responseService;
 
-        public AddReactionRoleCommandHandler(IApplicationDbContext context, IDiscordResponseService responseService, IDiscordMessageService messageService)
+        public AddReactionRoleCommandHandler(IApplicationDbContext context, IDiscordResponseService responseService,
+            IDiscordMessageService messageService)
         {
             _context = context;
             _responseService = responseService;
@@ -32,10 +34,11 @@ namespace GarbageCan.Application.Roles.Commands.AddReactionRole
         {
             await _context.ReactionRoles.AddAsync(new ReactionRole
             {
-                roleId = request.RoleId,
-                channelId = request.ChannelId,
-                messageId = request.MessageId,
-                emoteId = EmoteId(request.Emoji)
+                RoleId = request.RoleId,
+                GuildId = request.GuildId,
+                ChannelId = request.ChannelId,
+                MessageId = request.MessageId,
+                EmoteId = EmoteId(request.Emoji)
             }, cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);

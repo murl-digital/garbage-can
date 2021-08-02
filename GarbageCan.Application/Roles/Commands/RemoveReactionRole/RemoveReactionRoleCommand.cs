@@ -1,9 +1,9 @@
-﻿using GarbageCan.Application.Common.Exceptions;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using GarbageCan.Application.Common.Exceptions;
 using GarbageCan.Application.Common.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace GarbageCan.Application.Roles.Commands.RemoveReactionRole
 {
@@ -25,11 +25,8 @@ namespace GarbageCan.Application.Roles.Commands.RemoveReactionRole
 
         public async Task<Unit> Handle(RemoveReactionRoleCommand request, CancellationToken cancellationToken)
         {
-            var role = await _context.ReactionRoles.FirstOrDefaultAsync(x => x.id == request.Id, cancellationToken);
-            if (role == null)
-            {
-                throw new NotFoundException("Couldn't find Reaction Role");
-            }
+            var role = await _context.ReactionRoles.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+            if (role == null) throw new NotFoundException("Couldn't find Reaction Role");
 
             _context.ReactionRoles.Remove(role);
             await _context.SaveChangesAsync(cancellationToken);

@@ -1,16 +1,17 @@
-﻿using GarbageCan.Application.Common.Interfaces;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GarbageCan.Application.Common.Interfaces;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace GarbageCan.Application.Roles.Commands.PrintReactionRoles
 {
     public class PrintReactionRolesCommand : IRequest
     {
+        public ulong GuildId { get; set; }
     }
 
     public class PrintReactionRolesCommandHandler : IRequestHandler<PrintReactionRolesCommand>
@@ -30,18 +31,21 @@ namespace GarbageCan.Application.Roles.Commands.PrintReactionRoles
 
         public async Task<Unit> Handle(PrintReactionRolesCommand request, CancellationToken cancellationToken)
         {
-            var reactionRoles = await _context.ReactionRoles.ToListAsync(cancellationToken);
+            var reactionRoles = await _context.ReactionRoles
+                .Where(r => r.GuildId == request.GuildId)
+                .ToListAsync(cancellationToken);
             if (!reactionRoles.Any())
             {
                 await _responseService.RespondAsync("No reaction roles found!", formatAsBlock: true);
                 return Unit.Value;
             }
 
-            var roleNameDict = await _guildService.GetRoleNamesById(reactionRoles.Select(x => x.roleId));
-            var channelNameDict = await _guildService.GetChannelNamesById(reactionRoles.Select(x => x.channelId));
+            var roleNameDict = await _guildService.GetRoleNamesById(reactionRoles.Select(x => x.RoleId));
+            var channelNameDict = await _guildService.GetChannelNamesById(reactionRoles.Select(x => x.ChannelId));
 
             var lines = reactionRoles
-                .Select(x => $"{x.id} :: msg {x.messageId} in #{channelNameDict.GetValueOrDefault(x.channelId)} | {roleNameDict.GetValueOrDefault(x.roleId)}")
+                .Select(x =>
+                    $"{x.Id} :: msg {x.MessageId} in #{channelNameDict.GetValueOrDefault(x.ChannelId)} | {roleNameDict.GetValueOrDefault(x.RoleId)}")
                 .ToList();
             await _responseService.RespondAsync(string.Join(Environment.NewLine, lines), formatAsBlock: true);
 

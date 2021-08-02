@@ -1,4 +1,6 @@
-﻿using FluentAssertions;
+﻿using System;
+using System.Threading.Tasks;
+using FluentAssertions;
 using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Application.Roles.Commands.AlterRole;
 using GarbageCan.Application.UnitTests.Shared;
@@ -10,16 +12,14 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
-using System;
-using System.Threading.Tasks;
 
 namespace GarbageCan.Application.UnitTests.Roles.Commands
 {
     public class AlterRoleTests
     {
+        private IApplicationDbContext _dbContext;
         private ApplicationFixture _fixture;
         private IDiscordGuildRoleService _roleService;
-        private IApplicationDbContext _dbContext;
         private SubstituteLogger logger => _fixture.GetLogger<AlterRoleCommandHandler>();
 
         [SetUp]
@@ -56,16 +56,19 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
 
             var command = CreateCommand(channelId, messageId, emojiId, "TEST");
 
-            _roleService.GrantRoleAsync(command.GuildId, (ulong)badRoleId, command.UserId, "reaction role").Throws<Exception>();
+            _roleService.GrantRoleAsync(command.GuildId, (ulong) badRoleId, command.UserId, "reaction role")
+                .Throws<Exception>();
 
             var result = await _fixture.SendAsync(command);
 
             result.Should().BeTrue();
-            await _roleService.Received(1).GrantRoleAsync(command.GuildId, (ulong)goodRoleId, command.UserId, "reaction role");
+            await _roleService.Received(1)
+                .GrantRoleAsync(command.GuildId, (ulong) goodRoleId, command.UserId, "reaction role");
 
             logger.Received().Log(Arg.Is<LogLevel>(x => x == LogLevel.Error), Arg.Any<string>());
 
-            await _roleService.DidNotReceive().RevokeRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
+            await _roleService.DidNotReceive()
+                .RevokeRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
         }
 
         [Test]
@@ -91,13 +94,15 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             await _roleService.Received(1).GrantRoleAsync(command.GuildId, 6944, command.UserId, "reaction role");
 
             logger.DidNotReceive().Log(Arg.Is<LogLevel>(x => x == LogLevel.Error), Arg.Any<string>());
-            await _roleService.DidNotReceive().RevokeRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
+            await _roleService.DidNotReceive()
+                .RevokeRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
         }
 
         [Theory]
         [TestCase(15, 394, 29, "TEST")]
         [TestCase(15, 394, 0, "29")]
-        public async Task ShouldAssignReactionRole_WhenReactionRoleMatchesParameters(int commandChannelId, int commandMessageId, int commandEmojiId, string commandEmojiName)
+        public async Task ShouldAssignReactionRole_WhenReactionRoleMatchesParameters(int commandChannelId,
+            int commandMessageId, int commandEmojiId, string commandEmojiName)
         {
             var channelId = 15;
             var messageId = 394;
@@ -112,8 +117,10 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             var result = await _fixture.SendAsync(command);
 
             result.Should().BeTrue();
-            await _roleService.Received(1).GrantRoleAsync(command.GuildId, reactionRole.roleId, command.UserId, "reaction role");
-            await _roleService.DidNotReceive().RevokeRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
+            await _roleService.Received(1)
+                .GrantRoleAsync(command.GuildId, reactionRole.RoleId, command.UserId, "reaction role");
+            await _roleService.DidNotReceive()
+                .RevokeRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
 
             logger.DidNotReceive().Log(Arg.Is<LogLevel>(x => x == LogLevel.Error), Arg.Any<string>());
         }
@@ -123,7 +130,8 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
         [TestCase(15, 50505, 29, "TEST")]
         [TestCase(15, 394, 50505, "TEST")]
         [TestCase(15, 394, 0, "9040")]
-        public async Task ShouldNotAssignReactionRole_WhenReactionRoleDoesNotMatchesParameters(int commandChannelId, int commandMessageId, int commandEmojiId, string commandEmojiName)
+        public async Task ShouldNotAssignReactionRole_WhenReactionRoleDoesNotMatchesParameters(int commandChannelId,
+            int commandMessageId, int commandEmojiId, string commandEmojiName)
         {
             var channelId = 15;
             var messageId = 394;
@@ -138,8 +146,10 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             var result = await _fixture.SendAsync(command);
 
             result.Should().BeTrue();
-            await _roleService.DidNotReceive().GrantRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
-            await _roleService.DidNotReceive().RevokeRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
+            await _roleService.DidNotReceive()
+                .GrantRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
+            await _roleService.DidNotReceive()
+                .RevokeRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
 
             logger.DidNotReceive().Log(Arg.Is<LogLevel>(x => x == LogLevel.Error), Arg.Any<string>());
         }
@@ -149,7 +159,8 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
         [TestCase(15, 50505, 29, "TEST")]
         [TestCase(15, 394, 50505, "TEST")]
         [TestCase(15, 394, 0, "9040")]
-        public async Task ShouldNotRevokeReactionRole_WhenReactionRoleDoesNotMatchesParameters(int commandChannelId, int commandMessageId, int commandEmojiId, string commandEmojiName)
+        public async Task ShouldNotRevokeReactionRole_WhenReactionRoleDoesNotMatchesParameters(int commandChannelId,
+            int commandMessageId, int commandEmojiId, string commandEmojiName)
         {
             var channelId = 15;
             var messageId = 394;
@@ -164,8 +175,10 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             var result = await _fixture.SendAsync(command);
 
             result.Should().BeTrue();
-            await _roleService.DidNotReceive().RevokeRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
-            await _roleService.DidNotReceive().GrantRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
+            await _roleService.DidNotReceive()
+                .RevokeRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
+            await _roleService.DidNotReceive()
+                .GrantRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
 
             logger.DidNotReceive().Log(Arg.Is<LogLevel>(x => x == LogLevel.Error), Arg.Any<string>());
         }
@@ -189,14 +202,17 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
 
             var command = CreateCommand(channelId, messageId, emojiId, "TEST", false);
 
-            _roleService.RevokeRoleAsync(command.GuildId, (ulong)badRoleId, command.UserId, "reaction role").Throws<Exception>();
+            _roleService.RevokeRoleAsync(command.GuildId, (ulong) badRoleId, command.UserId, "reaction role")
+                .Throws<Exception>();
 
             var result = await _fixture.SendAsync(command);
 
             result.Should().BeTrue();
 
-            await _roleService.Received(1).RevokeRoleAsync(command.GuildId, (ulong)goodRoleId, command.UserId, "reaction role");
-            await _roleService.DidNotReceive().GrantRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
+            await _roleService.Received(1)
+                .RevokeRoleAsync(command.GuildId, (ulong) goodRoleId, command.UserId, "reaction role");
+            await _roleService.DidNotReceive()
+                .GrantRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
 
             logger.Received(1).Log(Arg.Is<LogLevel>(x => x == LogLevel.Error), Arg.Any<string>());
         }
@@ -223,7 +239,8 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             await _roleService.Received(1).RevokeRoleAsync(command.GuildId, 500, command.UserId, "reaction role");
             await _roleService.Received(1).RevokeRoleAsync(command.GuildId, 6944, command.UserId, "reaction role");
 
-            await _roleService.DidNotReceive().GrantRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
+            await _roleService.DidNotReceive()
+                .GrantRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
 
             logger.DidNotReceive().Log(Arg.Is<LogLevel>(x => x == LogLevel.Error), Arg.Any<string>());
         }
@@ -231,7 +248,8 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
         [Theory]
         [TestCase(15, 394, 29, "TEST")]
         [TestCase(15, 394, 0, "29")]
-        public async Task ShouldRevokeReactionRole_WhenReactionRoleMatchesParameters(int commandChannelId, int commandMessageId, int commandEmojiId, string commandEmojiName)
+        public async Task ShouldRevokeReactionRole_WhenReactionRoleMatchesParameters(int commandChannelId,
+            int commandMessageId, int commandEmojiId, string commandEmojiName)
         {
             var channelId = 15;
             var messageId = 394;
@@ -246,21 +264,24 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             var result = await _fixture.SendAsync(command);
 
             result.Should().BeTrue();
-            await _roleService.Received(1).RevokeRoleAsync(command.GuildId, reactionRole.roleId, command.UserId, "reaction role");
-            await _roleService.DidNotReceive().GrantRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
+            await _roleService.Received(1)
+                .RevokeRoleAsync(command.GuildId, reactionRole.RoleId, command.UserId, "reaction role");
+            await _roleService.DidNotReceive()
+                .GrantRoleAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<string>());
 
             logger.DidNotReceive().Log(Arg.Is<LogLevel>(x => x == LogLevel.Error), Arg.Any<string>());
         }
 
-        private static AlterRoleCommand CreateCommand(int commandChannelId, int commandMessageId, int commandEmojiId, string commandEmojiName, bool add = true)
+        private static AlterRoleCommand CreateCommand(int commandChannelId, int commandMessageId, int commandEmojiId,
+            string commandEmojiName, bool add = true)
         {
-            return new AlterRoleCommand
+            return new()
             {
-                ChannelId = (ulong)commandChannelId,
-                MessageId = (ulong)commandMessageId,
+                ChannelId = (ulong) commandChannelId,
+                MessageId = (ulong) commandMessageId,
                 Emoji = new Emoji
                 {
-                    Id = (ulong)commandEmojiId,
+                    Id = (ulong) commandEmojiId,
                     Name = commandEmojiName
                 },
                 GuildId = 45,
@@ -271,13 +292,13 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
 
         private static ReactionRole CreateReactionRole(int channelId, int emojiId, int messageId, int roleId = 102)
         {
-            return new ReactionRole
+            return new()
             {
-                id = 2,
-                roleId = (ulong)roleId,
-                channelId = (ulong)channelId,
-                emoteId = emojiId.ToString(),
-                messageId = (ulong)messageId,
+                Id = 2,
+                RoleId = (ulong) roleId,
+                ChannelId = (ulong) channelId,
+                EmoteId = emojiId.ToString(),
+                MessageId = (ulong) messageId
             };
         }
     }

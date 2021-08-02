@@ -2,10 +2,11 @@ namespace GarbageCan.Domain.Entities.Roles
 {
     public class ReactionRole
     {
-        public int id { get; set; }
-        public ulong messageId { get; set; }
-        public ulong channelId { get; set; }
-        public string emoteId { get; set; }
-        public ulong roleId { get; set; }
+        public int Id { get; set; }
+        public ulong GuildId { get; set; }
+        public ulong ChannelId { get; set; }
+        public ulong MessageId { get; set; }
+        public string EmoteId { get; set; }
+        public ulong RoleId { get; set; }
     }
 }

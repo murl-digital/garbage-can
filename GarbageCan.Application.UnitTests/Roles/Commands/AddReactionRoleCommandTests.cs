@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Threading.Tasks;
+using FluentAssertions;
 using GarbageCan.Application.Common.Exceptions;
 using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Application.Roles.Commands.AddReactionRole;
@@ -8,7 +9,6 @@ using GarbageCan.Domain.Entities.Roles;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NUnit.Framework;
-using System.Threading.Tasks;
 
 namespace GarbageCan.Application.UnitTests.Roles.Commands
 {
@@ -38,9 +38,10 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
         public async Task ShouldAddReactionRole_WhenNoReactionRolesExist()
         {
             ulong roleId = 5;
+            ulong guildId = 69;
             ulong channelId = 215u;
             ulong messageId = 215u;
-            Emoji emoji = new Emoji
+            var emoji = new Emoji
             {
                 Id = 4126u,
                 Name = "TEST"
@@ -53,6 +54,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             await _appFixture.SendAsync(new AddReactionRoleCommand
             {
                 RoleId = roleId,
+                GuildId = guildId,
                 ChannelId = channelId,
                 MessageId = messageId,
                 Emoji = emoji
@@ -62,9 +64,10 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             await _dbContext.ReactionRoles.Received(1).AddAsync(Arg.Any<ReactionRole>());
 
             addedRole.Should().NotBeNull();
-            addedRole.roleId.Should().Be(roleId);
-            addedRole.channelId.Should().Be(channelId);
-            addedRole.messageId.Should().Be(messageId);
+            addedRole.RoleId.Should().Be(roleId);
+            addedRole.GuildId.Should().Be(guildId);
+            addedRole.ChannelId.Should().Be(channelId);
+            addedRole.MessageId.Should().Be(messageId);
         }
 
         [Test]
@@ -73,7 +76,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             _dbContext.ConfigureMockDbSet(x => x.ReactionRoles);
             ulong channelId = 215u;
             ulong messageId = 215u;
-            Emoji emoji = new Emoji
+            var emoji = new Emoji
             {
                 Id = 4126u,
                 Name = "TEST"
@@ -96,7 +99,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
         [TestCase(50u, "TEST", "50")]
         public async Task ShouldProperlySetEmojiValue_WhenNoReactionRolesIsAdded(ulong id, string name, string expected)
         {
-            Emoji emoji = new Emoji
+            var emoji = new Emoji
             {
                 Id = id,
                 Name = name
@@ -115,7 +118,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             });
 
             addedRole.Should().NotBeNull();
-            addedRole.emoteId.Should().Be(expected);
+            addedRole.EmoteId.Should().Be(expected);
         }
 
         [Test]

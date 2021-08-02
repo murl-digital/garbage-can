@@ -1,4 +1,5 @@
-﻿using DSharpPlus;
+﻿using System.Threading.Tasks;
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
@@ -6,7 +7,6 @@ using GarbageCan.Application.Roles.Commands.AddReactionRole;
 using GarbageCan.Application.Roles.Commands.PrintReactionRoles;
 using GarbageCan.Application.Roles.Commands.RemoveReactionRole;
 using GarbageCan.Domain.Entities;
-using System.Threading.Tasks;
 
 namespace GarbageCan.Web.Commands.Roles
 {
@@ -20,6 +20,7 @@ namespace GarbageCan.Web.Commands.Roles
         {
             await Mediator.Send(new AddReactionRoleCommand
             {
+                GuildId = msg.Channel.Guild.Id,
                 ChannelId = msg.ChannelId,
                 MessageId = msg.Id,
                 RoleId = role.Id,
@@ -35,14 +36,18 @@ namespace GarbageCan.Web.Commands.Roles
         [RequirePermissions(Permissions.Administrator)]
         public async Task List(CommandContext ctx)
         {
-            await Mediator.Send(new PrintReactionRolesCommand(), ctx);
+            await Mediator.Send(new PrintReactionRolesCommand
+            {
+                GuildId = ctx.Guild.Id
+            }, ctx);
         }
 
         [Command("remove")]
         [RequirePermissions(Permissions.Administrator)]
         public async Task RemoveReactionRole(CommandContext ctx, int id)
         {
-            await Mediator.Send(new RemoveReactionRoleCommand { Id = id }, ctx);
+            // TODO: its possible to remove EVERY reaction role, even roles that you shouldn't have access to. whoops!
+            await Mediator.Send(new RemoveReactionRoleCommand {Id = id}, ctx);
         }
     }
 }
