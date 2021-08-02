@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Threading.Tasks;
+using FluentAssertions;
 using GarbageCan.Application.Common.Exceptions;
 using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Application.Roles.Commands.AddJoinRole;
@@ -7,7 +8,6 @@ using GarbageCan.Domain.Entities.Roles;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NUnit.Framework;
-using System.Threading.Tasks;
 
 namespace GarbageCan.Application.UnitTests.Roles.Commands
 {
@@ -41,14 +41,14 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
 
             await _appFixture.SendAsync(new AddJoinRoleCommand
             {
-                RoleId = roleId,
+                RoleId = roleId
             });
 
             await _dbContext.Received(1).SaveChangesAsync(default);
             await _dbContext.JoinRoles.Received(1).AddAsync(Arg.Any<JoinRole>());
 
             addedRole.Should().NotBeNull();
-            addedRole.roleId.Should().Be(roleId);
+            addedRole.RoleId.Should().Be(roleId);
         }
 
         [Test]
@@ -58,7 +58,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
 
             await _appFixture.SendAsync(new AddJoinRoleCommand
             {
-                RoleId = 5,
+                RoleId = 5
             });
 
             await _responseService.Received(1).RespondAsync("Role added successfully", true);

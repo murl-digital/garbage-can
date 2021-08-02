@@ -2,6 +2,7 @@ namespace GarbageCan.Domain.Entities.Roles
 {
     public class WatchedUser
     {
-        public ulong id { get; set; }
+        public ulong GuildId { get; set; }
+        public ulong UserId { get; set; }
     }
 }

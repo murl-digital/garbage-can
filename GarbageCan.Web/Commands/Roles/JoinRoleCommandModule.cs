@@ -1,11 +1,11 @@
-﻿using DSharpPlus;
+﻿using System.Threading.Tasks;
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using GarbageCan.Application.Roles.Commands.AddJoinRole;
 using GarbageCan.Application.Roles.Commands.PrintJoinRoles;
 using GarbageCan.Application.Roles.Commands.RemoveJoinRole;
-using System.Threading.Tasks;
 
 namespace GarbageCan.Web.Commands.Roles
 {
@@ -17,21 +17,28 @@ namespace GarbageCan.Web.Commands.Roles
         [RequirePermissions(Permissions.Administrator)]
         public async Task AddJoinRole(CommandContext ctx, DiscordRole role)
         {
-            await Mediator.Send(new AddJoinRoleCommand { RoleId = role.Id }, ctx);
+            await Mediator.Send(new AddJoinRoleCommand
+            {
+                GuildId = ctx.Guild.Id,
+                RoleId = role.Id
+            }, ctx);
         }
 
         [Command("list")]
         [RequirePermissions(Permissions.Administrator)]
         public async Task List(CommandContext ctx)
         {
-            await Mediator.Send(new PrintJoinRolesCommand(), ctx);
+            await Mediator.Send(new PrintJoinRolesCommand
+            {
+                GuildId = ctx.Guild.Id
+            }, ctx);
         }
 
         [Command("remove")]
         [RequirePermissions(Permissions.Administrator)]
         public async Task RemoveJoinRole(CommandContext ctx, int id)
         {
-            await Mediator.Send(new RemoveJoinRoleCommand { Id = id }, ctx);
+            await Mediator.Send(new RemoveJoinRoleCommand {Id = id}, ctx);
         }
     }
 }

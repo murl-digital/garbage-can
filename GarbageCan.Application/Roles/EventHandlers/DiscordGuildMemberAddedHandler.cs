@@ -16,31 +16,33 @@ namespace GarbageCan.Application.Roles.EventHandlers
         private readonly IApplicationDbContext _context;
         private readonly ILogger<DiscordGuildMemberAddedHandler> _logger;
 
-        public DiscordGuildMemberAddedHandler(IApplicationDbContext context, ILogger<DiscordGuildMemberAddedHandler> logger)
+        public DiscordGuildMemberAddedHandler(IApplicationDbContext context,
+            ILogger<DiscordGuildMemberAddedHandler> logger)
         {
             _context = context;
             _logger = logger;
         }
 
-        public async Task Handle(DomainEventNotification<DiscordGuildMemberAdded> notification, CancellationToken cancellationToken)
+        public async Task Handle(DomainEventNotification<DiscordGuildMemberAdded> notification,
+            CancellationToken cancellationToken)
         {
             try
             {
-                if (await _context.JoinWatchlist.AnyAsync(x => x.id == notification.DomainEvent.UserId, cancellationToken))
-                {
-                    return;
-                }
+                if (await _context.JoinWatchlist.AnyAsync(x => x.UserId == notification.DomainEvent.UserId,
+                    cancellationToken)) return;
 
                 await _context.JoinWatchlist.AddAsync(new WatchedUser
                 {
-                    id = notification.DomainEvent.UserId
+                    GuildId = notification.DomainEvent.GuildId,
+                    UserId = notification.DomainEvent.UserId
                 }, cancellationToken);
 
                 await _context.SaveChangesAsync(cancellationToken);
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, "Error during add of Join Watch list {@Notification}", notification.DomainEvent);
+                _logger.LogError(exception, "Error during add of Join Watch list {@Notification}",
+                    notification.DomainEvent);
             }
         }
     }

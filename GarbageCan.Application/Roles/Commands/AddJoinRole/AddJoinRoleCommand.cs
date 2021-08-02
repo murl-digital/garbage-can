@@ -1,13 +1,14 @@
-﻿using GarbageCan.Application.Common.Interfaces;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Domain.Entities.Roles;
 using MediatR;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace GarbageCan.Application.Roles.Commands.AddJoinRole
 {
     public class AddJoinRoleCommand : IRequest
     {
+        public ulong GuildId { get; set; }
         public ulong RoleId { get; set; }
     }
 
@@ -26,7 +27,8 @@ namespace GarbageCan.Application.Roles.Commands.AddJoinRole
         {
             await _context.JoinRoles.AddAsync(new JoinRole
             {
-                roleId = request.RoleId
+                GuildId = request.GuildId,
+                RoleId = request.RoleId
             }, cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);

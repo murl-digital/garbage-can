@@ -11,11 +11,12 @@ using Microsoft.Extensions.Logging;
 
 namespace GarbageCan.Application.Roles.EventHandlers
 {
-    public class DiscordGuildMemberUpdatedHandler : INotificationHandler<DomainEventNotification<DiscordGuildMemberUpdated>>
+    public class
+        DiscordGuildMemberUpdatedHandler : INotificationHandler<DomainEventNotification<DiscordGuildMemberUpdated>>
     {
         private readonly IApplicationDbContext _context;
-        private readonly IDiscordGuildRoleService _roleService;
         private readonly ILogger<DiscordGuildMemberUpdatedHandler> _logger;
+        private readonly IDiscordGuildRoleService _roleService;
 
         public DiscordGuildMemberUpdatedHandler(IApplicationDbContext context,
             IDiscordGuildRoleService roleService,
@@ -26,17 +27,16 @@ namespace GarbageCan.Application.Roles.EventHandlers
             _logger = logger;
         }
 
-        public async Task Handle(DomainEventNotification<DiscordGuildMemberUpdated> notification, CancellationToken cancellationToken)
+        public async Task Handle(DomainEventNotification<DiscordGuildMemberUpdated> notification,
+            CancellationToken cancellationToken)
         {
-            if (notification.DomainEvent.IsBot || (notification.DomainEvent.IsPending ?? true))
-            {
-                return;
-            }
+            if (notification.DomainEvent.IsBot || (notification.DomainEvent.IsPending ?? true)) return;
 
             try
             {
                 var watchListUsers = await _context.JoinWatchlist
-                    .Where(x => x.id == notification.DomainEvent.UserId)
+                    .Where(x => x.GuildId == notification.DomainEvent.GuildId &&
+                                x.UserId == notification.DomainEvent.UserId)
                     .ToListAsync(cancellationToken);
 
                 if (watchListUsers.Any())
@@ -45,14 +45,15 @@ namespace GarbageCan.Application.Roles.EventHandlers
 
                     await _context.SaveChangesAsync(cancellationToken);
 
-                    var joinRoles = await _context.JoinRoles.ToListAsync(cancellationToken);
+                    var joinRoles = await _context.JoinRoles
+                        .Where(r => r.GuildId == notification.DomainEvent.GuildId)
+                        .ToListAsync(cancellationToken);
 
                     foreach (var r in joinRoles)
-                    {
                         try
                         {
                             await _roleService.GrantRoleAsync(notification.DomainEvent.GuildId,
-                                r.roleId,
+                                r.RoleId,
                                 notification.DomainEvent.UserId,
                                 "join role");
                         }
@@ -60,12 +61,12 @@ namespace GarbageCan.Application.Roles.EventHandlers
                         {
                             _logger.LogError(ex, "couldn't grant role to user");
                         }
-                    }
                 }
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, "Error during add of Join Watch list {@Notification}", notification.DomainEvent);
+                _logger.LogError(exception, "Error during add of Join Watch list {@Notification}",
+                    notification.DomainEvent);
             }
         }
     }

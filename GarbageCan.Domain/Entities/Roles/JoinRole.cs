@@ -2,7 +2,8 @@ namespace GarbageCan.Domain.Entities.Roles
 {
     public class JoinRole
     {
-        public int id { get; set; }
-        public ulong roleId { get; set; }
+        public int Id { get; set; }
+        public ulong GuildId { get; set; }
+        public ulong RoleId { get; set; }
     }
 }

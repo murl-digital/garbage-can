@@ -43,7 +43,7 @@ namespace GarbageCan.Application.UnitTests.Roles.EventHandlers
             await _dbContext.Received(1).SaveChangesAsync(default);
 
             savedUser.Should().NotBeNull();
-            savedUser.id.Should().Be(userId);
+            savedUser.UserId.Should().Be(userId);
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace GarbageCan.Application.UnitTests.Roles.EventHandlers
 
             _dbContext.ConfigureMockDbSet(x => x.JoinWatchlist, new WatchedUser
             {
-                id = userId
+                UserId = userId
             });
 
             await _appFixture.Publish(new DiscordGuildMemberAdded

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using FluentAssertions;
 using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Application.Roles.EventHandlers;
 using GarbageCan.Application.UnitTests.Shared;
@@ -37,7 +36,7 @@ namespace GarbageCan.Application.UnitTests.Roles.EventHandlers
         public async Task ShouldLogError_WhenAnExceptionIsThrown()
         {
             ulong userId = 90;
-            var mockDbSet = _dbContext.ConfigureMockDbSet(x => x.JoinWatchlist, new WatchedUser { id = userId });
+            var mockDbSet = _dbContext.ConfigureMockDbSet(x => x.JoinWatchlist, new WatchedUser {UserId = userId});
             mockDbSet.When(x => x.Remove(Arg.Any<WatchedUser>())).Throw(new Exception("Test Exception"));
 
             await _appFixture.Publish(new DiscordGuildMemberUpdated
@@ -56,7 +55,7 @@ namespace GarbageCan.Application.UnitTests.Roles.EventHandlers
         {
             ulong userId = 90;
             ulong otherUserId = 95;
-            _dbContext.ConfigureMockDbSet(x => x.JoinWatchlist, new WatchedUser { id = otherUserId });
+            _dbContext.ConfigureMockDbSet(x => x.JoinWatchlist, new WatchedUser {UserId = otherUserId});
 
             await _appFixture.Publish(new DiscordGuildMemberUpdated
             {
@@ -73,7 +72,7 @@ namespace GarbageCan.Application.UnitTests.Roles.EventHandlers
         {
             ulong userId = 90;
             ulong otherUserId = 95;
-            _dbContext.ConfigureMockDbSet(x => x.JoinWatchlist, new WatchedUser { id = otherUserId });
+            _dbContext.ConfigureMockDbSet(x => x.JoinWatchlist, new WatchedUser {UserId = otherUserId});
 
             await _appFixture.Publish(new DiscordGuildMemberUpdated
             {
@@ -92,9 +91,9 @@ namespace GarbageCan.Application.UnitTests.Roles.EventHandlers
         public async Task ShouldDoNothing_WhenUserIsPendingOrNull(bool? pending)
         {
             ulong userId = 90;
-            var user = new WatchedUser { id = userId };
+            var user = new WatchedUser {UserId = userId};
             _dbContext.ConfigureMockDbSet(x => x.JoinWatchlist, user);
-            
+
             await _appFixture.Publish(new DiscordGuildMemberUpdated
             {
                 IsBot = false,
@@ -110,7 +109,7 @@ namespace GarbageCan.Application.UnitTests.Roles.EventHandlers
         public async Task ShouldRemoveFromWatchList_WhenUserIsInWatchList()
         {
             ulong userId = 90;
-            var user = new WatchedUser { id = userId };
+            var user = new WatchedUser {UserId = userId};
             _dbContext.ConfigureMockDbSet(x => x.JoinWatchlist, user);
 
             await _appFixture.Publish(new DiscordGuildMemberUpdated
@@ -129,10 +128,10 @@ namespace GarbageCan.Application.UnitTests.Roles.EventHandlers
         {
             ulong userId = 90;
             ulong guildId = 51;
-            var user = new WatchedUser { id = userId };
+            var user = new WatchedUser {UserId = userId};
             _dbContext.ConfigureMockDbSet(x => x.JoinWatchlist, user);
 
-            var roles = new List<JoinRole> { new() { roleId = 9 }, new() { roleId = 942 } };
+            var roles = new List<JoinRole> {new() {RoleId = 9}, new() {RoleId = 942}};
             _dbContext.ConfigureMockDbSet(x => x.JoinRoles, roles);
 
             await _appFixture.Publish(new DiscordGuildMemberUpdated
@@ -144,9 +143,7 @@ namespace GarbageCan.Application.UnitTests.Roles.EventHandlers
             });
 
             foreach (var joinRole in roles)
-            {
-                await _roleService.Received(1).GrantRoleAsync(guildId, joinRole.roleId, userId, "join role");
-            }
+                await _roleService.Received(1).GrantRoleAsync(guildId, joinRole.RoleId, userId, "join role");
         }
     }
 }

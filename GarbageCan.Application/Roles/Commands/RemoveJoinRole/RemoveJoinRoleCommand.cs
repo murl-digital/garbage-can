@@ -1,9 +1,9 @@
-﻿using GarbageCan.Application.Common.Exceptions;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using GarbageCan.Application.Common.Exceptions;
 using GarbageCan.Application.Common.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace GarbageCan.Application.Roles.Commands.RemoveJoinRole
 {
@@ -25,11 +25,8 @@ namespace GarbageCan.Application.Roles.Commands.RemoveJoinRole
 
         public async Task<Unit> Handle(RemoveJoinRoleCommand request, CancellationToken cancellationToken)
         {
-            var role = await _context.JoinRoles.FirstOrDefaultAsync(x => x.id == request.Id, cancellationToken);
-            if (role == null)
-            {
-                throw new NotFoundException("Couldn't find Join Role");
-            }
+            var role = await _context.JoinRoles.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+            if (role == null) throw new NotFoundException("Couldn't find Join Role");
 
             _context.JoinRoles.Remove(role);
             await _context.SaveChangesAsync(cancellationToken);

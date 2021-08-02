@@ -8,7 +8,10 @@ namespace GarbageCan.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<WatchedUser> builder)
         {
-            builder.HasKey(t => t.id);
+            builder.HasNoKey();
+            builder.HasIndex(t => t.GuildId);
+            builder.Property(t => t.GuildId).HasColumnName("guildId");
+            builder.Property(t => t.UserId).HasColumnName("userId");
             builder.ToTable("joinWatchlist");
         }
     }
