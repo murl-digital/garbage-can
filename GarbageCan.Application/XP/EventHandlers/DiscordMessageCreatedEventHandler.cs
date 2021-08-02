@@ -32,7 +32,7 @@ namespace GarbageCan.Application.XP.EventHandlers
                 notification.DomainEvent.AuthorIsSystem ||
                 notification.DomainEvent.ChannelIsPrivate ||
                 notification.DomainEvent.Content.StartsWith(_configuration.CommandPrefix) ||
-                _context.XPExcludedChannels.Any(c => c.channelId == notification.DomainEvent.ChannelId))
+                _context.XPExcludedChannels.Any(c => c.GuildId == notification.DomainEvent.GuildId && c.ChannelId == notification.DomainEvent.ChannelId))
             {
                 return;
             }

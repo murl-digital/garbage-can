@@ -2,6 +2,7 @@ namespace GarbageCan.Domain.Entities.XP
 {
     public class ExcludedChannel
     {
-        public ulong channelId { get; set; }
+        public ulong GuildId { get; set; }
+        public ulong ChannelId { get; set; }
     }
 }
