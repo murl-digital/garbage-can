@@ -22,19 +22,21 @@ namespace GarbageCan.Application.Roles.Commands.ApplyConiditionalRoles
         public ApplyConditionalRolesCommandHandler(IApplicationDbContext context, IDiscordGuildRoleService roleService)
         {
             _context = context;
-            this._roleService = roleService;
+            _roleService = roleService;
         }
 
         public async Task<Unit> Handle(ApplyConditionalRolesCommand request, CancellationToken cancellationToken)
         {
-            var conditionalRolesEntity = await _context.ConditionalRoles.ToArrayAsync(cancellationToken);
+            var conditionalRolesEntity = await _context.ConditionalRoles
+                .Where(r => r.GuildId == request.GuildId)
+                .ToArrayAsync(cancellationToken);
             var conditionalRoles = conditionalRolesEntity
-                .GroupBy(r => r.resultRoleId)
-                .ToDictionary(r => r.Key, r => r.Select(x => x.requiredRoleId).ToList());
+                .GroupBy(r => r.ResultRoleId)
+                .ToDictionary(r => r.Key, r => r.Select(x => x.RequiredRoleId).ToList());
 
             var resultingRolesWithNoRemain = conditionalRolesEntity
-                .Where(r => !r.remain)
-                .Select(r => r.resultRoleId)
+                .Where(r => !r.Remain)
+                .Select(r => r.ResultRoleId)
                 .ToArray();
 
             foreach (var (memberId, roles) in request.Members)
@@ -42,16 +44,12 @@ namespace GarbageCan.Application.Roles.Commands.ApplyConiditionalRoles
                 foreach (var role in roles
                     .Intersect(resultingRolesWithNoRemain)
                     .Where(r => !roles.Intersect(conditionalRoles[r]).Any()))
-                {
                     await _roleService.RevokeRoleAsync(request.GuildId, role, memberId, "conditional roles");
-                }
 
                 foreach (var (resultingRole, _) in conditionalRoles
                     .Where(r => !roles.Contains(r.Key))
                     .Where(r => roles.Intersect(r.Value).Any()))
-                {
                     await _roleService.GrantRoleAsync(request.GuildId, resultingRole, memberId, "conditional roles");
-                }
             }
 
             return Unit.Value;

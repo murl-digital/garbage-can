@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Threading.Tasks;
+using FluentAssertions;
 using GarbageCan.Application.Common.Exceptions;
 using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Application.Roles.Commands.RemoveConditionalRole;
@@ -7,7 +8,6 @@ using GarbageCan.Domain.Entities.Roles;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NUnit.Framework;
-using System.Threading.Tasks;
 
 namespace GarbageCan.Application.UnitTests.Roles.Commands
 {
@@ -36,7 +36,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             const int id = 5;
 
             ConditionalRole role = null;
-            var mockDbSet = _dbContext.ConfigureMockDbSet(x => x.ConditionalRoles, new ConditionalRole { id = id });
+            var mockDbSet = _dbContext.ConfigureMockDbSet(x => x.ConditionalRoles, new ConditionalRole {Id = id});
             mockDbSet.When(x => x.Remove(Arg.Any<ConditionalRole>())).Do(x => role = x.Arg<ConditionalRole>());
 
             await _appFixture.SendAsync(new RemoveConditionalRoleCommand
@@ -48,14 +48,14 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             _dbContext.ConditionalRoles.Received(1).Remove(Arg.Any<ConditionalRole>());
 
             role.Should().NotBeNull();
-            role.id.Should().Be(id);
+            role.Id.Should().Be(id);
         }
 
         [Test]
         public async Task ShouldRespondWithMessage_WhenRemovedSuccessfully()
         {
             const int id = 5;
-            _dbContext.ConfigureMockDbSet(x => x.ConditionalRoles, new ConditionalRole { id = id });
+            _dbContext.ConfigureMockDbSet(x => x.ConditionalRoles, new ConditionalRole {Id = id});
 
             await _appFixture.SendAsync(new RemoveConditionalRoleCommand
             {
@@ -76,7 +76,8 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
                 Id = 50
             };
 
-            FluentActions.Invoking(() => _appFixture.SendAsync(command)).Should().Throw<NotFoundException>().WithMessage("Couldn't find Conditional Role");
+            FluentActions.Invoking(() => _appFixture.SendAsync(command)).Should().Throw<NotFoundException>()
+                .WithMessage("Couldn't find Conditional Role");
         }
 
         [Theory]

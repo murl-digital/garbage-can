@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using GarbageCan.Application.Common.Interfaces;
+using GarbageCan.Application.Roles.Commands.ApplyConiditionalRoles;
 using GarbageCan.Application.UnitTests.Shared;
 using GarbageCan.Domain.Entities.Roles;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NUnit.Framework;
-using System.Threading.Tasks;
-using GarbageCan.Application.Roles.Commands.ApplyConiditionalRoles;
 
 namespace GarbageCan.Application.UnitTests.Roles.Commands
 {
@@ -37,10 +37,10 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
 
             _dbContext.ConfigureMockDbSet(x => x.ConditionalRoles, new ConditionalRole
             {
-                id = 0,
-                remain = false,
-                requiredRoleId = requiredRoleId,
-                resultRoleId = resultingRoleId
+                Id = 0,
+                Remain = false,
+                RequiredRoleId = requiredRoleId,
+                ResultRoleId = resultingRoleId
             });
 
             await _appFixture.SendAsync(new ApplyConditionalRolesCommand
@@ -64,10 +64,10 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
 
             _dbContext.ConfigureMockDbSet(x => x.ConditionalRoles, new ConditionalRole
             {
-                id = 0,
-                remain = false,
-                requiredRoleId = requiredRoleId,
-                resultRoleId = resultingRoleId
+                Id = 0,
+                Remain = false,
+                RequiredRoleId = requiredRoleId,
+                ResultRoleId = resultingRoleId
             });
 
             await _appFixture.SendAsync(new ApplyConditionalRolesCommand
@@ -91,10 +91,10 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
 
             _dbContext.ConfigureMockDbSet(x => x.ConditionalRoles, new ConditionalRole
             {
-                id = 0,
-                remain = true,
-                requiredRoleId = requiredRoleId,
-                resultRoleId = resultingRoleId
+                Id = 0,
+                Remain = true,
+                RequiredRoleId = requiredRoleId,
+                ResultRoleId = resultingRoleId
             });
 
             await _appFixture.SendAsync(new ApplyConditionalRolesCommand
@@ -118,10 +118,10 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
 
             _dbContext.ConfigureMockDbSet(x => x.ConditionalRoles, new ConditionalRole
             {
-                id = 0,
-                remain = false,
-                requiredRoleId = requiredRoleId,
-                resultRoleId = resultingRoleId
+                Id = 0,
+                Remain = false,
+                RequiredRoleId = requiredRoleId,
+                ResultRoleId = resultingRoleId
             });
 
             await _appFixture.SendAsync(new ApplyConditionalRolesCommand

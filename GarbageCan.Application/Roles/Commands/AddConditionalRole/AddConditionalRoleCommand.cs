@@ -1,13 +1,14 @@
-﻿using GarbageCan.Application.Common.Interfaces;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Domain.Entities.Roles;
 using MediatR;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace GarbageCan.Application.Roles.Commands.AddConditionalRole
 {
     public class AddConditionalRoleCommand : IRequest
     {
+        public ulong GuildId { get; set; }
         public bool Remain { get; set; }
         public ulong RequiredRoleId { get; set; }
         public ulong ResultRoleId { get; set; }
@@ -28,9 +29,10 @@ namespace GarbageCan.Application.Roles.Commands.AddConditionalRole
         {
             await _context.ConditionalRoles.AddAsync(new ConditionalRole
             {
-                requiredRoleId = request.RequiredRoleId,
-                resultRoleId = request.ResultRoleId,
-                remain = request.Remain,
+                GuildId = request.GuildId,
+                RequiredRoleId = request.RequiredRoleId,
+                ResultRoleId = request.ResultRoleId,
+                Remain = request.Remain
             }, cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);

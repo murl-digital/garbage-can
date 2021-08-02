@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Threading.Tasks;
+using FluentAssertions;
 using GarbageCan.Application.Common.Exceptions;
 using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Application.Roles.Commands.AddConditionalRole;
@@ -7,7 +8,6 @@ using GarbageCan.Domain.Entities.Roles;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NUnit.Framework;
-using System.Threading.Tasks;
 
 namespace GarbageCan.Application.UnitTests.Roles.Commands
 {
@@ -44,16 +44,16 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             {
                 RequiredRoleId = requiredRoleId,
                 ResultRoleId = resultingRoleId,
-                Remain = true,
+                Remain = true
             });
 
             await _dbContext.Received(1).SaveChangesAsync(default);
             await _dbContext.ConditionalRoles.Received(1).AddAsync(Arg.Any<ConditionalRole>());
 
             addedRole.Should().NotBeNull();
-            addedRole.requiredRoleId.Should().Be(requiredRoleId);
-            addedRole.resultRoleId.Should().Be(resultingRoleId);
-            addedRole.remain.Should().BeTrue();
+            addedRole.RequiredRoleId.Should().Be(requiredRoleId);
+            addedRole.ResultRoleId.Should().Be(resultingRoleId);
+            addedRole.Remain.Should().BeTrue();
         }
 
         [Test]
@@ -65,7 +65,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             {
                 RequiredRoleId = 5,
                 ResultRoleId = 15615,
-                Remain = false,
+                Remain = false
             });
 
             await _responseService.Received(1).RespondAsync("Role added successfully", true);

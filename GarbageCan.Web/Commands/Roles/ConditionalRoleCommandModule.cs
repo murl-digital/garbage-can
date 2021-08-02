@@ -1,11 +1,11 @@
-﻿using DSharpPlus;
+﻿using System.Threading.Tasks;
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using GarbageCan.Application.Roles.Commands.AddConditionalRole;
 using GarbageCan.Application.Roles.Commands.PrintConditionalRoles;
 using GarbageCan.Application.Roles.Commands.RemoveConditionalRole;
-using System.Threading.Tasks;
 
 namespace GarbageCan.Web.Commands.Roles
 {
@@ -19,6 +19,7 @@ namespace GarbageCan.Web.Commands.Roles
         {
             await Mediator.Send(new AddConditionalRoleCommand
             {
+                GuildId = ctx.Guild.Id,
                 RequiredRoleId = required.Id,
                 ResultRoleId = result.Id,
                 Remain = remain
@@ -29,14 +30,17 @@ namespace GarbageCan.Web.Commands.Roles
         [RequirePermissions(Permissions.Administrator)]
         public async Task List(CommandContext ctx)
         {
-            await Mediator.Send(new PrintConditionalRolesCommand(), ctx);
+            await Mediator.Send(new PrintConditionalRolesCommand
+            {
+                GuildId = ctx.Guild.Id
+            }, ctx);
         }
 
         [Command("remove")]
         [RequirePermissions(Permissions.Administrator)]
         public async Task RemoveConditionalRole(CommandContext ctx, int id)
         {
-            await Mediator.Send(new RemoveConditionalRoleCommand { Id = id }, ctx);
+            await Mediator.Send(new RemoveConditionalRoleCommand {Id = id}, ctx);
         }
     }
 }
