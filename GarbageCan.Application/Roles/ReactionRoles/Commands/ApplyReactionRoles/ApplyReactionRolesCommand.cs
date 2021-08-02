@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace GarbageCan.Application.Roles.Commands.AlterRole
 {
-    public class AlterRoleCommand : IRequest<bool>
+    public class ApplyReactionRolesCommand : IRequest<bool>
     {
         public bool Add { get; set; }
         public ulong ChannelId { get; set; }
@@ -20,22 +20,22 @@ namespace GarbageCan.Application.Roles.Commands.AlterRole
         public ulong UserId { get; set; }
     }
 
-    public class AlterRoleCommandHandler : IRequestHandler<AlterRoleCommand, bool>
+    public class ApplyReactionRolesCommandHandler : IRequestHandler<ApplyReactionRolesCommand, bool>
     {
         private readonly IApplicationDbContext _context;
-        private readonly ILogger<AlterRoleCommandHandler> _logger;
+        private readonly ILogger<ApplyReactionRolesCommandHandler> _logger;
         private readonly IDiscordGuildRoleService _roleService;
 
-        public AlterRoleCommandHandler(IApplicationDbContext context,
+        public ApplyReactionRolesCommandHandler(IApplicationDbContext context,
             IDiscordGuildRoleService roleService,
-            ILogger<AlterRoleCommandHandler> logger)
+            ILogger<ApplyReactionRolesCommandHandler> logger)
         {
             _context = context;
             _roleService = roleService;
             _logger = logger;
         }
 
-        public async Task<bool> Handle(AlterRoleCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(ApplyReactionRolesCommand request, CancellationToken cancellationToken)
         {
             var roles = await _context.ReactionRoles
                 .Where(x => x.GuildId == request.GuildId && x.ChannelId == request.ChannelId &&

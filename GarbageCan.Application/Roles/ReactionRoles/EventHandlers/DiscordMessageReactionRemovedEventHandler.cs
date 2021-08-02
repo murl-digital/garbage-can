@@ -1,31 +1,34 @@
-﻿using GarbageCan.Application.Common.Models;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using GarbageCan.Application.Common.Models;
 using GarbageCan.Application.Roles.Commands.AlterRole;
 using GarbageCan.Domain.Events;
 using MediatR;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace GarbageCan.Application.Roles.EventHandlers
 {
-    public class DiscordMessageReactionAddedEventHandler : INotificationHandler<DomainEventNotification<DiscordMessageReactionAddedEvent>>
+    public class
+        DiscordMessageReactionRemovedEventHandler : INotificationHandler<
+            DomainEventNotification<DiscordMessageReactionRemovedEvent>>
     {
         private readonly IMediator _mediator;
 
-        public DiscordMessageReactionAddedEventHandler(IMediator mediator)
+        public DiscordMessageReactionRemovedEventHandler(IMediator mediator)
         {
             _mediator = mediator;
         }
 
-        public async Task Handle(DomainEventNotification<DiscordMessageReactionAddedEvent> notification, CancellationToken cancellationToken)
+        public async Task Handle(DomainEventNotification<DiscordMessageReactionRemovedEvent> notification,
+            CancellationToken cancellationToken)
         {
-            await _mediator.Send(new AlterRoleCommand
+            await _mediator.Send(new ApplyReactionRolesCommand
             {
                 ChannelId = notification.DomainEvent.ChannelId,
                 Emoji = notification.DomainEvent.Emoji,
                 GuildId = notification.DomainEvent.GuildId,
                 MessageId = notification.DomainEvent.MessageId,
                 UserId = notification.DomainEvent.UserId,
-                Add = true
+                Add = false
             }, cancellationToken);
         }
     }

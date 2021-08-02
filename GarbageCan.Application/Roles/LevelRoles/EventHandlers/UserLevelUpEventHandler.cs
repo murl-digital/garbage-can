@@ -1,11 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Application.Common.Models;
 using GarbageCan.Application.Roles.Commands.ApplyLevelRoles;
 using GarbageCan.Domain.Events;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace GarbageCan.Application.Roles.EventHandlers
 {
@@ -18,9 +16,9 @@ namespace GarbageCan.Application.Roles.EventHandlers
             _mediator = mediator;
         }
 
-        public async Task Handle(DomainEventNotification<UserLevelUpEvent> notification, CancellationToken cancellationToken)
+        public async Task Handle(DomainEventNotification<UserLevelUpEvent> notification,
+            CancellationToken cancellationToken)
         {
-
             await _mediator.Send(new ApplyLevelRolesCommand
             {
                 GuildId = notification.DomainEvent.GuildId,

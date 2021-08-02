@@ -15,12 +15,12 @@ using NUnit.Framework;
 
 namespace GarbageCan.Application.UnitTests.Roles.Commands
 {
-    public class AlterRoleTests
+    public class ApplyReactionRolesCommandTests
     {
         private IApplicationDbContext _dbContext;
         private ApplicationFixture _fixture;
         private IDiscordGuildRoleService _roleService;
-        private SubstituteLogger logger => _fixture.GetLogger<AlterRoleCommandHandler>();
+        private SubstituteLogger logger => _fixture.GetLogger<ApplyReactionRolesCommandHandler>();
 
         [SetUp]
         public void Setup()
@@ -282,7 +282,8 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             logger.DidNotReceive().Log(Arg.Is<LogLevel>(x => x == LogLevel.Error), Arg.Any<string>());
         }
 
-        private static AlterRoleCommand CreateCommand(int commandGuildId, int commandChannelId, int commandMessageId,
+        private static ApplyReactionRolesCommand CreateCommand(int commandGuildId, int commandChannelId,
+            int commandMessageId,
             int commandEmojiId,
             string commandEmojiName, bool add = true)
         {

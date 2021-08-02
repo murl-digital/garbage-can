@@ -7,11 +7,11 @@ using NUnit.Framework;
 
 namespace GarbageCan.Application.UnitTests.Roles.Commands
 {
-    public class AlterRoleValidationTests
+    public class ApplyReactionRolesCommandValidationTests
     {
         private readonly ApplicationFixture _fixture;
 
-        public AlterRoleValidationTests()
+        public ApplyReactionRolesCommandValidationTests()
         {
             _fixture = new ApplicationFixture();
         }
@@ -19,13 +19,13 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
         [Theory]
         public void ShouldThrowValidationException_WhenEmojiIsNull()
         {
-            var command = new AlterRoleCommand
+            var command = new ApplyReactionRolesCommand
             {
                 GuildId = 151,
                 UserId = 450,
                 ChannelId = 4540,
                 MessageId = 500,
-                Emoji = null,
+                Emoji = null
             };
 
             FluentActions.Invoking(() => _fixture.SendAsync(command)).Should().Throw<ValidationException>();
@@ -39,9 +39,10 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
         [TestCase(41u, 41u, 41u, 41u, 0u, null)]
         [TestCase(41u, 41u, 41u, 41u, 0u, "")]
         [TestCase(41u, 41u, 41u, 41u, 0u, "   ")]
-        public void ShouldThrowValidationException_WhenHasInvalidProperty(ulong guildId, ulong userId, ulong channelId, ulong messageId, ulong emojiId, string emojiName)
+        public void ShouldThrowValidationException_WhenHasInvalidProperty(ulong guildId, ulong userId, ulong channelId,
+            ulong messageId, ulong emojiId, string emojiName)
         {
-            var command = new AlterRoleCommand
+            var command = new ApplyReactionRolesCommand
             {
                 GuildId = guildId,
                 UserId = userId,
@@ -50,8 +51,8 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
                 Emoji = new Emoji
                 {
                     Id = emojiId,
-                    Name = emojiName,
-                },
+                    Name = emojiName
+                }
             };
 
             FluentActions.Invoking(() => _fixture.SendAsync(command)).Should().Throw<ValidationException>();
