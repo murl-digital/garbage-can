@@ -40,6 +40,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
         [Test]
         public async Task ShouldAssignReactionRole_WhenAnExceptionIsThrownForSomeRoles()
         {
+            var guildId = 16;
             var channelId = 15;
             var messageId = 394;
             var emojiId = 29;
@@ -50,11 +51,11 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             _dbContext.ConfigureMockDbSet(x => x.ReactionRoles,
                 new[]
                 {
-                    CreateReactionRole(channelId, emojiId, messageId, badRoleId),
-                    CreateReactionRole(channelId, emojiId, messageId, goodRoleId)
+                    CreateReactionRole(guildId, channelId, emojiId, messageId, badRoleId),
+                    CreateReactionRole(guildId, channelId, emojiId, messageId, goodRoleId)
                 });
 
-            var command = CreateCommand(channelId, messageId, emojiId, "TEST");
+            var command = CreateCommand(guildId, channelId, messageId, emojiId, "TEST");
 
             _roleService.GrantRoleAsync(command.GuildId, (ulong) badRoleId, command.UserId, "reaction role")
                 .Throws<Exception>();
@@ -74,6 +75,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
         [Test]
         public async Task ShouldAssignReactionRole_WhenMultipleRolesMatch()
         {
+            var guildId = 16;
             var channelId = 15;
             var messageId = 394;
             var emojiId = 29;
@@ -81,11 +83,11 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             _dbContext.ConfigureMockDbSet(x => x.ReactionRoles,
                 new[]
                 {
-                    CreateReactionRole(channelId, emojiId, messageId, 500),
-                    CreateReactionRole(channelId, emojiId, messageId, 6944)
+                    CreateReactionRole(guildId, channelId, emojiId, messageId, 500),
+                    CreateReactionRole(guildId, channelId, emojiId, messageId, 6944)
                 });
 
-            var command = CreateCommand(channelId, messageId, emojiId, "TEST");
+            var command = CreateCommand(guildId, channelId, messageId, emojiId, "TEST");
 
             var result = await _fixture.SendAsync(command);
 
@@ -104,15 +106,16 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
         public async Task ShouldAssignReactionRole_WhenReactionRoleMatchesParameters(int commandChannelId,
             int commandMessageId, int commandEmojiId, string commandEmojiName)
         {
+            var guildId = 16;
             var channelId = 15;
             var messageId = 394;
             var emojiId = 29;
 
-            var reactionRole = CreateReactionRole(channelId, emojiId, messageId);
+            var reactionRole = CreateReactionRole(guildId, channelId, emojiId, messageId);
 
             _dbContext.ConfigureMockDbSet(x => x.ReactionRoles, reactionRole);
 
-            var command = CreateCommand(commandChannelId, commandMessageId, commandEmojiId, commandEmojiName);
+            var command = CreateCommand(guildId, commandChannelId, commandMessageId, commandEmojiId, commandEmojiName);
 
             var result = await _fixture.SendAsync(command);
 
@@ -133,15 +136,16 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
         public async Task ShouldNotAssignReactionRole_WhenReactionRoleDoesNotMatchesParameters(int commandChannelId,
             int commandMessageId, int commandEmojiId, string commandEmojiName)
         {
+            var guildId = 16;
             var channelId = 15;
             var messageId = 394;
             var emojiId = 29;
 
-            var reactionRole = CreateReactionRole(channelId, emojiId, messageId);
+            var reactionRole = CreateReactionRole(guildId, channelId, emojiId, messageId);
 
             _dbContext.ConfigureMockDbSet(x => x.ReactionRoles, reactionRole);
 
-            var command = CreateCommand(commandChannelId, commandMessageId, commandEmojiId, commandEmojiName);
+            var command = CreateCommand(guildId, commandChannelId, commandMessageId, commandEmojiId, commandEmojiName);
 
             var result = await _fixture.SendAsync(command);
 
@@ -162,15 +166,17 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
         public async Task ShouldNotRevokeReactionRole_WhenReactionRoleDoesNotMatchesParameters(int commandChannelId,
             int commandMessageId, int commandEmojiId, string commandEmojiName)
         {
+            var guildId = 16;
             var channelId = 15;
             var messageId = 394;
             var emojiId = 29;
 
-            var reactionRole = CreateReactionRole(channelId, emojiId, messageId);
+            var reactionRole = CreateReactionRole(guildId, channelId, emojiId, messageId);
 
             _dbContext.ConfigureMockDbSet(x => x.ReactionRoles, reactionRole);
 
-            var command = CreateCommand(commandChannelId, commandMessageId, commandEmojiId, commandEmojiName, false);
+            var command = CreateCommand(guildId, commandChannelId, commandMessageId, commandEmojiId, commandEmojiName,
+                false);
 
             var result = await _fixture.SendAsync(command);
 
@@ -186,6 +192,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
         [Test]
         public async Task ShouldRevokeReactionRole_WhenAnExceptionIsThrownForSomeRoles()
         {
+            var guildId = 16;
             var channelId = 15;
             var messageId = 394;
             var emojiId = 29;
@@ -196,11 +203,11 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             _dbContext.ConfigureMockDbSet(x => x.ReactionRoles,
                 new[]
                 {
-                    CreateReactionRole(channelId, emojiId, messageId, badRoleId),
-                    CreateReactionRole(channelId, emojiId, messageId, goodRoleId)
+                    CreateReactionRole(guildId, channelId, emojiId, messageId, badRoleId),
+                    CreateReactionRole(guildId, channelId, emojiId, messageId, goodRoleId)
                 });
 
-            var command = CreateCommand(channelId, messageId, emojiId, "TEST", false);
+            var command = CreateCommand(guildId, channelId, messageId, emojiId, "TEST", false);
 
             _roleService.RevokeRoleAsync(command.GuildId, (ulong) badRoleId, command.UserId, "reaction role")
                 .Throws<Exception>();
@@ -220,6 +227,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
         [Test]
         public async Task ShouldRevokeReactionRole_WhenMultipleRolesMatch()
         {
+            var guildId = 16;
             var channelId = 15;
             var messageId = 394;
             var emojiId = 29;
@@ -227,11 +235,11 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             _dbContext.ConfigureMockDbSet(x => x.ReactionRoles,
                 new[]
                 {
-                    CreateReactionRole(channelId, emojiId, messageId, 500),
-                    CreateReactionRole(channelId, emojiId, messageId, 6944)
+                    CreateReactionRole(guildId, channelId, emojiId, messageId, 500),
+                    CreateReactionRole(guildId, channelId, emojiId, messageId, 6944)
                 });
 
-            var command = CreateCommand(channelId, messageId, emojiId, "TEST", false);
+            var command = CreateCommand(guildId, channelId, messageId, emojiId, "TEST", false);
 
             var result = await _fixture.SendAsync(command);
 
@@ -251,15 +259,17 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
         public async Task ShouldRevokeReactionRole_WhenReactionRoleMatchesParameters(int commandChannelId,
             int commandMessageId, int commandEmojiId, string commandEmojiName)
         {
+            var guildId = 16;
             var channelId = 15;
             var messageId = 394;
             var emojiId = 29;
 
-            var reactionRole = CreateReactionRole(channelId, emojiId, messageId);
+            var reactionRole = CreateReactionRole(guildId, channelId, emojiId, messageId);
 
             _dbContext.ConfigureMockDbSet(x => x.ReactionRoles, reactionRole);
 
-            var command = CreateCommand(commandChannelId, commandMessageId, commandEmojiId, commandEmojiName, false);
+            var command = CreateCommand(guildId, commandChannelId, commandMessageId, commandEmojiId, commandEmojiName,
+                false);
 
             var result = await _fixture.SendAsync(command);
 
@@ -272,7 +282,8 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             logger.DidNotReceive().Log(Arg.Is<LogLevel>(x => x == LogLevel.Error), Arg.Any<string>());
         }
 
-        private static AlterRoleCommand CreateCommand(int commandChannelId, int commandMessageId, int commandEmojiId,
+        private static AlterRoleCommand CreateCommand(int commandGuildId, int commandChannelId, int commandMessageId,
+            int commandEmojiId,
             string commandEmojiName, bool add = true)
         {
             return new()
@@ -284,17 +295,19 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
                     Id = (ulong) commandEmojiId,
                     Name = commandEmojiName
                 },
-                GuildId = 45,
+                GuildId = (ulong) commandGuildId,
                 UserId = 4811,
                 Add = add
             };
         }
 
-        private static ReactionRole CreateReactionRole(int channelId, int emojiId, int messageId, int roleId = 102)
+        private static ReactionRole CreateReactionRole(int guildId, int channelId, int emojiId, int messageId,
+            int roleId = 102)
         {
             return new()
             {
                 Id = 2,
+                GuildId = (ulong) guildId,
                 RoleId = (ulong) roleId,
                 ChannelId = (ulong) channelId,
                 EmoteId = emojiId.ToString(),

@@ -32,6 +32,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
         [Test]
         public async Task ShouldGrantResultingRoleToMember_WhenMemberHasRequiredLevel()
         {
+            ulong guildId = 16;
             ulong resultingRoleId = 553;
             ulong memberId = 69;
             var level = 5;
@@ -41,18 +42,19 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
                 Id = 0,
                 Remain = false,
                 Lvl = level,
-                RoleId = resultingRoleId
+                RoleId = resultingRoleId,
+                GuildId = guildId
             });
 
             await _appFixture.SendAsync(new ApplyLevelRolesCommand
             {
-                GuildId = 1,
+                GuildId = guildId,
                 Level = level,
                 MemberId = memberId,
                 RoleIds = Array.Empty<ulong>()
             });
 
-            await _roleService.Received().GrantRoleAsync(1, resultingRoleId, memberId, Arg.Any<string>());
+            await _roleService.Received().GrantRoleAsync(guildId, resultingRoleId, memberId, Arg.Any<string>());
         }
 
         [Test]
@@ -157,6 +159,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
         public async Task ShouldReplaceResultingRoleFromMember_WhenHigherLevelRoleExists()
         {
             var level = 6;
+            ulong guildId = 16;
             ulong resultingRoleId = 553;
             ulong userId = 69;
 
@@ -167,78 +170,29 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
                     Id = 0,
                     Remain = false,
                     Lvl = 4,
-                    RoleId = resultingRoleId
+                    RoleId = resultingRoleId,
+                    GuildId = guildId
                 },
                 new LevelRole
                 {
                     Id = 1,
                     Remain = false,
                     Lvl = 6,
-                    RoleId = resultingRoleId + 1
+                    RoleId = resultingRoleId + 1,
+                    GuildId = guildId
                 }
             });
 
             await _appFixture.SendAsync(new ApplyLevelRolesCommand
             {
-                GuildId = 1,
+                GuildId = guildId,
                 MemberId = userId,
                 Level = level,
                 RoleIds = new[] {resultingRoleId}
             });
 
-            await _roleService.Received().RevokeRoleAsync(1, resultingRoleId, userId, Arg.Any<string>());
-            await _roleService.Received().GrantRoleAsync(1, resultingRoleId + 1, userId, Arg.Any<string>());
+            await _roleService.Received().RevokeRoleAsync(guildId, resultingRoleId, userId, Arg.Any<string>());
+            await _roleService.Received().GrantRoleAsync(guildId, resultingRoleId + 1, userId, Arg.Any<string>());
         }
-
-        /*[Test]
-        public async Task ShouldDoNothing_WhenMemberAlreadySatisfiesConditions()
-        {
-            ulong requiredRoleId = 5;
-            ulong resultingRoleId = 553;
-            ulong userId = 69;
-
-            _dbContext.ConfigureMockDbSet(x => x.ConditionalRoles, new ConditionalRole
-            {
-                id = 0,
-                remain = false,
-                requiredRoleId = requiredRoleId,
-                resultRoleId = resultingRoleId
-            });
-
-            await _appFixture.SendAsync(new ApplyConditionalRolesCommand
-            {
-                GuildId = 1,
-                Members = new Dictionary<ulong, ulong[]>
-                {
-                    {userId, new[] {requiredRoleId, resultingRoleId}}
-                }
-            });
-
-            await _roleService.DidNotReceiveWithAnyArgs().RevokeRoleAsync(default, default, default);
-            await _roleService.DidNotReceiveWithAnyArgs().GrantRoleAsync(default, default, default);
-        }
-
-        [Test]
-        public async Task ShouldDoNothing_WhenNoConditionalRolesExist()
-        {
-            ulong requiredRoleId = 5;
-            ulong resultingRoleId = 553;
-            ulong userId = 69;
-
-
-            _dbContext.ConfigureMockDbSet(x => x.ConditionalRoles);
-
-            await _appFixture.SendAsync(new ApplyConditionalRolesCommand
-            {
-                GuildId = 1,
-                Members = new Dictionary<ulong, ulong[]>
-                {
-                    {userId, new[] {requiredRoleId, resultingRoleId}}
-                }
-            });
-
-            await _roleService.DidNotReceiveWithAnyArgs().RevokeRoleAsync(default, default, default);
-            await _roleService.DidNotReceiveWithAnyArgs().GrantRoleAsync(default, default, default);
-        }*/
     }
 }

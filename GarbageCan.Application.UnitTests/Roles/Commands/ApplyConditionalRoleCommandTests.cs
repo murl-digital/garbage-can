@@ -32,6 +32,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
         [Test]
         public async Task ShouldGrantResultingRoleToMember_WhenMemberHasRequiredRole()
         {
+            ulong guildId = 16;
             ulong requiredRoleId = 5;
             ulong resultingRoleId = 553;
 
@@ -39,25 +40,27 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             {
                 Id = 0,
                 Remain = false,
+                GuildId = guildId,
                 RequiredRoleId = requiredRoleId,
                 ResultRoleId = resultingRoleId
             });
 
             await _appFixture.SendAsync(new ApplyConditionalRolesCommand
             {
-                GuildId = 1,
+                GuildId = guildId,
                 Members = new Dictionary<ulong, ulong[]>
                 {
                     {69, new[] {requiredRoleId}}
                 }
             });
 
-            await _roleService.Received().GrantRoleAsync(1, resultingRoleId, 69, Arg.Any<string>());
+            await _roleService.Received().GrantRoleAsync(guildId, resultingRoleId, 69, Arg.Any<string>());
         }
 
         [Test]
         public async Task ShouldRevokeResultingRoleFromMember_WhenMemberNoLongerHasRequiredRole()
         {
+            ulong guildId = 16;
             ulong requiredRoleId = 5;
             ulong resultingRoleId = 553;
             ulong userId = 69;
@@ -66,20 +69,21 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             {
                 Id = 0,
                 Remain = false,
+                GuildId = guildId,
                 RequiredRoleId = requiredRoleId,
                 ResultRoleId = resultingRoleId
             });
 
             await _appFixture.SendAsync(new ApplyConditionalRolesCommand
             {
-                GuildId = 1,
+                GuildId = guildId,
                 Members = new Dictionary<ulong, ulong[]>
                 {
                     {userId, new[] {resultingRoleId}}
                 }
             });
 
-            await _roleService.Received().RevokeRoleAsync(1, resultingRoleId, userId, Arg.Any<string>());
+            await _roleService.Received().RevokeRoleAsync(guildId, resultingRoleId, userId, Arg.Any<string>());
         }
 
         [Test]

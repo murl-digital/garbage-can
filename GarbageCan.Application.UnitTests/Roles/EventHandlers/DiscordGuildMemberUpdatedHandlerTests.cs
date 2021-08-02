@@ -128,10 +128,11 @@ namespace GarbageCan.Application.UnitTests.Roles.EventHandlers
         {
             ulong userId = 90;
             ulong guildId = 51;
-            var user = new WatchedUser {UserId = userId};
+            var user = new WatchedUser {GuildId = guildId, UserId = userId};
             _dbContext.ConfigureMockDbSet(x => x.JoinWatchlist, user);
 
-            var roles = new List<JoinRole> {new() {RoleId = 9}, new() {RoleId = 942}};
+            var roles = new List<JoinRole>
+                {new() {GuildId = guildId, RoleId = 9}, new() {GuildId = guildId, RoleId = 942}};
             _dbContext.ConfigureMockDbSet(x => x.JoinRoles, roles);
 
             await _appFixture.Publish(new DiscordGuildMemberUpdated
