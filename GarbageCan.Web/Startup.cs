@@ -137,6 +137,7 @@ namespace GarbageCan.Web
                 {
                     await PublishScopedEvent(provider, new DiscordGuildMemberAdded
                     {
+                        GuildId = args.Guild.Id,
                         UserId = args.Member.Id,
                         IsBot = args.Member.IsBot
                     });

@@ -9,6 +9,7 @@ namespace GarbageCan.Application.XP.Commands.CreateUser
 {
     public class CreateXPUserCommand : IRequest
     {
+        public ulong GuildId { get; set; }
         public ulong UserId { get; init; }
         public bool IsBot { get; init; }
     }
@@ -36,6 +37,7 @@ namespace GarbageCan.Application.XP.Commands.CreateUser
 
             await _context.XPUsers.AddAsync(new User
             {
+                GuildId = request.GuildId,
                 UserId = request.UserId,
             }, cancellationToken);
 

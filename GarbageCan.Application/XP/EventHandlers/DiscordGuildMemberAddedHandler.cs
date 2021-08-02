@@ -26,6 +26,7 @@ namespace GarbageCan.Application.XP.EventHandlers
             {
                 await _mediator.Send(new CreateXPUserCommand
                 {
+                    GuildId = notification.DomainEvent.GuildId,
                     UserId = notification.DomainEvent.UserId,
                     IsBot = notification.DomainEvent.IsBot
                 }, cancellationToken);
