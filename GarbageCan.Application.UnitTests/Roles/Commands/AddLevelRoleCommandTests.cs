@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Threading.Tasks;
+using FluentAssertions;
 using GarbageCan.Application.Common.Exceptions;
 using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Application.Roles.Commands.AddLevelRole;
@@ -7,7 +8,6 @@ using GarbageCan.Domain.Entities.Roles;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NUnit.Framework;
-using System.Threading.Tasks;
 
 namespace GarbageCan.Application.UnitTests.Roles.Commands
 {
@@ -34,7 +34,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
         public async Task ShouldAddLevelRole_WhenNoLevelRolesExist()
         {
             ulong roleId = 5;
-            int level = 45;
+            var level = 45;
 
             LevelRole addedRole = null;
             var mockDbSet = _dbContext.ConfigureMockDbSet(x => x.LevelRoles);
@@ -51,9 +51,9 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             await _dbContext.LevelRoles.Received(1).AddAsync(Arg.Any<LevelRole>());
 
             addedRole.Should().NotBeNull();
-            addedRole.roleId.Should().Be(roleId);
-            addedRole.lvl.Should().Be(level);
-            addedRole.remain.Should().BeTrue();
+            addedRole.RoleId.Should().Be(roleId);
+            addedRole.Lvl.Should().Be(level);
+            addedRole.Remain.Should().BeTrue();
         }
 
         [Test]

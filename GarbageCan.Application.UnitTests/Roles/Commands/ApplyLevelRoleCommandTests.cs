@@ -1,11 +1,12 @@
-﻿using GarbageCan.Application.Common.Interfaces;
+﻿using System;
+using System.Threading.Tasks;
+using GarbageCan.Application.Common.Interfaces;
+using GarbageCan.Application.Roles.Commands.ApplyLevelRoles;
 using GarbageCan.Application.UnitTests.Shared;
 using GarbageCan.Domain.Entities.Roles;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NUnit.Framework;
-using System.Threading.Tasks;
-using GarbageCan.Application.Roles.Commands.ApplyLevelRoles;
 
 namespace GarbageCan.Application.UnitTests.Roles.Commands
 {
@@ -37,10 +38,10 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
 
             _dbContext.ConfigureMockDbSet(x => x.LevelRoles, new LevelRole
             {
-                id = 0,
-                remain = false,
-                lvl = level,
-                roleId = resultingRoleId
+                Id = 0,
+                Remain = false,
+                Lvl = level,
+                RoleId = resultingRoleId
             });
 
             await _appFixture.SendAsync(new ApplyLevelRolesCommand
@@ -48,7 +49,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
                 GuildId = 1,
                 Level = level,
                 MemberId = memberId,
-                RoleIds = System.Array.Empty<ulong>()
+                RoleIds = Array.Empty<ulong>()
             });
 
             await _roleService.Received().GrantRoleAsync(1, resultingRoleId, memberId, Arg.Any<string>());
@@ -63,10 +64,10 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
 
             _dbContext.ConfigureMockDbSet(x => x.LevelRoles, new LevelRole
             {
-                id = 0,
-                remain = true,
-                lvl = 4,
-                roleId = resultingRoleId
+                Id = 0,
+                Remain = true,
+                Lvl = 4,
+                RoleId = resultingRoleId
             });
 
             await _appFixture.SendAsync(new ApplyLevelRolesCommand
@@ -74,12 +75,12 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
                 GuildId = 1,
                 MemberId = userId,
                 Level = level,
-                RoleIds = new []{resultingRoleId}
+                RoleIds = new[] {resultingRoleId}
             });
 
             await _roleService.DidNotReceiveWithAnyArgs().RevokeRoleAsync(default, default, default);
         }
-        
+
         [Test]
         public async Task ShouldNotRevokeResultingRoleFromMember_WhenHigherLevelRoleExists()
         {
@@ -87,21 +88,21 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             ulong resultingRoleId = 553;
             ulong userId = 69;
 
-            _dbContext.ConfigureMockDbSet(x => x.LevelRoles, new []
+            _dbContext.ConfigureMockDbSet(x => x.LevelRoles, new[]
             {
                 new LevelRole
                 {
-                    id = 0,
-                    remain = false,
-                    lvl = 4,
-                    roleId = resultingRoleId
+                    Id = 0,
+                    Remain = false,
+                    Lvl = 4,
+                    RoleId = resultingRoleId
                 },
                 new LevelRole
                 {
-                    id = 1,
-                    remain = false,
-                    lvl = 6,
-                    roleId = resultingRoleId + 1
+                    Id = 1,
+                    Remain = false,
+                    Lvl = 6,
+                    RoleId = resultingRoleId + 1
                 }
             });
 
@@ -110,12 +111,12 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
                 GuildId = 1,
                 MemberId = userId,
                 Level = level,
-                RoleIds = new []{resultingRoleId}
+                RoleIds = new[] {resultingRoleId}
             });
 
             await _roleService.DidNotReceiveWithAnyArgs().RevokeRoleAsync(default, default, default);
         }
-        
+
         [Test]
         public async Task ShouldNotRevokeResultingRoleFromMember_WhenHigherLevelRoleDoesNotExist()
         {
@@ -123,21 +124,21 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             ulong resultingRoleId = 553;
             ulong userId = 69;
 
-            _dbContext.ConfigureMockDbSet(x => x.LevelRoles, new []
+            _dbContext.ConfigureMockDbSet(x => x.LevelRoles, new[]
             {
                 new LevelRole
                 {
-                    id = 0,
-                    remain = false,
-                    lvl = 4,
-                    roleId = resultingRoleId
+                    Id = 0,
+                    Remain = false,
+                    Lvl = 4,
+                    RoleId = resultingRoleId
                 },
                 new LevelRole
                 {
-                    id = 1,
-                    remain = false,
-                    lvl = 6,
-                    roleId = 69696
+                    Id = 1,
+                    Remain = false,
+                    Lvl = 6,
+                    RoleId = 69696
                 }
             });
 
@@ -146,12 +147,12 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
                 GuildId = 1,
                 MemberId = userId,
                 Level = level,
-                RoleIds = new ulong[]{69696}
+                RoleIds = new ulong[] {69696}
             });
 
             await _roleService.DidNotReceiveWithAnyArgs().RevokeRoleAsync(default, default, default);
         }
-        
+
         [Test]
         public async Task ShouldReplaceResultingRoleFromMember_WhenHigherLevelRoleExists()
         {
@@ -159,21 +160,21 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             ulong resultingRoleId = 553;
             ulong userId = 69;
 
-            _dbContext.ConfigureMockDbSet(x => x.LevelRoles, new []
+            _dbContext.ConfigureMockDbSet(x => x.LevelRoles, new[]
             {
                 new LevelRole
                 {
-                    id = 0,
-                    remain = false,
-                    lvl = 4,
-                    roleId = resultingRoleId
+                    Id = 0,
+                    Remain = false,
+                    Lvl = 4,
+                    RoleId = resultingRoleId
                 },
                 new LevelRole
                 {
-                    id = 1,
-                    remain = false,
-                    lvl = 6,
-                    roleId = resultingRoleId + 1
+                    Id = 1,
+                    Remain = false,
+                    Lvl = 6,
+                    RoleId = resultingRoleId + 1
                 }
             });
 
@@ -182,9 +183,9 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
                 GuildId = 1,
                 MemberId = userId,
                 Level = level,
-                RoleIds = new []{resultingRoleId}
+                RoleIds = new[] {resultingRoleId}
             });
-            
+
             await _roleService.Received().RevokeRoleAsync(1, resultingRoleId, userId, Arg.Any<string>());
             await _roleService.Received().GrantRoleAsync(1, resultingRoleId + 1, userId, Arg.Any<string>());
         }

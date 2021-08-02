@@ -1,8 +1,8 @@
-﻿using GarbageCan.Application.Common.Interfaces;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Domain.Entities.Roles;
 using MediatR;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace GarbageCan.Application.Roles.Commands.AddLevelRole
 {
@@ -11,6 +11,7 @@ namespace GarbageCan.Application.Roles.Commands.AddLevelRole
         public int Level { get; set; }
         public bool Remain { get; set; }
         public ulong RoleId { get; set; }
+        public ulong GuildId { get; set; }
     }
 
     public class AddLevelRoleCommandHandler : IRequestHandler<AddLevelRoleCommand>
@@ -28,9 +29,10 @@ namespace GarbageCan.Application.Roles.Commands.AddLevelRole
         {
             await _context.LevelRoles.AddAsync(new LevelRole
             {
-                roleId = request.RoleId,
-                lvl = request.Level,
-                remain = request.Remain,
+                GuildId = request.GuildId,
+                RoleId = request.RoleId,
+                Lvl = request.Level,
+                Remain = request.Remain
             }, cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
