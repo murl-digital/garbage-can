@@ -8,8 +8,12 @@ namespace GarbageCan.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<QueuedBooster> builder)
         {
-            builder.HasKey(t => t.position);
-            builder.Property(t => t.position).ValueGeneratedNever();
+            builder.HasNoKey();
+            builder.HasIndex(t => t.GuildId);
+            builder.Property(t => t.GuildId).HasColumnName("guildId");
+            builder.Property(t => t.Position).HasColumnName("position");
+            builder.Property(t => t.Multiplier).HasColumnName("multiplier");
+            builder.Property(t => t.DurationInSeconds).HasColumnName("durationInSeconds");
             builder.ToTable("xpQueuedBoosters");
         }
     }
