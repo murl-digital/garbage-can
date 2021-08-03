@@ -8,7 +8,12 @@ namespace GarbageCan.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<UserBooster> builder)
         {
-            builder.HasKey(t => t.id);
+            builder.HasKey(t => t.Id);
+            builder.Property(t => t.Id).HasColumnName("id");
+            builder.Property(t => t.GuildId).HasColumnName("guildId");
+            builder.Property(t => t.UserId).HasColumnName("userId");
+            builder.Property(t => t.Multiplier).HasColumnName("multiplier");
+            builder.Property(t => t.DurationInSeconds).HasColumnName("durationInSeconds");
             builder.ToTable("xpUserBoosters");
         }
     }

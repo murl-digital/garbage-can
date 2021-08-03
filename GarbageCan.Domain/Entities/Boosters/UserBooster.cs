@@ -2,9 +2,10 @@
 {
     public class UserBooster
     {
-        public int id { get; set; }
-        public ulong userId { get; set; }
-        public float multiplier { get; set; }
-        public long durationInSeconds { get; set; }
+        public int Id { get; set; }
+        public ulong GuildId { get; set; }
+        public ulong UserId { get; set; }
+        public float Multiplier { get; set; }
+        public ulong DurationInSeconds { get; set; }
     }
 }
