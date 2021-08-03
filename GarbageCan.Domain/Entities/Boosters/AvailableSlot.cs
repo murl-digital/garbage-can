@@ -2,7 +2,8 @@
 {
     public class AvailableSlot
     {
-        public int id { get; set; }
-        public ulong channelId { get; set; }
+        public int Id { get; set; }
+        public ulong GuildId { get; set; }
+        public ulong ChannelId { get; set; }
     }
 }
