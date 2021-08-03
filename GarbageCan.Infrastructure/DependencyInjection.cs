@@ -1,12 +1,12 @@
-﻿using GarbageCan.Application.Common.Interfaces;
+﻿using System;
+using System.Threading.Tasks;
+using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Infrastructure.Discord;
 using GarbageCan.Infrastructure.Persistence;
 using GarbageCan.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Threading.Tasks;
 
 namespace GarbageCan.Infrastructure
 {
@@ -17,6 +17,8 @@ namespace GarbageCan.Infrastructure
             if (configuration.GetValue<bool>("UseInMemoryDatabase"))
             {
                 services.AddDbContext<ApplicationDbContext>(options => options.UseInMemoryDatabase("GarbageCanDbContext"));
+                services.AddDbContextFactory<ApplicationDbContext>(options =>
+                    options.UseInMemoryDatabase("GarbageCanDbContext"));
             }
             else
             {
@@ -25,6 +27,11 @@ namespace GarbageCan.Infrastructure
                 {
                     options.UseMySql(
                         connectionString, ServerVersion.AutoDetect(connectionString),
+                        b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName));
+                });
+                services.AddDbContextFactory<ApplicationDbContext>(options =>
+                {
+                    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString),
                         b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName));
                 });
             }

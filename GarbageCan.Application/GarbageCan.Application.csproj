@@ -23,6 +23,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Folder Include="Boosters\Services"/>
 	  <Folder Include="Roles\ConditionalRoles\Commands" />
 	  <Folder Include="Roles\JoinRoles\Commands" />
 	  <Folder Include="Roles\LevelRoles" />
