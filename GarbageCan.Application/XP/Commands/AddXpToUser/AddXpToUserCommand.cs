@@ -47,7 +47,7 @@ namespace GarbageCan.Application.XP.Commands.AddXpToUser
             }
 
             var oldXP = user.XP;
-            user.XP += _calculator.XpEarned(request.Message);
+            user.XP += _calculator.XpEarned(request.Message, request.GuildId);
 
             await _context.SaveChangesAsync(cancellationToken);
 

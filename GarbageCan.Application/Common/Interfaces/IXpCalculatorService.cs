@@ -2,7 +2,7 @@
 {
     public interface IXpCalculatorService
     {
-        double XpEarned(string message);
+        double XpEarned(string message, ulong guildId);
         double XpRequired(int level);
 
         double TotalXpRequired(int lvl)

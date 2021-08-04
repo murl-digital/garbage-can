@@ -1,14 +1,14 @@
-﻿using FluentAssertions;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using FluentAssertions;
 using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Application.UnitTests.Shared;
 using GarbageCan.Application.XP.Commands.AddXpToUser;
 using GarbageCan.Domain.Entities.XP;
+using GarbageCan.Domain.Events;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NUnit.Framework;
-using System.Linq;
-using System.Threading.Tasks;
-using GarbageCan.Domain.Events;
 
 namespace GarbageCan.Application.UnitTests.XP.Commands
 {
@@ -47,7 +47,7 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
             };
 
             _dbContext.ConfigureMockDbSet(x => x.XPUsers, user);
-            _calculator.XpEarned(message).Returns(20.0);
+            _calculator.XpEarned(message, TODO).Returns(20.0);
 
             var command = new AddXpToUserCommand
             {
@@ -60,7 +60,7 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
             await _dbContext.Received(1).SaveChangesAsync(default);
 
             _dbContext.XPUsers.First().XP.Should().Be(20);
-            _calculator.Received(1).XpEarned(message);
+            _calculator.Received(1).XpEarned(message, TODO);
         }
 
         [Test]
@@ -69,7 +69,7 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
             ulong userId = 90;
             var message = "TEST";
 
-            _calculator.XpEarned(message).Returns(0);
+            _calculator.XpEarned(message, TODO).Returns(0);
 
             User addedUser = null;
             var mockDbSet = _dbContext.ConfigureMockDbSet(x => x.XPUsers);
@@ -105,7 +105,7 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
             };
 
             _dbContext.ConfigureMockDbSet(x => x.XPUsers, user);
-            _calculator.XpEarned(message).Returns(20.0);
+            _calculator.XpEarned(message, TODO).Returns(20.0);
 
             var command = new AddXpToUserCommand
             {
@@ -125,7 +125,7 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
             ulong userId = 90;
             var message = "TEST";
 
-            _calculator.XpEarned(message).Returns(0);
+            _calculator.XpEarned(message, TODO).Returns(0);
 
             User addedUser = null;
             var mockDbSet = _dbContext.ConfigureMockDbSet(x => x.XPUsers);

@@ -1,18 +1,30 @@
 ﻿using System;
+using GarbageCan.Application.Boosters.Commands;
 using GarbageCan.Application.Common.Interfaces;
+using MediatR;
 
 namespace GarbageCan.Application.XP.Services
 {
     public class XpCalculatorService : IXpCalculatorService
     {
-        public double XpEarned(string message)
+        private readonly IMediator _mediator;
+
+        public XpCalculatorService(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
+
+        public double XpEarned(string message, ulong guildId)
         {
             var length = Math.Sqrt(message.Replace(" ", "").Length);
             length = Math.Min(10, length);
 
             // TODO: INCOMPLETE - need to implement boosters and rng
             // var result = length * (Math.Abs(Random.Sample()) * 0.5 + 1) * BoosterManager.GetMultiplier();
-            var result = length;
+            var result = length
+                         * _mediator.Send(new GetBoosterMultiplierCommand { GuildId = guildId })
+                             .GetAwaiter()
+                             .GetResult();
             return result;
         }
 

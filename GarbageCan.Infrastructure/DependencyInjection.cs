@@ -17,8 +17,6 @@ namespace GarbageCan.Infrastructure
             if (configuration.GetValue<bool>("UseInMemoryDatabase"))
             {
                 services.AddDbContext<ApplicationDbContext>(options => options.UseInMemoryDatabase("GarbageCanDbContext"));
-                services.AddDbContextFactory<ApplicationDbContext>(options =>
-                    options.UseInMemoryDatabase("GarbageCanDbContext"));
             }
             else
             {
@@ -29,16 +27,12 @@ namespace GarbageCan.Infrastructure
                         connectionString, ServerVersion.AutoDetect(connectionString),
                         b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName));
                 });
-                services.AddDbContextFactory<ApplicationDbContext>(options =>
-                {
-                    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString),
-                        b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName));
-                });
             }
             services.AddTransient<IApplicationDbContext, ApplicationDbContext>();
             services.AddTransient<IDomainEventService, DomainEventService>();
             services.AddTransient<IDateTime, DateTimeService>();
             services.AddTransient<ICurrentUserService, DiscordContextUserService>();
+            services.AddSingleton<IBoosterService, BoosterService>();
 
             services.AddTransient<IDiscordGuildService, DiscordGuildService>();
             services.AddTransient<IDiscordResponseService, DiscordResponseService>();
