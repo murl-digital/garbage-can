@@ -35,7 +35,7 @@ namespace GarbageCan.Application.Boosters.Commands
             if (!_boosterService.AvailableSlots.ContainsKey(request.GuildId))
                 throw new InvalidOperationException("Specified guild has no available slots");
 
-            if (_boosterService.AvailableSlots[request.GuildId].All(s => s.Id == request.Slot.Id))
+            if (!_boosterService.AvailableSlots[request.GuildId].Exists(s => s.Id == request.Slot.Id))
                 throw new InvalidOperationException("Specified slot doesn't exist in guild");
 
             var booster = new ActiveBooster
@@ -43,7 +43,7 @@ namespace GarbageCan.Application.Boosters.Commands
                 GuildId = request.GuildId,
                 ExpirationDate = _dateTime.Now.ToUniversalTime().Add(request.Duration),
                 Multiplier = request.Multiplier,
-                Slot = request.Slot
+                Slot = _context.XPAvailableSlots.First(s => s.Id == request.Slot.Id)
             };
 
             _boosterService.ActiveBoosters[request.GuildId].Add(booster);
