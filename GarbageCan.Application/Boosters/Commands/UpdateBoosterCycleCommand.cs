@@ -50,11 +50,11 @@ namespace GarbageCan.Application.Boosters.Commands
                 saveQueue = true;
 
                 var usedSlots = _boosterService.ActiveBoosters[request.GuildId]
-                    .Select(b => b.Slot)
+                    .Select(b => b.Slot.Id)
                     .ToList();
 
                 var slot = _boosterService.AvailableSlots[request.GuildId]
-                    .First(s => !usedSlots.Contains(s));
+                    .First(s => !usedSlots.Contains(s.Id));
 
                 var booster = _boosterService.QueuedBoosters[request.GuildId].Dequeue();
 
@@ -71,10 +71,11 @@ namespace GarbageCan.Application.Boosters.Commands
                 _boosterService.AvailableSlots[request.GuildId].Count)
             {
                 var usedSlots = _boosterService.ActiveBoosters[request.GuildId]
-                    .Select(b => b.Slot)
+                    .Select(b => b.Slot.Id)
                     .ToList();
 
-                foreach (var slot in _boosterService.AvailableSlots[request.GuildId].Where(s => !usedSlots.Contains(s)))
+                foreach (var slot in _boosterService.AvailableSlots[request.GuildId]
+                    .Where(s => !usedSlots.Contains(s.Id)))
                     await _discordChannelService.RenameChannel(request.GuildId, slot.ChannelId, "-");
             }
 
