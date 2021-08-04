@@ -51,11 +51,11 @@ namespace GarbageCan.Application.Boosters.Commands
             }
 
             var usedSlots = _boosterService.ActiveBoosters[request.GuildId]
-                .Select(b => b.Slot)
+                .Select(b => b.Slot.Id)
                 .ToList();
 
             var slot = _boosterService.AvailableSlots[request.GuildId]
-                .First(s => !usedSlots.Contains(s));
+                .First(s => !usedSlots.Contains(s.Id));
 
             await _mediator.Send(new ActivateBoosterCommand
             {
