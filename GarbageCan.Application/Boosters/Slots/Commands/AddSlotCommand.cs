@@ -17,11 +17,14 @@ namespace GarbageCan.Application.Boosters.Commands
     {
         private readonly IApplicationDbContext _context;
         private readonly IBoosterService _boosterService;
+        private readonly IDiscordGuildChannelService _discordChannelService;
 
-        public AddSlotCommandHandler(IApplicationDbContext context, IBoosterService boosterService)
+        public AddSlotCommandHandler(IApplicationDbContext context, IBoosterService boosterService,
+            IDiscordGuildChannelService discordChannelService)
         {
             _context = context;
             _boosterService = boosterService;
+            _discordChannelService = discordChannelService;
         }
 
         public async Task<Unit> Handle(AddSlotCommand request, CancellationToken cancellationToken)
@@ -35,6 +38,11 @@ namespace GarbageCan.Application.Boosters.Commands
             await _context.SaveChangesAsync(cancellationToken);
             _boosterService.AvailableSlots.TryAdd(request.GuildId, new List<AvailableSlot>());
             _boosterService.AvailableSlots[request.GuildId].Add(slot);
+
+            _boosterService.QueuedBoosters.TryAdd(request.GuildId, new Queue<QueuedBooster>());
+            _boosterService.ActiveBoosters.TryAdd(request.GuildId, new List<ActiveBooster>());
+
+            await _discordChannelService.RenameChannel(request.GuildId, request.ChannelId, "-");
 
             return Unit.Value;
         }

@@ -21,13 +21,15 @@ namespace GarbageCan.Application.Boosters.Commands
         private readonly IApplicationDbContext _context;
         private readonly IBoosterService _boosterService;
         private readonly IDateTime _dateTime;
+        private readonly IDiscordGuildChannelService _discordChannelService;
 
         public ActivateBoosterCommandHandler(IApplicationDbContext context, IBoosterService boosterService,
-            IDateTime dateTime)
+            IDateTime dateTime, IDiscordGuildChannelService discordChannelService)
         {
             _context = context;
             _boosterService = boosterService;
             _dateTime = dateTime;
+            _discordChannelService = discordChannelService;
         }
 
         public async Task<Unit> Handle(ActivateBoosterCommand request, CancellationToken cancellationToken)
@@ -50,6 +52,9 @@ namespace GarbageCan.Application.Boosters.Commands
 
             _context.XPActiveBoosters.Add(booster);
             await _context.SaveChangesAsync(cancellationToken);
+
+            await _discordChannelService.RenameChannel(request.GuildId, request.Slot.ChannelId,
+                $"{1 + request.Multiplier}");
 
             return Unit.Value;
         }
