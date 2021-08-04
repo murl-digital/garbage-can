@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Boosters\Commands"/>
     <Folder Include="Common\Behaviours\" />
   </ItemGroup>
 

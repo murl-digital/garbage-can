@@ -37,20 +37,23 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
         [Test]
         public async Task ShouldAddXp_WhenUserExists()
         {
+            ulong guildId = 6;
             ulong userId = 90;
             var message = "TEST";
             var user = new User
             {
+                GuildId = guildId,
                 UserId = userId,
                 Lvl = 0,
                 XP = 0
             };
 
             _dbContext.ConfigureMockDbSet(x => x.XPUsers, user);
-            _calculator.XpEarned(message, TODO).Returns(20.0);
+            _calculator.XpEarned(message, guildId).Returns(20.0);
 
             var command = new AddXpToUserCommand
             {
+                GuildId = guildId,
                 UserId = userId,
                 Message = message
             };
@@ -60,16 +63,17 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
             await _dbContext.Received(1).SaveChangesAsync(default);
 
             _dbContext.XPUsers.First().XP.Should().Be(20);
-            _calculator.Received(1).XpEarned(message, TODO);
+            _calculator.Received(1).XpEarned(message, guildId);
         }
 
         [Test]
         public async Task ShouldCreateNewUser_WhenUserDoesNotExist()
         {
+            ulong guildId = 6;
             ulong userId = 90;
             var message = "TEST";
 
-            _calculator.XpEarned(message, TODO).Returns(0);
+            _calculator.XpEarned(message, guildId).Returns(0);
 
             User addedUser = null;
             var mockDbSet = _dbContext.ConfigureMockDbSet(x => x.XPUsers);
@@ -77,6 +81,7 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
 
             var command = new AddXpToUserCommand
             {
+                GuildId = guildId,
                 UserId = userId,
                 Message = message
             };
@@ -87,6 +92,7 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
             await _dbContext.Received(1).SaveChangesAsync(default);
 
             addedUser.Should().NotBeNull();
+            addedUser.GuildId.Should().Be(6);
             addedUser.UserId.Should().Be(90);
             addedUser.Lvl.Should().Be(0);
             addedUser.XP.Should().Be(0);
@@ -95,37 +101,42 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
         [Test]
         public async Task ShouldPublishXpAddedEvent_WhenUserExists()
         {
+            ulong guildId = 6;
             ulong userId = 90;
             var message = "TEST";
             var user = new User
             {
+                GuildId = guildId,
                 UserId = userId,
                 Lvl = 0,
                 XP = 0
             };
 
             _dbContext.ConfigureMockDbSet(x => x.XPUsers, user);
-            _calculator.XpEarned(message, TODO).Returns(20.0);
+            _calculator.XpEarned(message, guildId).Returns(20.0);
 
             var command = new AddXpToUserCommand
             {
+                GuildId = guildId,
                 UserId = userId,
                 Message = message
             };
 
             await _appFixture.SendAsync(command);
-            
+
             await _appFixture.Provider.GetRequiredService<IDomainEventService>().Received(1)
-                .Publish(Arg.Is<XpAddedToUserEvent>(e => e.UserId == userId && e.OldXp == 0 && e.NewXp == 20));   
+                .Publish(Arg.Is<XpAddedToUserEvent>(e =>
+                    e.GuildId == guildId && e.UserId == userId && e.OldXp == 0 && e.NewXp == 20));
         }
 
         [Test]
         public async Task ShouldPublishXpAddedEvent_WhenUserDoesNotExist()
         {
+            ulong guildId = 6;
             ulong userId = 90;
             var message = "TEST";
 
-            _calculator.XpEarned(message, TODO).Returns(0);
+            _calculator.XpEarned(message, guildId).Returns(0);
 
             User addedUser = null;
             var mockDbSet = _dbContext.ConfigureMockDbSet(x => x.XPUsers);
@@ -133,14 +144,16 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
 
             var command = new AddXpToUserCommand
             {
+                GuildId = guildId,
                 UserId = userId,
                 Message = message
             };
 
             await _appFixture.SendAsync(command);
-            
+
             await _appFixture.Provider.GetRequiredService<IDomainEventService>().Received(1)
-                .Publish(Arg.Is<XpAddedToUserEvent>(e => e.UserId == userId && e.OldXp == 0 && e.NewXp == 0));
+                .Publish(Arg.Is<XpAddedToUserEvent>(e =>
+                    e.GuildId == guildId && e.UserId == userId && e.OldXp == 0 && e.NewXp == 0));
         }
     }
 }
