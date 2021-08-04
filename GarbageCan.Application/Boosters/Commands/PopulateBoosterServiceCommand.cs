@@ -26,21 +26,33 @@ namespace GarbageCan.Application.Boosters.Commands
 
         public async Task<Unit> Handle(PopulateBoosterServiceCommand request, CancellationToken cancellationToken)
         {
-            _boosterService.AvailableSlots = await _context.XPAvailableSlots
+            var availableSlots = await _context.XPAvailableSlots
                 .AsNoTracking()
+                .ToArrayAsync(cancellationToken);
+            var queuedBoosters = await _context.XPQueuedBoosters
+                .AsNoTracking()
+                .ToArrayAsync(cancellationToken);
+            var activeBoosters = await _context.XPActiveBoosters
+                .AsNoTracking()
+                .ToArrayAsync(cancellationToken);
+
+            _boosterService.AvailableSlots = availableSlots
                 .GroupBy(s => s.GuildId)
-                .ToDictionaryAsync(s => s.Key, s => s.ToList(), cancellationToken);
-            _boosterService.QueuedBoosters = await _context.XPQueuedBoosters
-                .AsNoTracking()
+                .ToDictionary(s => s.Key, s => s.ToList());
+            _boosterService.QueuedBoosters = queuedBoosters
                 .GroupBy(b => b.GuildId)
-                .ToDictionaryAsync(
+                .ToDictionary(
                     k => k.Key,
-                    v => new Queue<QueuedBooster>(v.OrderBy(b => b.Position).ToList()),
-                    cancellationToken);
-            _boosterService.ActiveBoosters = await _context.XPActiveBoosters
-                .AsNoTracking()
+                    v => new Queue<QueuedBooster>(v.OrderBy(b => b.Position).ToList()));
+            _boosterService.ActiveBoosters = activeBoosters
                 .GroupBy(b => b.GuildId)
-                .ToDictionaryAsync(k => k.Key, v => v.ToList(), cancellationToken);
+                .ToDictionary(k => k.Key, v => v.ToList());
+
+            foreach (var key in _boosterService.AvailableSlots.Keys)
+            {
+                _boosterService.QueuedBoosters.TryAdd(key, new Queue<QueuedBooster>());
+                _boosterService.ActiveBoosters.TryAdd(key, new List<ActiveBooster>());
+            }
 
             return Unit.Value;
         }
