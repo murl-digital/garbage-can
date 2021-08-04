@@ -1,6 +1,4 @@
 ﻿using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using GarbageCan.Application.Common.Interfaces;
 using MediatR;
 
@@ -11,7 +9,7 @@ namespace GarbageCan.Application.Boosters.Commands
         public ulong GuildId { get; set; }
     }
 
-    public class GetBoosterMultiplierCommandHandler : IRequestHandler<GetBoosterMultiplierCommand, float>
+    public class GetBoosterMultiplierCommandHandler : RequestHandler<GetBoosterMultiplierCommand, float>
     {
         private readonly IBoosterService _boosterService;
 
@@ -20,9 +18,9 @@ namespace GarbageCan.Application.Boosters.Commands
             _boosterService = boosterService;
         }
 
-        public Task<float> Handle(GetBoosterMultiplierCommand request, CancellationToken cancellationToken)
+        protected override float Handle(GetBoosterMultiplierCommand request)
         {
-            return Task.FromResult(1 + _boosterService.ActiveBoosters[request.GuildId]?.Sum(b => b.Multiplier) ?? 0);
+            return 1 + _boosterService.ActiveBoosters[request.GuildId]?.Sum(b => b.Multiplier) ?? 0;
         }
     }
 }
