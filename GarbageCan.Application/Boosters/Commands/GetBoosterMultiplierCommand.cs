@@ -20,7 +20,9 @@ namespace GarbageCan.Application.Boosters.Commands
 
         protected override float Handle(GetBoosterMultiplierCommand request)
         {
-            return 1 + _boosterService.ActiveBoosters[request.GuildId]?.Sum(b => b.Multiplier) ?? 0;
+            return 1 + (_boosterService.ActiveBoosters.TryGetValue(request.GuildId, out var boosters)
+                ? boosters?.Sum(b => b.Multiplier) ?? 0
+                : 0);
         }
     }
 }
