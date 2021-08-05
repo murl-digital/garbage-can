@@ -5,7 +5,7 @@ using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Domain.Entities.Boosters;
 using MediatR;
 
-namespace GarbageCan.Application.Boosters.Commands
+namespace GarbageCan.Application.Boosters.AvailableSlots.Commands
 {
     public class AddSlotCommand : IRequest
     {

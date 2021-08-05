@@ -5,7 +5,7 @@ using GarbageCan.Application.Common.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace GarbageCan.Application.Roles.Commands.ApplyLevelRoles
+namespace GarbageCan.Application.Roles.LevelRoles.Commands.ApplyLevelRoles
 {
     public class ApplyLevelRolesCommand : IRequest
     {

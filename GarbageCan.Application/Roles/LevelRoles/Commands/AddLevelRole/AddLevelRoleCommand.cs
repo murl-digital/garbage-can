@@ -4,7 +4,7 @@ using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Domain.Entities.Roles;
 using MediatR;
 
-namespace GarbageCan.Application.Roles.Commands.AddLevelRole
+namespace GarbageCan.Application.Roles.LevelRoles.Commands.AddLevelRole
 {
     public class AddLevelRoleCommand : IRequest
     {

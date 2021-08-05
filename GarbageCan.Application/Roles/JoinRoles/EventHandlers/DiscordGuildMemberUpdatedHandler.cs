@@ -9,7 +9,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace GarbageCan.Application.Roles.EventHandlers
+namespace GarbageCan.Application.Roles.JoinRoles.EventHandlers
 {
     public class
         DiscordGuildMemberUpdatedHandler : INotificationHandler<DomainEventNotification<DiscordGuildMemberUpdated>>

@@ -2,7 +2,7 @@
 using FluentAssertions;
 using GarbageCan.Application.Common.Exceptions;
 using GarbageCan.Application.Common.Interfaces;
-using GarbageCan.Application.Roles.Commands.AddLevelRole;
+using GarbageCan.Application.Roles.LevelRoles.Commands.AddLevelRole;
 using GarbageCan.Application.UnitTests.Shared;
 using GarbageCan.Domain.Entities.Roles;
 using Microsoft.Extensions.DependencyInjection;

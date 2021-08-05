@@ -4,7 +4,7 @@ using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Domain.Entities.Roles;
 using MediatR;
 
-namespace GarbageCan.Application.Roles.Commands.AddJoinRole
+namespace GarbageCan.Application.Roles.JoinRoles.Commands.AddJoinRole
 {
     public class AddJoinRoleCommand : IRequest
     {

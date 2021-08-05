@@ -5,7 +5,7 @@ using GarbageCan.Domain.Entities;
 using GarbageCan.Domain.Entities.Roles;
 using MediatR;
 
-namespace GarbageCan.Application.Roles.Commands.AddReactionRole
+namespace GarbageCan.Application.Roles.ReactionRoles.Commands.AddReactionRole
 {
     public class AddReactionRoleCommand : IRequest
     {

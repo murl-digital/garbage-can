@@ -3,9 +3,9 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using GarbageCan.Application.Roles.Commands.AddLevelRole;
-using GarbageCan.Application.Roles.Commands.PrintLevelRoles;
-using GarbageCan.Application.Roles.Commands.RemoveLevelRole;
+using GarbageCan.Application.Roles.LevelRoles.Commands.AddLevelRole;
+using GarbageCan.Application.Roles.LevelRoles.Commands.PrintLevelRoles;
+using GarbageCan.Application.Roles.LevelRoles.Commands.RemoveLevelRole;
 
 namespace GarbageCan.Web.Commands.Roles
 {

@@ -1,11 +1,11 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using GarbageCan.Application.Common.Models;
-using GarbageCan.Application.Roles.Commands.ApplyLevelRoles;
+using GarbageCan.Application.Roles.LevelRoles.Commands.ApplyLevelRoles;
 using GarbageCan.Domain.Events;
 using MediatR;
 
-namespace GarbageCan.Application.Roles.EventHandlers
+namespace GarbageCan.Application.Roles.LevelRoles.EventHandlers
 {
     public class UserLevelUpEventHandler : INotificationHandler<DomainEventNotification<UserLevelUpEvent>>
     {

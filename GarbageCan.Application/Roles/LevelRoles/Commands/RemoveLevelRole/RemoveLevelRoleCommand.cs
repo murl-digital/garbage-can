@@ -5,7 +5,7 @@ using GarbageCan.Application.Common.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace GarbageCan.Application.Roles.Commands.RemoveLevelRole
+namespace GarbageCan.Application.Roles.LevelRoles.Commands.RemoveLevelRole
 {
     public class RemoveLevelRoleCommand : IRequest
     {

@@ -2,7 +2,7 @@
 using FluentAssertions;
 using GarbageCan.Application.Common.Exceptions;
 using GarbageCan.Application.Common.Interfaces;
-using GarbageCan.Application.Roles.Commands.RemoveJoinRole;
+using GarbageCan.Application.Roles.JoinRoles.Commands.RemoveJoinRole;
 using GarbageCan.Application.UnitTests.Shared;
 using GarbageCan.Domain.Entities.Roles;
 using Microsoft.Extensions.DependencyInjection;

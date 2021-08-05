@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using GarbageCan.Application.Common.Interfaces;
-using GarbageCan.Application.Roles.Commands.ApplyConiditionalRoles;
+using GarbageCan.Application.Roles.ConditionalRoles.Commands.ApplyConditionalRoles;
 using MediatR;
 using Quartz;
 

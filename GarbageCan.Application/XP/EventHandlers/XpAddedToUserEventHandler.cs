@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Application.Common.Models;

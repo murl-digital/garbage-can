@@ -5,7 +5,7 @@ using GarbageCan.Application.Common.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace GarbageCan.Application.Roles.Commands.RemoveReactionRole
+namespace GarbageCan.Application.Roles.ReactionRoles.Commands.RemoveReactionRole
 {
     public class RemoveReactionRoleCommand : IRequest
     {

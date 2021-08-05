@@ -3,9 +3,9 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using GarbageCan.Application.Roles.Commands.AddJoinRole;
-using GarbageCan.Application.Roles.Commands.PrintJoinRoles;
-using GarbageCan.Application.Roles.Commands.RemoveJoinRole;
+using GarbageCan.Application.Roles.JoinRoles.Commands.AddJoinRole;
+using GarbageCan.Application.Roles.JoinRoles.Commands.PrintJoinRoles;
+using GarbageCan.Application.Roles.JoinRoles.Commands.RemoveJoinRole;
 
 namespace GarbageCan.Web.Commands.Roles
 {

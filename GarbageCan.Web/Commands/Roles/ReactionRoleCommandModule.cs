@@ -3,9 +3,9 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using GarbageCan.Application.Roles.Commands.AddReactionRole;
-using GarbageCan.Application.Roles.Commands.PrintReactionRoles;
-using GarbageCan.Application.Roles.Commands.RemoveReactionRole;
+using GarbageCan.Application.Roles.ReactionRoles.Commands.AddReactionRole;
+using GarbageCan.Application.Roles.ReactionRoles.Commands.PrintReactionRoles;
+using GarbageCan.Application.Roles.ReactionRoles.Commands.RemoveReactionRole;
 using GarbageCan.Domain.Entities;
 
 namespace GarbageCan.Web.Commands.Roles

@@ -7,7 +7,7 @@ using GarbageCan.Application.Common.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace GarbageCan.Application.Roles.Commands.PrintLevelRoles
+namespace GarbageCan.Application.Roles.LevelRoles.Commands.PrintLevelRoles
 {
     public class PrintLevelRolesCommand : IRequest
     {

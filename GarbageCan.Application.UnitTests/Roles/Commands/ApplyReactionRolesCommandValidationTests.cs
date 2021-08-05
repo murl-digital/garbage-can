@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using GarbageCan.Application.Common.Exceptions;
-using GarbageCan.Application.Roles.Commands.AlterRole;
+using GarbageCan.Application.Roles.ReactionRoles.Commands.ApplyReactionRoles;
 using GarbageCan.Application.UnitTests.Shared;
 using GarbageCan.Domain.Entities;
 using NUnit.Framework;

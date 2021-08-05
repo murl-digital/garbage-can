@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using GarbageCan.Domain.Entities.Boosters;
 using MediatR;
 
-namespace GarbageCan.Application.Boosters.Queries
+namespace GarbageCan.Application.Boosters.UserBoosters.Queries
 {
     public class GetUserBoosterQuery : IRequest<UserBooster>
     {

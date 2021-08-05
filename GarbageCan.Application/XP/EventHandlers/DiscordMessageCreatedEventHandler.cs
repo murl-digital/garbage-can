@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Application.Common.Models;
 using GarbageCan.Application.XP.Commands.AddXpToUser;

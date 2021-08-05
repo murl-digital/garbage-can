@@ -7,11 +7,12 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using GarbageCan.Application.Boosters.ActiveBoosters.Queries;
+using GarbageCan.Application.Boosters.AvailableSlots.Commands;
 using GarbageCan.Application.Boosters.AvailableSlots.Queries;
 using GarbageCan.Application.Boosters.Commands;
-using GarbageCan.Application.Boosters.Queries;
 using GarbageCan.Application.Boosters.QueuedBoosters.Queries;
 using GarbageCan.Application.Boosters.UserBoosters.Commands;
+using GarbageCan.Application.Boosters.UserBoosters.Queries;
 using GarbageCan.Domain.Enums;
 using Humanizer;
 using Serilog;
@@ -266,7 +267,7 @@ namespace GarbageCan.Web.Commands.Boosters
                 {
                     try
                     {
-                        await Mediator.Send(new RemoveSlotCommand { guildId = ctx.Guild.Id, id = id }, ctx);
+                        await Mediator.Send(new RemoveSlotCommand { GuildId = ctx.Guild.Id, Id = id }, ctx);
                     }
                     catch (ArgumentException)
 

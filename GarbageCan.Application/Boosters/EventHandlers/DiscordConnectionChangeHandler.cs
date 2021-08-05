@@ -6,7 +6,7 @@ using GarbageCan.Domain.Enums;
 using GarbageCan.Domain.Events;
 using MediatR;
 
-namespace GarbageCan.Web.EventHandlers
+namespace GarbageCan.Application.Boosters.EventHandlers
 {
     public class
         DiscordConnectionChangeHandler : INotificationHandler<DomainEventNotification<DiscordConnectionChangeEvent>>

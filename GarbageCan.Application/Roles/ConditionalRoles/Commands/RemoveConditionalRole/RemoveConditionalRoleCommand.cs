@@ -5,7 +5,7 @@ using GarbageCan.Application.Common.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace GarbageCan.Application.Roles.Commands.RemoveConditionalRole
+namespace GarbageCan.Application.Roles.ConditionalRoles.Commands.RemoveConditionalRole
 {
     public class RemoveConditionalRoleCommand : IRequest
     {

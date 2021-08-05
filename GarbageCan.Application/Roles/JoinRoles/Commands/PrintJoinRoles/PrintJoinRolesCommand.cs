@@ -7,7 +7,7 @@ using GarbageCan.Application.Common.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace GarbageCan.Application.Roles.Commands.PrintJoinRoles
+namespace GarbageCan.Application.Roles.JoinRoles.Commands.PrintJoinRoles
 {
     public class PrintJoinRolesCommand : IRequest
     {

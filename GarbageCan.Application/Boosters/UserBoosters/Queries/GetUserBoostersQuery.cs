@@ -6,7 +6,7 @@ using GarbageCan.Domain.Entities.Boosters;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace GarbageCan.Application.Boosters.Queries
+namespace GarbageCan.Application.Boosters.UserBoosters.Queries
 {
     public class GetUserBoostersQuery : IRequest<UserBooster[]>
     {

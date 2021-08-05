@@ -6,12 +6,12 @@ using GarbageCan.Application.Common.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace GarbageCan.Application.Boosters.Commands
+namespace GarbageCan.Application.Boosters.AvailableSlots.Commands
 {
     public class RemoveSlotCommand : IRequest
     {
-        public ulong guildId { get; set; }
-        public int id { get; set; }
+        public ulong GuildId { get; set; }
+        public int Id { get; set; }
     }
 
     public class RemoveSlotCommandHandler : IRequestHandler<RemoveSlotCommand>
@@ -27,15 +27,15 @@ namespace GarbageCan.Application.Boosters.Commands
 
         public async Task<Unit> Handle(RemoveSlotCommand request, CancellationToken cancellationToken)
         {
-            if (!_boosterService.AvailableSlots.ContainsKey(request.guildId))
+            if (!_boosterService.AvailableSlots.ContainsKey(request.GuildId))
                 throw new InvalidOperationException("Invalid guild ID");
-            if (_boosterService.AvailableSlots[request.guildId].All(s => s.Id != request.id))
+            if (_boosterService.AvailableSlots[request.GuildId].All(s => s.Id != request.Id))
                 throw new ArgumentException("Invalid slot ID");
 
             _context.XPAvailableSlots.Remove(
-                await _context.XPAvailableSlots.FirstAsync(s => s.Id == request.id, cancellationToken));
+                await _context.XPAvailableSlots.FirstAsync(s => s.Id == request.Id, cancellationToken));
             await _context.SaveChangesAsync(cancellationToken);
-            _boosterService.AvailableSlots[request.guildId].RemoveAll(s => s.Id == request.id);
+            _boosterService.AvailableSlots[request.GuildId].RemoveAll(s => s.Id == request.Id);
 
             return Unit.Value;
         }

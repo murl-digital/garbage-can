@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace GarbageCan.Application.Roles.Commands.RemoveJoinRole
+namespace GarbageCan.Application.Roles.JoinRoles.Commands.RemoveJoinRole
 {
     public class RemoveJoinRoleCommandValidator : AbstractValidator<RemoveJoinRoleCommand>
     {

@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace GarbageCan.Application.Roles.Commands.RemoveConditionalRole
+namespace GarbageCan.Application.Roles.ConditionalRoles.Commands.RemoveConditionalRole
 {
     public class RemoveConditionalRoleCommandValidator : AbstractValidator<RemoveConditionalRoleCommand>
     {

@@ -2,7 +2,7 @@
 using FluentAssertions;
 using GarbageCan.Application.Common.Exceptions;
 using GarbageCan.Application.Common.Interfaces;
-using GarbageCan.Application.Roles.Commands.AddReactionRole;
+using GarbageCan.Application.Roles.ReactionRoles.Commands.AddReactionRole;
 using GarbageCan.Application.UnitTests.Shared;
 using GarbageCan.Domain.Entities;
 using GarbageCan.Domain.Entities.Roles;

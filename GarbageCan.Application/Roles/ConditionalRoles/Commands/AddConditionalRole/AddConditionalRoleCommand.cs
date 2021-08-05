@@ -4,7 +4,7 @@ using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Domain.Entities.Roles;
 using MediatR;
 
-namespace GarbageCan.Application.Roles.Commands.AddConditionalRole
+namespace GarbageCan.Application.Roles.ConditionalRoles.Commands.AddConditionalRole
 {
     public class AddConditionalRoleCommand : IRequest
     {

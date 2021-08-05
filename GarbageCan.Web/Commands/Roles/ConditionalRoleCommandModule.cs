@@ -3,9 +3,9 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using GarbageCan.Application.Roles.Commands.AddConditionalRole;
-using GarbageCan.Application.Roles.Commands.PrintConditionalRoles;
-using GarbageCan.Application.Roles.Commands.RemoveConditionalRole;
+using GarbageCan.Application.Roles.ConditionalRoles.Commands.AddConditionalRole;
+using GarbageCan.Application.Roles.ConditionalRoles.Commands.PrintConditionalRoles;
+using GarbageCan.Application.Roles.ConditionalRoles.Commands.RemoveConditionalRole;
 
 namespace GarbageCan.Web.Commands.Roles
 {

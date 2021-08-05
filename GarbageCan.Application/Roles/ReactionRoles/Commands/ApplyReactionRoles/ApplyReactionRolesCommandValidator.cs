@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace GarbageCan.Application.Roles.Commands.AlterRole
+namespace GarbageCan.Application.Roles.ReactionRoles.Commands.ApplyReactionRoles
 {
     public class ApplyReactionRolesCommandValidator : AbstractValidator<ApplyReactionRolesCommand>
     {

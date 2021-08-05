@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GarbageCan.Application.Common.Interfaces;
-using GarbageCan.Application.Roles.EventHandlers;
+using GarbageCan.Application.Roles.JoinRoles.EventHandlers;
 using GarbageCan.Application.UnitTests.Shared;
 using GarbageCan.Domain.Entities.Roles;
 using GarbageCan.Domain.Events;

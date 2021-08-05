@@ -5,7 +5,7 @@ using GarbageCan.Application.Common.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace GarbageCan.Application.Roles.Commands.RemoveJoinRole
+namespace GarbageCan.Application.Roles.JoinRoles.Commands.RemoveJoinRole
 {
     public class RemoveJoinRoleCommand : IRequest
     {
