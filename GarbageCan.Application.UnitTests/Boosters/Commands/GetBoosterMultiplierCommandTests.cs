@@ -79,8 +79,8 @@ namespace GarbageCan.Application.UnitTests.Boosters.Commands
             };
 
             var result = await _appFixture.SendAsync(command);
-
-            result.Should().Be(1 + multiplier + otherMultiplier);
+            var sum = multiplier + otherMultiplier;
+            result.Should().Be(1 + sum);
         }
 
         [Test]
