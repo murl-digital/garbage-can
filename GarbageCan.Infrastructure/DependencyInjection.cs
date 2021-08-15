@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using DSharpPlus.Entities;
 using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Infrastructure.Discord;
 using GarbageCan.Infrastructure.Persistence;
@@ -41,6 +42,7 @@ namespace GarbageCan.Infrastructure
             services.AddTransient<IDiscordModerationService, DiscordModerationService>();
             services.AddTransient<IDiscordDirectMessageService, DiscordDirectMessageService>();
             services.AddTransient<IDiscordMessageService, DiscordMessageService>();
+            services.AddTransient<IDiscordWebhookService, DiscordWebhookService>();
             services.AddScoped<DiscordCommandContextService>();
             services.AddSingleton<DiscordEmojiProviderService>();
 

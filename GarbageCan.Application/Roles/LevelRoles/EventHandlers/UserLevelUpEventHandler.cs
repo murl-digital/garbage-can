@@ -32,8 +32,8 @@ namespace GarbageCan.Application.Roles.LevelRoles.EventHandlers
 
                 await _mediator.Send(new ApplyLevelRolesCommand
                 {
-                    GuildId = notification.DomainEvent.GuildId,
-                    MemberId = notification.DomainEvent.UserId,
+                    GuildId = notification.DomainEvent.MessageDetails.GuildId,
+                    MemberId = notification.DomainEvent.MessageDetails.UserId,
                     Level = level
                 }, cancellationToken);
             }

@@ -97,7 +97,9 @@ namespace GarbageCan.Web
                         Content = args.Message.Content,
                         AuthorIsBot = args.Author.IsBot,
                         AuthorIsSystem = args.Author.IsSystem ?? false,
-                        ChannelIsPrivate = args.Channel.IsPrivate
+                        ChannelIsPrivate = args.Channel.IsPrivate,
+                        AuthorAvatarUrl = args.Author.AvatarUrl,
+                        AuthorDisplayName = (await args.Guild.GetMemberAsync(args.Author.Id))?.DisplayName
                     });
                 };
 

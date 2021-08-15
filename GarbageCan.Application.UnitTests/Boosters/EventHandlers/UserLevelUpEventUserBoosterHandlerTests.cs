@@ -69,8 +69,11 @@ namespace GarbageCan.Application.UnitTests.Boosters.EventHandlers
         {
             await _sut.Handle(new DomainEventNotification<UserLevelUpEvent>(new UserLevelUpEvent
             {
-                GuildId = GuildId,
-                UserId = UserId,
+                MessageDetails = new MessageDetails
+                {
+                    GuildId = GuildId,
+                    UserId = UserId
+                },
                 OldLvl = oldLevel,
                 NewLvl = newLevel,
             }), CancellationToken.None);

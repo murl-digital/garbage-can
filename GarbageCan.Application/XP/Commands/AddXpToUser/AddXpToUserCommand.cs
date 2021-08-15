@@ -11,7 +11,10 @@ namespace GarbageCan.Application.XP.Commands.AddXpToUser
     public class AddXpToUserCommand : IRequest
     {
         public ulong GuildId { get; set; }
+        public ulong ChannelId { get; set; }
         public ulong UserId { get; set; }
+        public string UserDisplayName { get; set; }
+        public string UserAvatarUrl { get; set; }
         public string Message { get; set; }
     }
 
@@ -21,7 +24,9 @@ namespace GarbageCan.Application.XP.Commands.AddXpToUser
         private readonly IDomainEventService _provider;
         private readonly IXpCalculatorService _calculator;
 
-        public AddXpToUserCommandHandler(IApplicationDbContext context, IDomainEventService provider, IXpCalculatorService calculator)
+        public AddXpToUserCommandHandler(IApplicationDbContext context,
+            IDomainEventService provider,
+            IXpCalculatorService calculator)
         {
             _context = context;
             _calculator = calculator;
@@ -42,7 +47,7 @@ namespace GarbageCan.Application.XP.Commands.AddXpToUser
                     Lvl = 0,
                     XP = 0
                 };
-                
+
                 _context.XPUsers.Add(user);
             }
 
@@ -53,8 +58,15 @@ namespace GarbageCan.Application.XP.Commands.AddXpToUser
 
             await _provider.Publish(new XpAddedToUserEvent
             {
-                GuildId = user.GuildId,
-                UserId = user.UserId,
+                MessageDetails = new MessageDetails
+                {
+                    Message = request.Message,
+                    ChannelId = request.ChannelId,
+                    GuildId = request.GuildId,
+                    UserId = request.UserId,
+                    UserAvatarUrl = request.UserAvatarUrl,
+                    UserDisplayName = request.UserDisplayName,
+                },
                 OldXp = oldXP,
                 NewXp = user.XP
             });

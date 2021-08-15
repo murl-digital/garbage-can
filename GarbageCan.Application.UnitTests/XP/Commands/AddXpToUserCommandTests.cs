@@ -126,7 +126,7 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
 
             await _appFixture.Provider.GetRequiredService<IDomainEventService>().Received(1)
                 .Publish(Arg.Is<XpAddedToUserEvent>(e =>
-                    e.GuildId == guildId && e.UserId == userId && e.OldXp == 0 && e.NewXp == 20));
+                    e.MessageDetails.GuildId == guildId && e.MessageDetails.UserId == userId && e.OldXp == 0 && e.NewXp == 20));
         }
 
         [Test]
@@ -153,7 +153,7 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
 
             await _appFixture.Provider.GetRequiredService<IDomainEventService>().Received(1)
                 .Publish(Arg.Is<XpAddedToUserEvent>(e =>
-                    e.GuildId == guildId && e.UserId == userId && e.OldXp == 0 && e.NewXp == 0));
+                    e.MessageDetails.GuildId == guildId && e.MessageDetails.UserId == userId && e.OldXp == 0 && e.NewXp == 0));
         }
     }
 }

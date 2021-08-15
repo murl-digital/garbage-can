@@ -9,19 +9,19 @@ using System.Threading.Tasks;
 
 namespace GarbageCan.Application.XP.EventHandlers
 {
-    public class
-        DiscordMessageCreatedEventHandler : INotificationHandler<DomainEventNotification<DiscordMessageCreatedEvent>>
+    public class DiscordMessageCreatedEventHandler : INotificationHandler<DomainEventNotification<DiscordMessageCreatedEvent>>
     {
         private readonly IMediator _mediator;
         private readonly IDiscordConfiguration _configuration;
         private readonly IApplicationDbContext _context;
+        private readonly IDiscordGuildService _discordGuildService;
 
-        public DiscordMessageCreatedEventHandler(IMediator mediator, IDiscordConfiguration configuration,
-            IApplicationDbContext context)
+        public DiscordMessageCreatedEventHandler(IMediator mediator, IDiscordConfiguration configuration, IApplicationDbContext context, IDiscordGuildService discordGuildService)
         {
             _mediator = mediator;
             _configuration = configuration;
             _context = context;
+            _discordGuildService = discordGuildService;
         }
 
         public async Task Handle(DomainEventNotification<DiscordMessageCreatedEvent> notification,
@@ -39,8 +39,11 @@ namespace GarbageCan.Application.XP.EventHandlers
             await _mediator.Send(new AddXpToUserCommand
             {
                 GuildId = notification.DomainEvent.GuildId,
+                ChannelId = notification.DomainEvent.ChannelId,
                 UserId = notification.DomainEvent.AuthorId,
-                Message = notification.DomainEvent.Content
+                Message = notification.DomainEvent.Content,
+                UserAvatarUrl = notification.DomainEvent.AuthorAvatarUrl,
+                UserDisplayName = notification.DomainEvent.AuthorDisplayName,
             }, cancellationToken);
         }
     }

@@ -34,8 +34,8 @@ namespace GarbageCan.Application.Boosters.EventHandlers
 
             await _mediator.Send(new AddUserBoosterCommand
             {
-                GuildId = notification.DomainEvent.GuildId,
-                UserId = notification.DomainEvent.UserId,
+                GuildId = notification.DomainEvent.MessageDetails.GuildId,
+                UserId = notification.DomainEvent.MessageDetails.UserId,
                 Multiplier = 1.5f,
                 Duration = TimeSpan.FromMinutes(30)
             }, cancellationToken);
