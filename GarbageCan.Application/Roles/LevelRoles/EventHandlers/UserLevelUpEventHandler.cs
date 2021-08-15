@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿using System;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GarbageCan.Application.Common.Models;
 using GarbageCan.Application.Roles.LevelRoles.Commands.ApplyLevelRoles;
@@ -16,15 +18,25 @@ namespace GarbageCan.Application.Roles.LevelRoles.EventHandlers
             _mediator = mediator;
         }
 
-        public async Task Handle(DomainEventNotification<UserLevelUpEvent> notification,
-            CancellationToken cancellationToken)
+        public async Task Handle(DomainEventNotification<UserLevelUpEvent> notification, CancellationToken cancellationToken)
         {
-            await _mediator.Send(new ApplyLevelRolesCommand
+            var levels = Enumerable.Range(notification.DomainEvent.OldLvl + 1,
+                Math.Abs(notification.DomainEvent.NewLvl - notification.DomainEvent.OldLvl));
+
+            foreach (var level in levels)
             {
-                GuildId = notification.DomainEvent.GuildId,
-                MemberId = notification.DomainEvent.UserId,
-                Level = notification.DomainEvent.NewLvl
-            });
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                await _mediator.Send(new ApplyLevelRolesCommand
+                {
+                    GuildId = notification.DomainEvent.GuildId,
+                    MemberId = notification.DomainEvent.UserId,
+                    Level = level
+                }, cancellationToken);
+            }
         }
     }
 }
