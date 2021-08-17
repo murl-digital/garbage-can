@@ -65,6 +65,24 @@ namespace GarbageCan.Application.UnitTests.Boosters.EventHandlers
                 Arg.Any<CancellationToken>());
         }
 
+        [Test]
+        [TestCase(9, 16, 2)]
+        [TestCase(9, 20, 3)]
+        [TestCase(4, 100, 19)]
+        public async Task Handle_ShouldCreateMultipleUserBoosters_WhenLevelSurpassesMultipleMultiplesOf5(int oldLevel, int newLevel, int numberOfBoosters)
+        {
+            await RunHandler(oldLevel, newLevel);
+
+            await _mediator.Received(numberOfBoosters).Send(
+                Arg.Is<AddUserBoosterCommand>(command =>
+                    command.GuildId == GuildId &&
+                    command.UserId == UserId &&
+                    command.Duration == TimeSpan.FromMinutes(30) &&
+                    Math.Abs(command.Multiplier - 1.5f) < 0.0001
+                ),
+                Arg.Any<CancellationToken>());
+        }
+
         private async Task RunHandler(int oldLevel, int newLevel)
         {
             await _sut.Handle(new DomainEventNotification<UserLevelUpEvent>(new UserLevelUpEvent

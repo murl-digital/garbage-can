@@ -24,21 +24,21 @@ namespace GarbageCan.Application.Boosters.EventHandlers
             var oldLevel = notification.DomainEvent.OldLvl;
             var newLevel = notification.DomainEvent.NewLvl;
 
-            var shouldCreate =
+            var levelsEarnedThatGrantBoosters =
                 Enumerable.Range(oldLevel + 1, Math.Abs(newLevel - oldLevel))
-                    .Any(x => x >= 10 && x % 5 == 0);
-            if (!shouldCreate)
-            {
-                return;
-            }
+                    .Where(x => x >= 10 && x % 5 == 0)
+                    .ToList();
 
-            await _mediator.Send(new AddUserBoosterCommand
+            foreach (var lvl in levelsEarnedThatGrantBoosters)
             {
-                GuildId = notification.DomainEvent.MessageDetails.GuildId,
-                UserId = notification.DomainEvent.MessageDetails.UserId,
-                Multiplier = 1.5f,
-                Duration = TimeSpan.FromMinutes(30)
-            }, cancellationToken);
+                await _mediator.Send(new AddUserBoosterCommand
+                {
+                    GuildId = notification.DomainEvent.MessageDetails.GuildId,
+                    UserId = notification.DomainEvent.MessageDetails.UserId,
+                    Multiplier = 1.5f,
+                    Duration = TimeSpan.FromMinutes(30)
+                }, cancellationToken);
+            }
         }
     }
 }
