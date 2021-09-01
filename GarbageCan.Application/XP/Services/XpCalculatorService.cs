@@ -16,16 +16,17 @@ namespace GarbageCan.Application.XP.Services
 
         public double XpEarned(string message, ulong guildId)
         {
+            float GetMultiplier() =>
+                _mediator.Send(new GetBoosterMultiplierCommand { GuildId = guildId })
+                    .GetAwaiter()
+                    .GetResult();
+
             var length = Math.Sqrt(message.Replace(" ", "").Length);
             length = Math.Min(10, length);
 
-            // TODO: INCOMPLETE - need to implement boosters and rng
+            // TODO: INCOMPLETE - need to implement rng
             // var result = length * (Math.Abs(Random.Sample()) * 0.5 + 1) * BoosterManager.GetMultiplier();
-            var result = length
-                         * _mediator.Send(new GetBoosterMultiplierCommand { GuildId = guildId })
-                             .GetAwaiter()
-                             .GetResult();
-            return result;
+            return length * GetMultiplier();
         }
 
         public double XpRequired(int level)
