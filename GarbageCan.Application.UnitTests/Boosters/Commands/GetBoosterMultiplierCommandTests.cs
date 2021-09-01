@@ -27,7 +27,7 @@ namespace GarbageCan.Application.UnitTests.Boosters.Commands
 
         [Test]
         public async Task ShouldReturnMultiplier_IfActiveBoosterExists(
-            [Range(0.1f, 68f /*lol*/, 0.1f)] float multiplier)
+            [Range(0.1f, 10f /*lol*/, 0.1f)] float multiplier)
         {
             ulong guildId = 6;
             var booster = new ActiveBooster
