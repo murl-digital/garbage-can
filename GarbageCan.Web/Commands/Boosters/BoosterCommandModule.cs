@@ -43,12 +43,12 @@ namespace GarbageCan.Web.Commands.Boosters
         {
             try
             {
-                var booster = await Mediator.Send(new GetUserBoosterQuery
+                var booster = (await Mediator.Send(new GetUserBoostersQuery
                 {
                     GuildId = ctx.Guild.Id,
-                    UserId = ctx.User.Id,
-                    Id = id
-                }, ctx);
+                    UserId = ctx.User.Id
+                }, ctx)).FirstOrDefault();
+                
                 if (booster == null)
                 {
                     await ctx.RespondAsync("No booster exists with that id");
