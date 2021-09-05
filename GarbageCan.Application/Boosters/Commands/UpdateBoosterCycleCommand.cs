@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GarbageCan.Application.Common.Interfaces;
+using GarbageCan.Domain.Entities.Boosters;
 using MediatR;
 using Z.EntityFramework.Plus;
 
@@ -33,9 +35,10 @@ namespace GarbageCan.Application.Boosters.Commands
 
         public async Task<Unit> Handle(UpdateBoosterCycleCommand request, CancellationToken cancellationToken)
         {
+            var (activeBoosters, queuedBoosters, availableSlots) = GetTheDeets(request.GuildId);
             var now = _dateTime.Now.ToUniversalTime();
 
-            _boosterService.ActiveBoosters[request.GuildId]
+            activeBoosters
                 .RemoveAll(b => b.ExpirationDate < now);
             await _context.XPActiveBoosters
                 .Where(b => b.ExpirationDate < now)
@@ -43,20 +46,18 @@ namespace GarbageCan.Application.Boosters.Commands
 
             var saveQueue = false;
 
-            while (_boosterService.QueuedBoosters[request.GuildId].Count > 0 &&
-                   _boosterService.ActiveBoosters[request.GuildId].Count <
-                   _boosterService.AvailableSlots[request.GuildId].Count)
+            while (queuedBoosters.Count > 0 && activeBoosters.Count < availableSlots.Count)
             {
                 saveQueue = true;
 
-                var usedSlots = _boosterService.ActiveBoosters[request.GuildId]
+                var usedSlots = activeBoosters
                     .Select(b => b.Slot.Id)
                     .ToList();
 
-                var slot = _boosterService.AvailableSlots[request.GuildId]
+                var slot = availableSlots
                     .First(s => !usedSlots.Contains(s.Id));
 
-                var booster = _boosterService.QueuedBoosters[request.GuildId].Dequeue();
+                var booster = queuedBoosters.Dequeue();
 
                 await _mediator.Send(new ActivateBoosterCommand
                 {
@@ -67,14 +68,13 @@ namespace GarbageCan.Application.Boosters.Commands
                 }, cancellationToken);
             }
 
-            if (_boosterService.ActiveBoosters[request.GuildId].Count <
-                _boosterService.AvailableSlots[request.GuildId].Count)
+            if (activeBoosters.Count < availableSlots.Count)
             {
-                var usedSlots = _boosterService.ActiveBoosters[request.GuildId]
+                var usedSlots = activeBoosters
                     .Select(b => b.Slot.Id)
                     .ToList();
 
-                foreach (var slot in _boosterService.AvailableSlots[request.GuildId]
+                foreach (var slot in availableSlots
                     .Where(s => !usedSlots.Contains(s.Id)))
                     await _discordChannelService.RenameChannel(request.GuildId, slot.ChannelId, "-");
             }
@@ -82,6 +82,13 @@ namespace GarbageCan.Application.Boosters.Commands
             if (saveQueue) await _mediator.Send(new SaveQueueCommand { GuildId = request.GuildId }, cancellationToken);
 
             return Unit.Value;
+        }
+
+        private (List<ActiveBooster>, Queue<QueuedBooster>, List<AvailableSlot>)
+            GetTheDeets(ulong guildId)
+        {
+            return (_boosterService.ActiveBoosters[guildId], _boosterService.QueuedBoosters[guildId],
+                _boosterService.AvailableSlots[guildId]);
         }
     }
 }
