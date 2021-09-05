@@ -10,5 +10,7 @@ namespace GarbageCan.Application.Common.Interfaces
         Task<string> GetMemberDisplayNameAsync(ulong userId);
 
         Task<Dictionary<ulong, string>> GetRoleNamesById(IEnumerable<ulong> roleIds);
+
+        IEnumerable<ulong> GetAllCurrentGuilds();
     }
 }

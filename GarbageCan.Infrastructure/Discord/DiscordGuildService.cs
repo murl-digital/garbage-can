@@ -1,21 +1,25 @@
-﻿using GarbageCan.Application.Common.Interfaces;
-using GarbageCan.Infrastructure.Discord.Exceptions;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DSharpPlus;
+using GarbageCan.Application.Common.Interfaces;
+using GarbageCan.Infrastructure.Discord.Exceptions;
+using Microsoft.Extensions.Logging;
 
 namespace GarbageCan.Infrastructure.Discord
 {
     public class DiscordGuildService : IDiscordGuildService
     {
         private readonly DiscordCommandContextService _contextService;
+        private readonly DiscordClient _client;
         private readonly ILogger<DiscordGuildService> _logger;
 
-        public DiscordGuildService(DiscordCommandContextService contextService, ILogger<DiscordGuildService> logger)
+        public DiscordGuildService(DiscordCommandContextService contextService, DiscordClient client,
+            ILogger<DiscordGuildService> logger)
         {
             _contextService = contextService;
+            _client = client;
             _logger = logger;
         }
 
@@ -98,6 +102,11 @@ namespace GarbageCan.Infrastructure.Discord
                 _logger.LogError(ex, "Couldn't Role Id Names. Guild: {@guild} RoleIds: {RoleIds} ", roleIds, new { guild.Id, guild.Name });
                 throw;
             }
+        }
+
+        public IEnumerable<ulong> GetAllCurrentGuilds()
+        {
+            return _client.Guilds.Keys;
         }
     }
 }
