@@ -23,27 +23,33 @@ namespace GarbageCan.Infrastructure.Discord
         {
             return _client.Guilds[_configuration.GuildId].Members.Select(x => new Member
             {
-                Id = x.Value.Id,
+                Id = x.Key,
                 DisplayName = x.Value.DisplayName,
                 IsBot = x.Value.IsBot
             }).ToList();
         }
 
-        public async Task<Member> GetMemberAsync(ulong id)
+        public Task<Member> GetMemberAsync(ulong id)
         {
             try
             {
-                var member = await _client.Guilds[_configuration.GuildId].GetMemberAsync(id);
-                return new Member
+                var dictionary = _client.Guilds[_configuration.GuildId].Members;
+                if (!dictionary.ContainsKey(id))
+                {
+                    return Task.FromResult((Member)null);
+                }
+
+                var member = dictionary[id];
+                return Task.FromResult(new Member
                 {
                     Id = member.Id,
                     DisplayName = member.DisplayName,
                     IsBot = member.IsBot
-                };
+                });
             }
             catch (NotFoundException)
             {
-                return null;
+                return Task.FromResult((Member)null);
             }
         }
     }

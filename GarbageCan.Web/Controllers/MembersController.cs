@@ -33,7 +33,7 @@ namespace GarbageCan.Web.Controllers
             
             return memberVms.Select(x => new Member
             {
-                Id = x.Id,
+                Id = x.Id.ToString(),
                 Level = x.Level,
                 Name = x.Name,
                 Xp = x.Xp,
@@ -56,7 +56,7 @@ namespace GarbageCan.Web.Controllers
 
             return Ok(new Member
             {
-                Id = id,
+                Id = id.ToString(),
                 Name = member.Name,
                 Xp = member.Xp,
                 Level = member.Level
