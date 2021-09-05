@@ -1,14 +1,24 @@
-﻿namespace GarbageCan.Application.Common.Interfaces
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace GarbageCan.Application.Common.Interfaces
 {
     public interface IXpCalculatorService
     {
-        double XpEarned(string message, ulong guildId);
-        double XpRequired(int level);
+        Task<double> XpEarned(string message, ulong guildId);
+        Task<double> XpRequired(int level);
 
-        double TotalXpRequired(int lvl)
+        async Task<double> TotalXpRequired(int lvl)
         {
             var result = 0.0;
-            for (var i = 0; i <= lvl; i++) result += XpRequired(i);
+            var taskList = new List<Task>();
+            for (var i = 0; i <= lvl; i++)
+            {
+                var j = i;
+                taskList.Add(Task.Run(async () => result += await XpRequired(j)));
+            }
+
+            await Task.WhenAll(taskList);
 
             return result;
         }

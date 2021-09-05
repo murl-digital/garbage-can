@@ -1,11 +1,11 @@
-﻿using GarbageCan.Application.Common.Interfaces;
+﻿using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Application.XP.Queries.GetXPImageStream;
 using GarbageCan.Domain.Entities.XP;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace GarbageCan.Application.XP.Commands.PrintUserLevel
 {
@@ -51,9 +51,9 @@ namespace GarbageCan.Application.XP.Commands.PrintUserLevel
             var placement = users.FindIndex(u => u == request.UserId) + 1;
             var displayName = await _guildService.GetMemberDisplayNameAsync(request.UserId);
 
-            var currentXp = user.XP - _xpCalculator.TotalXpRequired(user.Lvl - 1);
-            var required = _xpCalculator.TotalXpRequired(user.Lvl);
-            var progress = currentXp / _xpCalculator.XpRequired(user.Lvl);
+            var currentXp = user.XP - await _xpCalculator.TotalXpRequired(user.Lvl - 1);
+            var required = await _xpCalculator.TotalXpRequired(user.Lvl);
+            var progress = currentXp / await _xpCalculator.XpRequired(user.Lvl);
 
             var image = await _mediator.Send(new GetXPImageStreamQuery
             {
