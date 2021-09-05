@@ -9,6 +9,7 @@ using GarbageCan.Application.Moderation.Commands.Mute;
 using GarbageCan.Application.Moderation.Commands.Restrict;
 using System;
 using System.Threading.Tasks;
+using GarbageCan.Application.Common.Models;
 
 namespace GarbageCan.Web.Commands.Moderation
 {
@@ -36,7 +37,13 @@ namespace GarbageCan.Web.Commands.Moderation
         [RequirePermissions(Permissions.Administrator)]
         public async Task LogTalk(CommandContext ctx, DiscordMember member, [RemainingText] string comments)
         {
-            await Mediator.Send(new LogTalkCommand { Comments = comments, UserId = member.Id, DisplayName = member.DisplayName }, ctx);
+            var response = await Mediator.Send(new LogTalkCommand { Comments = comments, UserId = member.Id }, ctx);
+            
+            await Mediator.RespondAsync(ctx, new PlainTextResponse
+            {
+                Message = $"1 on 1 talk with {member.DisplayName} has been logged with id {response}",
+                PrependEmoji = true
+            });
         }
 
         [Command("logWarning")]

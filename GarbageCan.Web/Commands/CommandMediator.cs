@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.Entities;
+using GarbageCan.Application.Common.Interfaces;
+using GarbageCan.Application.Common.Models;
 using GarbageCan.Infrastructure.Discord;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +18,8 @@ namespace GarbageCan.Web.Commands
         private readonly IServiceProvider _provider;
         private readonly ILogger<CommandMediator> _logger;
 
-        public CommandMediator(IServiceProvider provider, ILogger<CommandMediator> logger)
+        public CommandMediator(IServiceProvider provider,
+            ILogger<CommandMediator> logger)
         {
             _provider = provider;
             _logger = logger;
@@ -41,6 +46,37 @@ namespace GarbageCan.Web.Commands
                 await commandContext.RespondAsync("An error occurred");
                 return default;
             }
+        }
+
+        public async Task RespondAsync(CommandContext context, PlainTextResponse response)
+        {
+            string content = response.Message;
+
+            if (response.PrependEmoji)
+            {
+                var config = _provider.GetRequiredService<IDiscordConfiguration>();
+                var client = _provider.GetRequiredService<DiscordClient>();
+                var discordEmoji = DiscordEmoji.FromName(client, config.EmojiName);
+                content = $"{discordEmoji} {response.Message}";
+            }
+
+            if (response.FormatAsBlock)
+            {
+                content = Formatter.BlockCode(content);
+            }
+
+            await context.RespondAsync(content);
+        }
+
+        public async Task RespondAsync(CommandContext context, FileResponse response)
+        {
+            var messageBuilder = new DiscordMessageBuilder().WithFile(response.FileName, response.Stream);
+            if (response.ReplyMessageId.HasValue)
+            {
+                messageBuilder.WithReply(response.ReplyMessageId.Value, response.ReplyMention);
+            }
+
+            await context.RespondAsync(messageBuilder);
         }
     }
 }
