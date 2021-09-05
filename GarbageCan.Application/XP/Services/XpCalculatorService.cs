@@ -30,7 +30,7 @@ namespace GarbageCan.Application.XP.Services
             return length * multiplier;
         }
 
-        public async Task<double> XpRequired(int level)
+        public double XpRequired(int level)
         {
             return Math.Round(250 + 75 * Math.Pow(level, 0.6), 1);
         }

@@ -1,11 +1,13 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using GarbageCan.Application.Roles.LevelRoles.Commands.AddLevelRole;
-using GarbageCan.Application.Roles.LevelRoles.Commands.PrintLevelRoles;
 using GarbageCan.Application.Roles.LevelRoles.Commands.RemoveLevelRole;
+using GarbageCan.Application.Roles.LevelRoles.Queries.GetGuildLevelRoles;
 
 namespace GarbageCan.Web.Commands.Roles
 {
@@ -24,16 +26,29 @@ namespace GarbageCan.Web.Commands.Roles
                 Level = lvl,
                 Remain = remain
             }, ctx);
+            
+            await Mediator.RespondAsync(ctx, "Role added successfully", true);
         }
 
         [Command("list")]
         [RequirePermissions(Permissions.Administrator)]
         public async Task List(CommandContext ctx)
         {
-            await Mediator.Send(new PrintLevelRolesCommand
+            var levelRoles = await Mediator.Send(new GetGuildLevelRolesQuery
             {
                 GuildId = ctx.Guild.Id
             }, ctx);
+            
+            if (!levelRoles.Any())
+            {
+                await Mediator.RespondAsync(ctx, "No level roles found!", formatAsBlock: true);
+                return;
+            }
+
+            var lines = levelRoles
+                .Select(x => $"{x.Id} :: level {x.Lvl} | {GetRoleName(ctx.Guild, x.RoleId)}")
+                .ToList();
+            await Mediator.RespondAsync(ctx, string.Join(Environment.NewLine, lines), formatAsBlock: true);
         }
 
         [Command("remove")]
@@ -41,7 +56,9 @@ namespace GarbageCan.Web.Commands.Roles
         public async Task RemoveLevelRole(CommandContext ctx, int id)
         {
             // TODO: same issue as reaction roles here
-            await Mediator.Send(new RemoveLevelRoleCommand {Id = id}, ctx);
+            await Mediator.Send(new RemoveLevelRoleCommand { Id = id }, ctx);
+            
+            await Mediator.RespondAsync(ctx, "Role removed successfully", true);
         }
     }
 }

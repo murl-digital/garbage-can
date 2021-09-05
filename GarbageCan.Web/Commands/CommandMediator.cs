@@ -1,7 +1,12 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.Entities;
+using GarbageCan.Application.Common.Interfaces;
+using GarbageCan.Application.Common.Models;
 using GarbageCan.Infrastructure.Discord;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +19,8 @@ namespace GarbageCan.Web.Commands
         private readonly IServiceProvider _provider;
         private readonly ILogger<CommandMediator> _logger;
 
-        public CommandMediator(IServiceProvider provider, ILogger<CommandMediator> logger)
+        public CommandMediator(IServiceProvider provider,
+            ILogger<CommandMediator> logger)
         {
             _provider = provider;
             _logger = logger;
@@ -41,6 +47,42 @@ namespace GarbageCan.Web.Commands
                 await commandContext.RespondAsync("An error occurred");
                 return default;
             }
+        }
+
+
+        public async Task RespondAsync(CommandContext context, string message, bool prependEmoji = false, bool formatAsBlock = false)
+        {
+            string content = message;
+
+            if (prependEmoji)
+            {
+                var config = _provider.GetRequiredService<IDiscordConfiguration>();
+                var client = _provider.GetRequiredService<DiscordClient>();
+                var discordEmoji = DiscordEmoji.FromName(client, config.EmojiName);
+                content = $"{discordEmoji} {message}";
+            }
+
+            if (formatAsBlock)
+            {
+                content = Formatter.BlockCode(content);
+            }
+
+            await context.RespondAsync(content);
+        }
+
+        public async Task RespondAsync(CommandContext context,
+            string fileName,
+            Stream stream,
+            ulong? replyMessageId = null,
+            bool replyMention = false)
+        {
+            var messageBuilder = new DiscordMessageBuilder().WithFile(fileName, stream);
+            if (replyMessageId.HasValue)
+            {
+                messageBuilder.WithReply(replyMessageId.Value, replyMention);
+            }
+
+            await context.RespondAsync(messageBuilder);
         }
     }
 }

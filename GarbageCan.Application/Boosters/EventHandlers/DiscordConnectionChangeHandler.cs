@@ -8,8 +8,7 @@ using MediatR;
 
 namespace GarbageCan.Application.Boosters.EventHandlers
 {
-    public class
-        DiscordConnectionChangeHandler : INotificationHandler<DomainEventNotification<DiscordConnectionChangeEvent>>
+    public class DiscordConnectionChangeHandler : INotificationHandler<DomainEventNotification<DiscordConnectionChangeEvent>>
     {
         private readonly IMediator _mediator;
 

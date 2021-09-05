@@ -7,30 +7,26 @@ using System.Threading.Tasks;
 
 namespace GarbageCan.Application.Moderation.Commands.LogTalk
 {
-    public class LogTalkCommand : IRequest<bool>
+    public class LogTalkCommand : IRequest<int>
     {
         public ulong UserId { get; set; }
-        public string DisplayName { get; set; }
         public string Comments { get; set; }
     }
 
-    public class LogTalkCommandHandler : IRequestHandler<LogTalkCommand, bool>
+    public class LogTalkCommandHandler : IRequestHandler<LogTalkCommand, int>
     {
-        private readonly IDiscordResponseService _responseService;
         private readonly ICurrentUserService _currentUserService;
         private readonly IApplicationDbContext _context;
         private readonly IDateTime _dateTime;
 
-        public LogTalkCommandHandler(IDiscordResponseService responseService, ICurrentUserService currentUserService,
-            IApplicationDbContext context, IDateTime dateTime)
+        public LogTalkCommandHandler(ICurrentUserService currentUserService, IApplicationDbContext context, IDateTime dateTime)
         {
-            _responseService = responseService;
             _currentUserService = currentUserService;
             _context = context;
             _dateTime = dateTime;
         }
 
-        public async Task<bool> Handle(LogTalkCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(LogTalkCommand request, CancellationToken cancellationToken)
         {
             var now = _dateTime.Now.ToUniversalTime();
             var tryParse = ulong.TryParse(_currentUserService.UserId, out ulong test);
@@ -44,9 +40,7 @@ namespace GarbageCan.Application.Moderation.Commands.LogTalk
             };
             await _context.ModerationActionLogs.AddAsync(log, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
-            await _responseService.RespondAsync(
-                $"1 on 1 talk with {request.DisplayName} has been logged with id {log.id}", true);
-            return true;
+            return log.id;
         }
     }
 }

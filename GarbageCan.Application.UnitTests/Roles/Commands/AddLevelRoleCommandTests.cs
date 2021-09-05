@@ -15,18 +15,15 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
     {
         private ApplicationFixture _appFixture;
         private IApplicationDbContext _dbContext;
-        private IDiscordResponseService _responseService;
 
         [SetUp]
         public void Setup()
         {
             _appFixture = new ApplicationFixture();
             _dbContext = Substitute.For<IApplicationDbContext>();
-            _responseService = Substitute.For<IDiscordResponseService>();
             _appFixture.OnConfigureServices += (_, services) =>
             {
                 services.AddSingleton(_dbContext);
-                services.AddSingleton(_responseService);
             };
         }
 
@@ -54,21 +51,6 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             addedRole.RoleId.Should().Be(roleId);
             addedRole.Lvl.Should().Be(level);
             addedRole.Remain.Should().BeTrue();
-        }
-
-        [Test]
-        public async Task ShouldRespondWithMessage_WhenAddedSuccessfully()
-        {
-            _dbContext.ConfigureMockDbSet(x => x.LevelRoles);
-
-            await _appFixture.SendAsync(new AddLevelRoleCommand
-            {
-                RoleId = 5,
-                Level = 50
-            });
-
-            await _responseService.Received(1).RespondAsync("Role added successfully", true);
-            await _responseService.Received(1).RespondAsync(Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<bool>());
         }
 
         [Theory]

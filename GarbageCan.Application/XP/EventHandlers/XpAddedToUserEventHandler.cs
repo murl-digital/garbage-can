@@ -26,7 +26,7 @@ namespace GarbageCan.Application.XP.EventHandlers
             var user = await _context.XPUsers.FirstOrDefaultAsync(u => u.UserId == notification.DomainEvent.MessageDetails.UserId, cancellationToken);
 
             var oldLevel = user.Lvl;
-            while (user.XP > await _calculator.TotalXpRequired(user.Lvl))
+            while (user.XP > _calculator.TotalXpRequired(user.Lvl))
             {
                 user.Lvl++;
             }

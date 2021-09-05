@@ -14,14 +14,12 @@ namespace GarbageCan.Application.XP.EventHandlers
         private readonly IMediator _mediator;
         private readonly IDiscordConfiguration _configuration;
         private readonly IApplicationDbContext _context;
-        private readonly IDiscordGuildService _discordGuildService;
 
-        public DiscordMessageCreatedEventHandler(IMediator mediator, IDiscordConfiguration configuration, IApplicationDbContext context, IDiscordGuildService discordGuildService)
+        public DiscordMessageCreatedEventHandler(IMediator mediator, IDiscordConfiguration configuration, IApplicationDbContext context)
         {
             _mediator = mediator;
             _configuration = configuration;
             _context = context;
-            _discordGuildService = discordGuildService;
         }
 
         public async Task Handle(DomainEventNotification<DiscordMessageCreatedEvent> notification,

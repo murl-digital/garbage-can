@@ -10,7 +10,8 @@ namespace GarbageCan.Web.Commands.Fun
         [Command("oobify")]
         public async Task OobifyCommand(CommandContext ctx, [RemainingText] string message)
         {
-            await Mediator.Send(new OobifyTextCommand { Text = message }, ctx);
+            var text = await Mediator.Send(new OobifyTextCommand { Text = message }, ctx);
+            await Mediator.RespondAsync(ctx, text);
         }
     }
 }
