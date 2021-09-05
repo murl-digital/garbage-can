@@ -38,7 +38,7 @@ namespace GarbageCan.Application.UnitTests.Boosters.Commands
 
         // TODO: these tests need to be readdresed or a better method for handling guilds with no booster info needs to be hashed out
         [Test]
-        public async Task AllCollectionsShouldBeEmpty_WhenSlotDoesNotExist()
+        public async Task AllCollectionsShouldBeEmpty_WhenNoGuildsExist()
         {
             Dictionary<ulong, List<ActiveBooster>> activeBoosters = null;
             Dictionary<ulong, Queue<QueuedBooster>> queuedBoosters = null;
@@ -61,8 +61,10 @@ namespace GarbageCan.Application.UnitTests.Boosters.Commands
             availableSlots.Should().NotBeNull().And.BeEmpty();
         }
 
-        [Test]
-        public async Task OtherCollectionsShouldNotBeEmpty_WhenSlotExists()
+        [Theory]
+        [TestCase(true)]
+        [TestCase(false)]
+        public async Task OtherCollectionsShouldNotBeEmpty_WhenGuildExists(bool withSlot)
         {
             ulong guildId = 6;
             ulong channelId = 7;
@@ -85,7 +87,12 @@ namespace GarbageCan.Application.UnitTests.Boosters.Commands
 
             _dbContext.ConfigureMockDbSet(x => x.XPActiveBoosters);
             _dbContext.ConfigureMockDbSet(x => x.XPQueuedBoosters);
-            _dbContext.ConfigureMockDbSet(x => x.XPAvailableSlots, slot);
+            if (withSlot)
+                _dbContext.ConfigureMockDbSet(x => x.XPAvailableSlots, slot);
+            else
+                _dbContext.ConfigureMockDbSet(x => x.XPAvailableSlots);
+
+            _discordGuildService.GetAllCurrentGuilds().Returns(new[] { guildId });
 
             await _appFixture.SendAsync(new PopulateBoosterServiceCommand());
 
@@ -93,8 +100,16 @@ namespace GarbageCan.Application.UnitTests.Boosters.Commands
             queuedBoosters.Should().NotBeNull();
             availableSlots.Should().NotBeNull();
 
-            availableSlots[guildId].First().GuildId.Should().Be(guildId);
-            availableSlots[guildId].First().ChannelId.Should().Be(channelId);
+            if (withSlot)
+            {
+                availableSlots[guildId].First().GuildId.Should().Be(guildId);
+                availableSlots[guildId].First().ChannelId.Should().Be(channelId);
+            }
+            else
+            {
+                availableSlots[guildId].Should().NotBeNull().And.BeEmpty();
+            }
+
             activeBoosters[guildId].Should().NotBeNull().And.BeEmpty();
             queuedBoosters[guildId].Should().NotBeNull().And.BeEmpty();
         }
