@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Linq;
 using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Domain.Entities.Boosters;
 using MediatR;
@@ -7,7 +7,6 @@ namespace GarbageCan.Application.Boosters.ActiveBoosters.Queries
 {
     public class GetActiveBoostersQuery : IRequest<ActiveBooster[]>
     {
-        public ulong GuildId { get; set; }
     }
 
     public class GetActiveBoostersQueryHandler : RequestHandler<GetActiveBoostersQuery, ActiveBooster[]>
@@ -21,9 +20,7 @@ namespace GarbageCan.Application.Boosters.ActiveBoosters.Queries
 
         protected override ActiveBooster[] Handle(GetActiveBoostersQuery request)
         {
-            return _boosterService.ActiveBoosters.TryGetValue(request.GuildId, out var boosters)
-                ? boosters.ToArray()
-                : Array.Empty<ActiveBooster>();
+            return _boosterService.ActiveBoosters.SelectMany(x => x.Value).ToArray();
         }
     }
 }

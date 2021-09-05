@@ -5,12 +5,12 @@ using MediatR;
 
 namespace GarbageCan.Application.Boosters.QueuedBoosters.Queries
 {
-    public class GetQueuedBoostersQuery : IRequest<QueuedBooster[]>
+    public class GetGuildQueuedBoostersQuery : IRequest<QueuedBooster[]>
     {
         public ulong GuildId { get; set; }
     }
 
-    public class GetQueuedBoostersQueryHandler : RequestHandler<GetQueuedBoostersQuery, QueuedBooster[]>
+    public class GetQueuedBoostersQueryHandler : RequestHandler<GetGuildQueuedBoostersQuery, QueuedBooster[]>
     {
         private readonly IBoosterService _boosterService;
 
@@ -19,7 +19,7 @@ namespace GarbageCan.Application.Boosters.QueuedBoosters.Queries
             _boosterService = boosterService;
         }
 
-        protected override QueuedBooster[] Handle(GetQueuedBoostersQuery request)
+        protected override QueuedBooster[] Handle(GetGuildQueuedBoostersQuery request)
         {
             return _boosterService.QueuedBoosters.TryGetValue(request.GuildId, out var boosters)
                 ? boosters.ToArray()
