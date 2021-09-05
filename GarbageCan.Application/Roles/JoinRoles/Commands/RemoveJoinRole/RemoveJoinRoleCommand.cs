@@ -15,12 +15,10 @@ namespace GarbageCan.Application.Roles.JoinRoles.Commands.RemoveJoinRole
     public class RemoveJoinRoleCommandHandler : IRequestHandler<RemoveJoinRoleCommand>
     {
         private readonly IApplicationDbContext _context;
-        private readonly IDiscordResponseService _responseService;
 
-        public RemoveJoinRoleCommandHandler(IApplicationDbContext context, IDiscordResponseService responseService)
+        public RemoveJoinRoleCommandHandler(IApplicationDbContext context)
         {
             _context = context;
-            _responseService = responseService;
         }
 
         public async Task<Unit> Handle(RemoveJoinRoleCommand request, CancellationToken cancellationToken)
@@ -31,7 +29,6 @@ namespace GarbageCan.Application.Roles.JoinRoles.Commands.RemoveJoinRole
             _context.JoinRoles.Remove(role);
             await _context.SaveChangesAsync(cancellationToken);
 
-            await _responseService.RespondAsync("Role removed successfully", true);
             return Unit.Value;
         }
     }

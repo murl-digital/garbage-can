@@ -12,12 +12,10 @@ namespace GarbageCan.Application.Moderation.Commands.Restrict
     public class RestrictChannelCommand : IRequest<Unit>
     {
         public ulong ChannelId { get; set; }
-        public string ChannelMention { get; set; }
         public string ChannelName { get; set; }
         public string Comments { get; set; }
         public ulong GuildId { get; set; }
         public TimeSpan TimeSpan { get; set; }
-        public string UserDisplayName { get; set; }
         public ulong UserId { get; set; }
     }
 
@@ -28,17 +26,14 @@ namespace GarbageCan.Application.Moderation.Commands.Restrict
         private readonly IApplicationDbContext _dbContext;
         private readonly IDiscordDirectMessageService _directMessageService;
         private readonly IDiscordModerationService _moderationService;
-        private readonly IDiscordResponseService _responseService;
 
         public RestrictChannelCommandHandler(IDiscordModerationService moderationService,
-            IDiscordResponseService responseService,
             IDateTime dateTime,
             IApplicationDbContext dbContext,
             IDiscordDirectMessageService directMessageService,
             ICurrentUserService currentUserService)
         {
             _moderationService = moderationService;
-            _responseService = responseService;
             _dateTime = dateTime;
             _dbContext = dbContext;
             _directMessageService = directMessageService;
@@ -56,8 +51,6 @@ namespace GarbageCan.Application.Moderation.Commands.Restrict
             await _directMessageService.SendMessageAsync(request.UserId, message);
 
             await _dbContext.SaveChangesAsync(cancellationToken);
-
-            await _responseService.RespondAsync($"{request.UserDisplayName}'s access to {request.ChannelMention} has been restricted for {request.TimeSpan.Humanize()}", true);
 
             return Unit.Value;
         }

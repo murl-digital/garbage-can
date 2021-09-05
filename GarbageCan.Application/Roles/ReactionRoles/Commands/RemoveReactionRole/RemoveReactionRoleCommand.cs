@@ -15,12 +15,10 @@ namespace GarbageCan.Application.Roles.ReactionRoles.Commands.RemoveReactionRole
     public class RemoveReactionRoleCommandHandler : IRequestHandler<RemoveReactionRoleCommand>
     {
         private readonly IApplicationDbContext _context;
-        private readonly IDiscordResponseService _responseService;
 
-        public RemoveReactionRoleCommandHandler(IApplicationDbContext context, IDiscordResponseService responseService)
+        public RemoveReactionRoleCommandHandler(IApplicationDbContext context)
         {
             _context = context;
-            _responseService = responseService;
         }
 
         public async Task<Unit> Handle(RemoveReactionRoleCommand request, CancellationToken cancellationToken)
@@ -30,8 +28,7 @@ namespace GarbageCan.Application.Roles.ReactionRoles.Commands.RemoveReactionRole
 
             _context.ReactionRoles.Remove(role);
             await _context.SaveChangesAsync(cancellationToken);
-
-            await _responseService.RespondAsync("Role removed successfully", true);
+            
             return Unit.Value;
         }
     }

@@ -25,7 +25,6 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
         private IDateTime _dateTime;
         private IApplicationDbContext _dbContext;
         private IDiscordDirectMessageService _directMessageService;
-        private IDiscordResponseService _responseService;
         private IRoleConfiguration _roleConfiguration;
         private ulong _roleId;
         private IDiscordGuildRoleService _roleService;
@@ -35,7 +34,6 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
         {
             _appFixture = new ApplicationFixture();
             _roleService = Substitute.For<IDiscordGuildRoleService>();
-            _responseService = Substitute.For<IDiscordResponseService>();
             _dateTime = Substitute.For<IDateTime>();
             _roleConfiguration = Substitute.For<IRoleConfiguration>();
             _directMessageService = Substitute.For<IDiscordDirectMessageService>();
@@ -55,7 +53,6 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
             {
                 services.AddSingleton(_roleService);
                 services.AddSingleton(_dbContext);
-                services.AddSingleton(_responseService);
                 services.AddSingleton(_dateTime);
                 services.AddSingleton(_currentUserService);
                 services.AddSingleton(_roleConfiguration);
@@ -130,17 +127,6 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
 
             await _directMessageService.ReceivedWithAnyArgs(1).SendMessageAsync(default, default);
             await _directMessageService.Received(1).SendMessageAsync(command.UserId, expectedMessage);
-        }
-
-        [Test]
-        public async Task ShouldSendResponseMessage_WhenValidRequestCalled()
-        {
-            var command = GenerateCommand();
-
-            await _appFixture.SendAsync(command);
-
-            await _responseService.ReceivedWithAnyArgs(1).RespondAsync(default);
-            await _responseService.Received(1).RespondAsync($"{command.UserDisplayName} has been muted", true, false);
         }
 
         private static MuteCommand GenerateCommand()

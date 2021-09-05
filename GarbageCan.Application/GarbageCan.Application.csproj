@@ -26,7 +26,6 @@
 	<ItemGroup>
 	  <Folder Include="Roles\ConditionalRoles\Commands" />
 	  <Folder Include="Roles\JoinRoles\Commands" />
-	  <Folder Include="Roles\LevelRoles" />
 	  <Folder Include="Roles\ReactionRoles\Commands" />
 	</ItemGroup>
 

@@ -10,6 +10,7 @@ using GarbageCan.Application.Moderation.Commands.Restrict;
 using System;
 using System.Threading.Tasks;
 using GarbageCan.Application.Common.Models;
+using Humanizer;
 
 namespace GarbageCan.Web.Commands.Moderation
 {
@@ -28,8 +29,9 @@ namespace GarbageCan.Web.Commands.Moderation
                 GuildId = ctx.Guild.Id,
                 UserId = member.Id,
                 Reason = reason,
-                UserDisplayName = member.DisplayName
             }, ctx);
+
+            await Mediator.RespondAsync(ctx, $"{member.DisplayName} has been banned", true);
         }
 
         [Command("logPersonalTalk")]
@@ -47,7 +49,8 @@ namespace GarbageCan.Web.Commands.Moderation
         [RequireRoles(RoleCheckMode.All, "Staff")]
         public async Task LogWarning(CommandContext ctx, DiscordMember member, [RemainingText] string comments)
         {
-            await Mediator.Send(new LogWarningCommand { Comments = comments, UserId = member.Id }, ctx);
+            var id = await Mediator.Send(new LogWarningCommand { Comments = comments, UserId = member.Id }, ctx);
+            await Mediator.RespondAsync(ctx, $"Verbal warning logged with id {id}", true);
         }
 
         [Command("mute")]
@@ -62,6 +65,8 @@ namespace GarbageCan.Web.Commands.Moderation
                 TimeSpan = span,
                 GuildId = ctx.Guild.Id
             }, ctx);
+
+            await Mediator.RespondAsync(ctx, $"{member.DisplayName} has been muted", true);
         }
 
         [Command("mute")]
@@ -79,35 +84,42 @@ namespace GarbageCan.Web.Commands.Moderation
 
         [Command("restrict")]
         [RequireRoles(RoleCheckMode.All, "Staff")]
-        public async Task Restrict(CommandContext ctx, DiscordMember member, DiscordChannel channel, TimeSpan span, [RemainingText] string comments)
+        public async Task Restrict(CommandContext ctx, DiscordMember member, DiscordChannel channel, TimeSpan span,
+            [RemainingText] string comments)
         {
             await Mediator.Send(new RestrictChannelCommand
             {
                 Comments = comments,
                 UserId = member.Id,
-                UserDisplayName = member.DisplayName,
                 TimeSpan = span,
                 GuildId = ctx.Guild.Id,
                 ChannelId = channel.Id,
                 ChannelName = channel.Name,
-                ChannelMention = channel.Mention,
             }, ctx);
+
+            await Mediator.RespondAsync(ctx,
+                $"{member.DisplayName}'s access to {channel.Mention} has been restricted for {span.Humanize()}",
+                true);
         }
 
         [Command("restrict")]
         public async Task RestrictDefault(CommandContext ctx, DiscordMember member, DiscordChannel channel, [RemainingText] string comments)
         {
+            var span = TimeSpan.FromHours(24);
+
             await Mediator.Send(new RestrictChannelCommand
             {
                 Comments = comments,
                 UserId = member.Id,
-                UserDisplayName = member.DisplayName,
-                TimeSpan = TimeSpan.FromHours(24),
+                TimeSpan = span,
                 GuildId = ctx.Guild.Id,
                 ChannelId = channel.Id,
                 ChannelName = channel.Name,
-                ChannelMention = channel.Mention,
             }, ctx);
+
+            await Mediator.RespondAsync(ctx,
+                $"{member.DisplayName}'s access to {channel.Mention} has been restricted for {span.Humanize()}",
+                true);
         }
     }
 }
