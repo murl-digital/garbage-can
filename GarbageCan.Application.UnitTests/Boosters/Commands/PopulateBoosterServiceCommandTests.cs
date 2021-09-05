@@ -18,6 +18,7 @@ namespace GarbageCan.Application.UnitTests.Boosters.Commands
         private ApplicationFixture _appFixture;
         private IApplicationDbContext _dbContext;
         private IBoosterService _boosterService;
+        private IDiscordGuildService _discordGuildService;
 
         [SetUp]
         public void Setup()
@@ -25,14 +26,17 @@ namespace GarbageCan.Application.UnitTests.Boosters.Commands
             _appFixture = new ApplicationFixture();
             _dbContext = Substitute.For<IApplicationDbContext>();
             _boosterService = Substitute.For<IBoosterService>();
+            _discordGuildService = Substitute.For<IDiscordGuildService>();
 
             _appFixture.OnConfigureServices += (_, services) =>
             {
                 services.AddSingleton(_dbContext);
                 services.AddSingleton(_boosterService);
+                services.AddSingleton(_discordGuildService);
             };
         }
 
+        // TODO: these tests need to be readdresed or a better method for handling guilds with no booster info needs to be hashed out
         [Test]
         public async Task AllCollectionsShouldBeEmpty_WhenSlotDoesNotExist()
         {
@@ -201,6 +205,8 @@ namespace GarbageCan.Application.UnitTests.Boosters.Commands
             _dbContext.ConfigureMockDbSet(x => x.XPActiveBoosters);
             _dbContext.ConfigureMockDbSet(x => x.XPQueuedBoosters, boosters.Union(otherBoosters));
             _dbContext.ConfigureMockDbSet(x => x.XPAvailableSlots, new[] { slot, otherSlot });
+
+            _discordGuildService.GetAllCurrentGuilds().Returns(new[] { guildId, otherGuildId });
 
             await _appFixture.SendAsync(new PopulateBoosterServiceCommand());
 

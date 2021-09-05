@@ -17,11 +17,14 @@ namespace GarbageCan.Application.Boosters.Commands
     {
         private readonly IApplicationDbContext _context;
         private readonly IBoosterService _boosterService;
+        private readonly IDiscordGuildService _guildService;
 
-        public PopulateBoosterServiceCommandHandler(IApplicationDbContext context, IBoosterService boosterService)
+        public PopulateBoosterServiceCommandHandler(IApplicationDbContext context, IBoosterService boosterService,
+            IDiscordGuildService guildService)
         {
             _context = context;
             _boosterService = boosterService;
+            _guildService = guildService;
         }
 
         public async Task<Unit> Handle(PopulateBoosterServiceCommand request, CancellationToken cancellationToken)
@@ -48,8 +51,9 @@ namespace GarbageCan.Application.Boosters.Commands
                 .GroupBy(b => b.GuildId)
                 .ToDictionary(k => k.Key, v => v.ToList());
 
-            foreach (var key in _boosterService.AvailableSlots.Keys)
+            foreach (var key in _guildService.GetAllCurrentGuilds())
             {
+                _boosterService.AvailableSlots.TryAdd(key, new List<AvailableSlot>());
                 _boosterService.QueuedBoosters.TryAdd(key, new Queue<QueuedBooster>());
                 _boosterService.ActiveBoosters.TryAdd(key, new List<ActiveBooster>());
             }
