@@ -70,8 +70,8 @@ namespace GarbageCan.Web.Commands.Boosters
                     case BoosterResult.Queued:
                         await ctx.RespondAsync("Your booster has been queued!");
                         break;
-                    case BoosterResult.SlotsFull:
-                        break;
+                    default:
+                        throw new InvalidOperationException($"AddBooster returned unexpected result: {result}");
                 }
 
                 await Mediator.Send(new RemoveUserBoosterCommand { Id = booster.Id }, ctx);
