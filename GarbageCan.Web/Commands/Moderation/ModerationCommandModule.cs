@@ -38,12 +38,8 @@ namespace GarbageCan.Web.Commands.Moderation
         public async Task LogTalk(CommandContext ctx, DiscordMember member, [RemainingText] string comments)
         {
             var response = await Mediator.Send(new LogTalkCommand { Comments = comments, UserId = member.Id }, ctx);
-            
-            await Mediator.RespondAsync(ctx, new PlainTextResponse
-            {
-                Message = $"1 on 1 talk with {member.DisplayName} has been logged with id {response}",
-                PrependEmoji = true
-            });
+
+            await Mediator.RespondAsync(ctx, $"1 on 1 talk with {member.DisplayName} has been logged with id {response}", true);
         }
 
         [Command("logWarning")]

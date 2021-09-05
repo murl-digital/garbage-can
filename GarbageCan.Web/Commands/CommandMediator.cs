@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using DSharpPlus;
@@ -48,19 +49,20 @@ namespace GarbageCan.Web.Commands
             }
         }
 
-        public async Task RespondAsync(CommandContext context, PlainTextResponse response)
-        {
-            string content = response.Message;
 
-            if (response.PrependEmoji)
+        public async Task RespondAsync(CommandContext context, string message, bool prependEmoji = false, bool formatAsBlock = false)
+        {
+            string content = message;
+
+            if (prependEmoji)
             {
                 var config = _provider.GetRequiredService<IDiscordConfiguration>();
                 var client = _provider.GetRequiredService<DiscordClient>();
                 var discordEmoji = DiscordEmoji.FromName(client, config.EmojiName);
-                content = $"{discordEmoji} {response.Message}";
+                content = $"{discordEmoji} {message}";
             }
 
-            if (response.FormatAsBlock)
+            if (formatAsBlock)
             {
                 content = Formatter.BlockCode(content);
             }
@@ -68,12 +70,16 @@ namespace GarbageCan.Web.Commands
             await context.RespondAsync(content);
         }
 
-        public async Task RespondAsync(CommandContext context, FileResponse response)
+        public async Task RespondAsync(CommandContext context,
+            string fileName,
+            Stream stream,
+            ulong? replyMessageId = null,
+            bool replyMention = false)
         {
-            var messageBuilder = new DiscordMessageBuilder().WithFile(response.FileName, response.Stream);
-            if (response.ReplyMessageId.HasValue)
+            var messageBuilder = new DiscordMessageBuilder().WithFile(fileName, stream);
+            if (replyMessageId.HasValue)
             {
-                messageBuilder.WithReply(response.ReplyMessageId.Value, response.ReplyMention);
+                messageBuilder.WithReply(replyMessageId.Value, replyMention);
             }
 
             await context.RespondAsync(messageBuilder);
