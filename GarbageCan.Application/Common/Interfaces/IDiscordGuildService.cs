@@ -5,6 +5,6 @@ namespace GarbageCan.Application.Common.Interfaces
 {
     public interface IDiscordGuildService
     {
-        IEnumerable<ulong> GetAllCurrentGuilds();
+        IEnumerable<ulong> GetAllCurrentGuildIds();
     }
 }

@@ -8,12 +8,10 @@ namespace GarbageCan.Infrastructure.Discord
 {
     public class DiscordModerationService : IDiscordModerationService
     {
-        private readonly DiscordClient _client;
         private readonly DiscordGuildService _guildService;
 
-        public DiscordModerationService(DiscordClient client, DiscordGuildService guildService)
+        public DiscordModerationService(DiscordGuildService guildService)
         {
-            _client = client;
             _guildService = guildService;
         }
 
@@ -26,7 +24,7 @@ namespace GarbageCan.Infrastructure.Discord
         public async Task RestoreChannelAccess(ulong? guildId, ulong userId, ulong channelId, string reason = null)
         {
             var member = await GetMember(guildId, userId);
-            var channel = await _client.GetChannelAsync(channelId);
+            var channel = await GetChannel(guildId, channelId);
 
             var permissionOverwrites = channel.PermissionOverwrites.FirstOrDefault(o => o.Id == member.Id);
             if (permissionOverwrites != null)
@@ -38,7 +36,7 @@ namespace GarbageCan.Infrastructure.Discord
         public async Task RestrictChannelAccess(ulong guildId, ulong userId, ulong channelId)
         {
             var member = await GetMember(guildId, userId);
-            var channel = await _client.GetChannelAsync(channelId);
+            var channel = await GetChannel(guildId, channelId);
             await channel.AddOverwriteAsync(member, Permissions.None, Permissions.AccessChannels);
         }
 
@@ -47,6 +45,13 @@ namespace GarbageCan.Infrastructure.Discord
             var guild = await _guildService.GetGuild(guildId);
             var member = await guild.GetMemberAsync(userId);
             return member;
+        }
+
+        private async Task<DiscordChannel> GetChannel(ulong? guildId, ulong channelId)
+        {
+            var guild = await _guildService.GetGuild(guildId);
+            var channel = guild.GetChannel(channelId);
+            return channel;
         }
     }
 }

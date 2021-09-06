@@ -1,21 +1,21 @@
 ﻿using System.Threading.Tasks;
-using DSharpPlus;
 using GarbageCan.Application.Common.Interfaces;
 
 namespace GarbageCan.Infrastructure.Discord
 {
     public class DiscordGuildChannelService : IDiscordGuildChannelService
     {
-        private readonly DiscordClient _discordClient;
+        private readonly DiscordGuildService _guildService;
 
-        public DiscordGuildChannelService(DiscordClient discordClient)
+        public DiscordGuildChannelService(DiscordGuildService guildService)
         {
-            _discordClient = discordClient;
+            _guildService = guildService;
         }
 
         public async Task RenameChannel(ulong guildId, ulong channelId, string name)
         {
-            await _discordClient.Guilds[guildId].GetChannel(channelId).ModifyAsync(channel => channel.Name = name);
+            var guild = await _guildService.GetGuild(guildId);
+            await guild.GetChannel(channelId).ModifyAsync(channel => channel.Name = name);
         }
     }
 }

@@ -73,6 +73,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             _dbContext.ConfigureMockDbSet(x => x.ReactionRoles);
             ulong channelId = 215u;
             ulong messageId = 215u;
+            ulong guildId = 90;
             var emoji = new Emoji
             {
                 Id = 4126u,
@@ -81,14 +82,15 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
 
             await _appFixture.SendAsync(new AddReactionRoleCommand
             {
+                GuildId = guildId,
                 RoleId = 5,
                 ChannelId = channelId,
                 MessageId = messageId,
                 Emoji = emoji
             });
 
-            await _messageService.Received(1).CreateReactionAsync(channelId, messageId, emoji);
-            await _messageService.Received(1).CreateReactionAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<Emoji>());
+            await _messageService.Received(1).CreateReactionAsync(guildId, channelId, messageId, emoji);
+            await _messageService.Received(1).CreateReactionAsync(Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<ulong>(), Arg.Any<Emoji>());
         }
 
         [Theory]

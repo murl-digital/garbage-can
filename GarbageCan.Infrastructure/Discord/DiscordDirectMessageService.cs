@@ -10,15 +10,12 @@ namespace GarbageCan.Infrastructure.Discord
 {
     public class DiscordDirectMessageService : IDiscordDirectMessageService
     {
-        private readonly DiscordClient _contextService;
         private readonly DiscordGuildService _guildService;
         private readonly ILogger<DiscordDirectMessageService> _logger;
 
-        public DiscordDirectMessageService(DiscordClient contextService, 
-            DiscordGuildService guildService,
+        public DiscordDirectMessageService(DiscordGuildService guildService,
             ILogger<DiscordDirectMessageService> logger)
         {
-            _contextService = contextService;
             _guildService = guildService;
             _logger = logger;
         }

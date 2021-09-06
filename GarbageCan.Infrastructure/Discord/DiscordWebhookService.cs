@@ -11,12 +11,12 @@ namespace GarbageCan.Infrastructure.Discord
 {
     public class DiscordWebhookService : IDiscordWebhookService
     {
-        private readonly DiscordClient _client;
+        private readonly DiscordGuildService _guildService;
         private readonly ILogger<DiscordWebhookService> _logger;
 
-        public DiscordWebhookService(DiscordClient client, ILogger<DiscordWebhookService> logger)
+        public DiscordWebhookService(DiscordGuildService guildService, ILogger<DiscordWebhookService> logger)
         {
-            _client = client;
+            _guildService = guildService;
             _logger = logger;
         }
 
@@ -29,7 +29,7 @@ namespace GarbageCan.Infrastructure.Discord
         {
             try
             {
-                var guild = await _client.GetGuildAsync(guildId);
+                var guild = await _guildService.GetGuild(guildId);
                 var context = guild.Channels[channelId];
                 var webhook = await context.CreateWebhookAsync(hookName);
 

@@ -51,7 +51,7 @@ namespace GarbageCan.Application.Boosters.Commands
                 .GroupBy(b => b.GuildId)
                 .ToDictionary(k => k.Key, v => v.ToList());
 
-            foreach (var key in _guildService.GetAllCurrentGuilds())
+            foreach (var key in _guildService.GetAllCurrentGuildIds())
             {
                 _boosterService.AvailableSlots.TryAdd(key, new List<AvailableSlot>());
                 _boosterService.QueuedBoosters.TryAdd(key, new Queue<QueuedBooster>());

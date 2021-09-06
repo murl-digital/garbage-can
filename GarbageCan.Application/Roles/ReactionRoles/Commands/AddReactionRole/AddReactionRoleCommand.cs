@@ -39,7 +39,7 @@ namespace GarbageCan.Application.Roles.ReactionRoles.Commands.AddReactionRole
             }, cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
-            await _messageService.CreateReactionAsync(request.ChannelId, request.MessageId, request.Emoji);
+            await _messageService.CreateReactionAsync(request.GuildId, request.ChannelId, request.MessageId, request.Emoji);
             return Unit.Value;
         }
 
