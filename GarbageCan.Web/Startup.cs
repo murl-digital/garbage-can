@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using AspNetCoreRateLimit;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using GarbageCan.Application;
@@ -38,10 +40,6 @@ namespace GarbageCan.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo {Title = "GarbageCan.Web", Version = "v1"});
-            });
 
             services.AddApplication(typeof(Startup).Assembly);
             services.AddInfrastructure(Configuration);
@@ -72,7 +70,7 @@ namespace GarbageCan.Web
 
                 var commands = client.UseCommandsNext(new CommandsNextConfiguration
                 {
-                    StringPrefixes = new[] {configuration.CommandPrefix},
+                    StringPrefixes = new[] { configuration.CommandPrefix },
                     Services = provider
                 });
 
@@ -173,6 +171,36 @@ namespace GarbageCan.Web
 
                 return client;
             });
+
+            services.AddSwaggerGen(c =>
+            {
+                c.EnableAnnotations();
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Garbage Can",
+                    Description = "REST api to interact with the Garbage Can Discord Bot",
+                    Version = "v1",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Joe Sorensen",
+                        Email = "no peeking",
+                        Url = new Uri("https://github.com/murl-digital")
+                    }
+                });
+            });
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("gbc",
+                    builder => builder
+                        .AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .Build()
+                );
+            });
+
+            AddRateLimiting(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -190,6 +218,8 @@ namespace GarbageCan.Web
 
             app.UseRouting();
 
+            app.UseCors("gbc");
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
@@ -200,7 +230,7 @@ namespace GarbageCan.Web
                 var logger = app.ApplicationServices.GetService<ILogger<Startup>>();
 
                 logger.LogInformation("SHUTTING DOWN");
-                service?.Publish(new DiscordConnectionChangeEvent {Status = DiscordConnectionStatus.Shutdown})
+                service?.Publish(new DiscordConnectionChangeEvent { Status = DiscordConnectionStatus.Shutdown })
                     .GetAwaiter().GetResult();
 
                 var client = app.ApplicationServices.GetService<DiscordClient>();
@@ -223,6 +253,30 @@ namespace GarbageCan.Web
             {
                 logger.LogError(exception, "Error On Scoped event publish. Event: {@Event}", notification);
             }
+        }
+
+        private static void AddRateLimiting(IServiceCollection services)
+        {
+            services.AddMemoryCache();
+            services.Configure<IpRateLimitOptions>(options =>
+            {
+                options.EnableEndpointRateLimiting = true;
+                options.StackBlockedRequests = true;
+                options.GeneralRules = new List<RateLimitRule>
+                {
+                    new()
+                    {
+                        Endpoint = "*",
+                        Period = "30s",
+                        Limit = 20
+                    }
+                };
+            });
+            services.Configure<IpRateLimitPolicies>(_ => { });
+            services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+            services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+            services.AddHttpContextAccessor();
         }
     }
 }

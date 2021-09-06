@@ -91,13 +91,13 @@ namespace GarbageCan.Web.Commands.Boosters
                 var builder = new StringBuilder();
 
                 var activeBuilder = new StringBuilder();
-                foreach (var booster in await Mediator.Send(new GetActiveBoostersQuery { GuildId = ctx.Guild.Id }, ctx))
+                foreach (var booster in await Mediator.Send(new GetGuildActiveBoostersQuery { GuildId = ctx.Guild.Id }, ctx))
                     activeBuilder.AppendLine(
                         $"slot {booster.Slot.Id} :: {booster.Multiplier}x expiring {booster.ExpirationDate.Humanize()}");
                 if (activeBuilder.Length == 0) activeBuilder.AppendLine("No boosters");
 
                 var queuedBuilder = new StringBuilder();
-                var queue = (await Mediator.Send(new GetQueuedBoostersQuery { GuildId = ctx.Guild.Id }, ctx)).ToList();
+                var queue = (await Mediator.Send(new GetGuildQueuedBoostersQuery { GuildId = ctx.Guild.Id }, ctx)).ToList();
                 foreach (var booster in queue)
                     queuedBuilder.AppendLine(
                         $"{queue.IndexOf(booster)} :: {booster.Multiplier}x for {TimeSpan.FromSeconds(booster.DurationInSeconds).Humanize()}");

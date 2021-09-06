@@ -5,21 +5,21 @@ using MediatR;
 
 namespace GarbageCan.Application.Boosters.ActiveBoosters.Queries
 {
-    public class GetActiveBoostersQuery : IRequest<ActiveBooster[]>
+    public class GetGuildActiveBoostersQuery : IRequest<ActiveBooster[]>
     {
         public ulong GuildId { get; set; }
     }
 
-    public class GetActiveBoostersQueryHandler : RequestHandler<GetActiveBoostersQuery, ActiveBooster[]>
+    public class GetGuildActiveBoostersQueryHandler : RequestHandler<GetGuildActiveBoostersQuery, ActiveBooster[]>
     {
         private readonly IBoosterService _boosterService;
 
-        public GetActiveBoostersQueryHandler(IBoosterService boosterService)
+        public GetGuildActiveBoostersQueryHandler(IBoosterService boosterService)
         {
             _boosterService = boosterService;
         }
 
-        protected override ActiveBooster[] Handle(GetActiveBoostersQuery request)
+        protected override ActiveBooster[] Handle(GetGuildActiveBoostersQuery request)
         {
             return _boosterService.ActiveBoosters.TryGetValue(request.GuildId, out var boosters)
                 ? boosters.ToArray()

@@ -43,6 +43,7 @@ namespace GarbageCan.Infrastructure
             services.AddSingleton<IRngService, RngService>();
 
             services.AddTransient<IDiscordGuildService, DiscordGuildService>();
+            services.AddTransient<IDiscordGuildMemberService, DiscordGuildMemberService>();
             services.AddTransient<IDiscordGuildRoleService, DiscordGuildRoleService>();
             services.AddTransient<IDiscordGuildChannelService, DiscordGuildChannelService>();
             services.AddTransient<IDiscordModerationService, DiscordModerationService>();
