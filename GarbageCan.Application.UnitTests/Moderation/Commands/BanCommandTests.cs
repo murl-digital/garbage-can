@@ -20,7 +20,6 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
         private IDateTime _dateTime;
         private IApplicationDbContext _dbContext;
         private IDiscordModerationService _moderationService;
-        private IDiscordResponseService _responseService;
         private ICurrentUserService _currentUserService;
         private ulong _currentUserId;
 
@@ -30,7 +29,6 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
             _appFixture = new ApplicationFixture();
             _moderationService = Substitute.For<IDiscordModerationService>();
             _dbContext = Substitute.For<IApplicationDbContext>();
-            _responseService = Substitute.For<IDiscordResponseService>();
             _dateTime = Substitute.For<IDateTime>();
             _currentUserService = Substitute.For<ICurrentUserService>();
             _actionLogMock = _dbContext.ConfigureMockDbSet(x => x.ModerationActionLogs);
@@ -40,7 +38,6 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
             {
                 services.AddSingleton(_moderationService);
                 services.AddSingleton(_dbContext);
-                services.AddSingleton(_responseService);
                 services.AddSingleton(_dateTime);
                 services.AddSingleton(_currentUserService);
             };
@@ -54,7 +51,6 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
                 GuildId = 70650,
                 UserId = 90,
                 Reason = "You're Annoying",
-                UserDisplayName = "TestUser"
             };
 
             await _appFixture.SendAsync(command);
@@ -77,7 +73,6 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
                 GuildId = 70650,
                 UserId = 90,
                 Reason = "You're Annoying",
-                UserDisplayName = "TestUser"
             };
 
             await _appFixture.SendAsync(command);
@@ -92,23 +87,6 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
             addedLog.issuedDate.Should().Be(now.ToUniversalTime());
             addedLog.punishmentLevel.Should().Be(PunishmentLevel.Ban);
             addedLog.comments.Should().Be(command.Reason);
-        }
-
-        [Test]
-        public async Task ShouldSendResponseMessage_WhenValidRequestCalled()
-        {
-            var command = new BanCommand
-            {
-                GuildId = 70650,
-                UserId = 90,
-                Reason = "You're Annoying",
-                UserDisplayName = "TestUser"
-            };
-
-            await _appFixture.SendAsync(command);
-
-            await _responseService.ReceivedWithAnyArgs(1).RespondAsync(default);
-            await _responseService.Received(1).RespondAsync($"{command.UserDisplayName} has been banned", true, false);
         }
     }
 }

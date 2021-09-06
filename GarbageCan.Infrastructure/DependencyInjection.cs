@@ -40,10 +40,10 @@ namespace GarbageCan.Infrastructure
             services.AddTransient<IDateTime, DateTimeService>();
             services.AddTransient<ICurrentUserService, DiscordContextUserService>();
             services.AddSingleton<IBoosterService, BoosterService>();
+            services.AddSingleton<IRngService, RngService>();
 
             services.AddTransient<IDiscordGuildService, DiscordGuildService>();
             services.AddTransient<IDiscordGuildMemberService, DiscordGuildMemberService>();
-            services.AddTransient<IDiscordResponseService, DiscordResponseService>();
             services.AddTransient<IDiscordGuildRoleService, DiscordGuildRoleService>();
             services.AddTransient<IDiscordGuildChannelService, DiscordGuildChannelService>();
             services.AddTransient<IDiscordModerationService, DiscordModerationService>();

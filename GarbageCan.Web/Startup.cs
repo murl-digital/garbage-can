@@ -1,3 +1,6 @@
+using System;
+using System.Reflection;
+using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using GarbageCan.Application;
@@ -18,10 +21,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Reflection;
-using System.Threading.Tasks;
-using DiscordConfiguration = DSharpPlus.DiscordConfiguration;
+using DiscordConfiguration = GarbageCan.Web.Configurations.DiscordConfiguration;
 
 namespace GarbageCan.Web
 {
@@ -50,7 +50,7 @@ namespace GarbageCan.Web
 
             services.Configure<IDiscordClientConfiguration, DiscordClientConfiguration>(
                 Configuration.GetSection("Discord:Client"));
-            services.Configure<IDiscordConfiguration, Configurations.DiscordConfiguration>(
+            services.Configure<IDiscordConfiguration, DiscordConfiguration>(
                 Configuration.GetSection("Discord"));
             services.Configure<IRoleConfiguration, RoleConfiguration>(Configuration.GetSection("Roles"));
 
@@ -61,7 +61,7 @@ namespace GarbageCan.Web
                 var clientConfiguration = provider.GetRequiredService<IDiscordClientConfiguration>();
                 var configuration = provider.GetRequiredService<IDiscordConfiguration>();
                 var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-                var client = new DiscordClient(new DiscordConfiguration
+                var client = new DiscordClient(new DSharpPlus.DiscordConfiguration
                 {
                     Token = clientConfiguration.Token,
                     TokenType = TokenType.Bot,
@@ -159,6 +159,16 @@ namespace GarbageCan.Web
                 client.GuildDownloadCompleted += async (_, _) =>
                 {
                     await PublishScopedEvent(provider, new DiscordGuildDownloadCompleteEvent());
+                };
+
+                client.GuildUpdated += async (_, args) =>
+                {
+                    await PublishScopedEvent(provider, new DiscordGuildUpdatedEvent
+                    {
+                        GuildId = args.GuildBefore.Id,
+                        PreviousBoostCount = args.GuildBefore.PremiumSubscriptionCount ?? 0,
+                        BoostCount = args.GuildAfter.PremiumSubscriptionCount ?? 0
+                    });
                 };
 
                 return client;

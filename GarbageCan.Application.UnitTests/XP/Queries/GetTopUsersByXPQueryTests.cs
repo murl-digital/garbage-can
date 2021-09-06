@@ -16,54 +16,25 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
     public class GetTopUsersByXPQueryTests
     {
         private ApplicationFixture _fixture;
-        private IDiscordGuildService _guildService;
         private IApplicationDbContext _dbContext;
 
         [SetUp]
         public void Setup()
         {
-            _guildService = Substitute.For<IDiscordGuildService>();
             _dbContext = Substitute.For<IApplicationDbContext>();
 
             _fixture = new ApplicationFixture();
             _fixture.OnConfigureServices += (_, services) =>
             {
-                services.AddSingleton(_guildService);
                 services.AddSingleton(_dbContext);
             };
-        }
-
-        [Test]
-        public async Task ShouldHaveDisplayNameFromGuildCall_WhenGuildIncludesUser()
-        {
-            ulong currentUserId = 90;
-            var displayName = "TEST";
-            var currentUser = new User { UserId = currentUserId, Lvl = 100, XP = 20 };
-            _guildService.GetMemberDisplayNameAsync(currentUserId).Returns(displayName);
-
-            _dbContext.ConfigureMockDbSet(x => x.XPUsers, currentUser);
-
-            var command = new GetTopUsersByXPQuery
-            {
-                CurrentUserId = currentUserId,
-                Count = 10
-            };
-
-            var result = await _fixture.SendAsync(command);
-
-            var first = result.TopTenUsers.First();
-            first.User.Should().BeEquivalentTo(currentUser);
-            first.DisplayName.Should().Be(displayName);
-            await _guildService.Received(1).GetMemberDisplayNameAsync(currentUserId);
         }
 
         [Test]
         public async Task ShouldReturnContextUser_WhenUserIsInDbSet()
         {
             ulong currentUserId = 90;
-            var displayName = "TEST";
             var currentUser = new User { UserId = currentUserId, Lvl = 100, XP = 20 };
-            _guildService.GetMemberDisplayNameAsync(currentUserId).Returns(displayName);
 
             _dbContext.ConfigureMockDbSet(x => x.XPUsers, currentUser);
 
@@ -84,9 +55,7 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
         public async Task ShouldReturnSingleUser_WhenJustOneUserInDbSet()
         {
             ulong currentUserId = 90;
-            var displayName = "TEST";
             var currentUser = new User { UserId = currentUserId, Lvl = 100, XP = 20 };
-            _guildService.GetMemberDisplayNameAsync(currentUserId).Returns(displayName);
 
             _dbContext.ConfigureMockDbSet(x => x.XPUsers, currentUser);
 
@@ -107,7 +76,6 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
         public async Task ShouldReturnTopCountUsers_WhenMoreUsersExistThanAreRequestFromTheCount()
         {
             var users = GenerateUsers(34);
-            users.ForEach(x => _guildService.GetMemberDisplayNameAsync(x.UserId).Returns("TEST"));
 
             _dbContext.ConfigureMockDbSet(x => x.XPUsers, users);
 

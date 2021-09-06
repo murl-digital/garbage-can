@@ -15,13 +15,10 @@ namespace GarbageCan.Application.Roles.ConditionalRoles.Commands.RemoveCondition
     public class RemoveConditionalRoleCommandHandler : IRequestHandler<RemoveConditionalRoleCommand>
     {
         private readonly IApplicationDbContext _context;
-        private readonly IDiscordResponseService _responseService;
 
-        public RemoveConditionalRoleCommandHandler(IApplicationDbContext context,
-            IDiscordResponseService responseService)
+        public RemoveConditionalRoleCommandHandler(IApplicationDbContext context)
         {
             _context = context;
-            _responseService = responseService;
         }
 
         public async Task<Unit> Handle(RemoveConditionalRoleCommand request, CancellationToken cancellationToken)
@@ -31,8 +28,6 @@ namespace GarbageCan.Application.Roles.ConditionalRoles.Commands.RemoveCondition
 
             _context.ConditionalRoles.Remove(role);
             await _context.SaveChangesAsync(cancellationToken);
-
-            await _responseService.RespondAsync("Role removed successfully", true);
             return Unit.Value;
         }
     }

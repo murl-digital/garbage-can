@@ -20,6 +20,10 @@ namespace GarbageCan.Application.UnitTests.Boosters.Commands
         private IBoosterService _boosterService;
         private IDiscordGuildService _discordGuildService;
 
+        private Dictionary<ulong, List<ActiveBooster>> _activeBoosters = null;
+        private Dictionary<ulong, Queue<QueuedBooster>> _queuedBoosters = null;
+        private Dictionary<ulong, List<AvailableSlot>> _availableSlots = null;
+
         [SetUp]
         public void Setup()
         {
@@ -34,35 +38,34 @@ namespace GarbageCan.Application.UnitTests.Boosters.Commands
                 services.AddSingleton(_boosterService);
                 services.AddSingleton(_discordGuildService);
             };
+
+            _boosterService.ActiveBoosters = Arg.Do<Dictionary<ulong, List<ActiveBooster>>>(x => _activeBoosters = x);
+            _boosterService.QueuedBoosters = Arg.Do<Dictionary<ulong, Queue<QueuedBooster>>>(x => _queuedBoosters = x);
+            _boosterService.AvailableSlots = Arg.Do<Dictionary<ulong, List<AvailableSlot>>>(x => _availableSlots = x);
+            _boosterService.ActiveBoosters.Returns(_activeBoosters);
+            _boosterService.QueuedBoosters.Returns(_queuedBoosters);
+            _boosterService.AvailableSlots.Returns(_availableSlots);
         }
 
         // TODO: these tests need to be readdresed or a better method for handling guilds with no booster info needs to be hashed out
         [Test]
-        public async Task AllCollectionsShouldBeEmpty_WhenSlotDoesNotExist()
+        public async Task AllCollectionsShouldBeEmpty_WhenNoGuildsExist()
         {
-            Dictionary<ulong, List<ActiveBooster>> activeBoosters = null;
-            Dictionary<ulong, Queue<QueuedBooster>> queuedBoosters = null;
-            Dictionary<ulong, List<AvailableSlot>> availableSlots = null;
-            _boosterService.ActiveBoosters = Arg.Do<Dictionary<ulong, List<ActiveBooster>>>(x => activeBoosters = x);
-            _boosterService.QueuedBoosters = Arg.Do<Dictionary<ulong, Queue<QueuedBooster>>>(x => queuedBoosters = x);
-            _boosterService.AvailableSlots = Arg.Do<Dictionary<ulong, List<AvailableSlot>>>(x => availableSlots = x);
-            _boosterService.ActiveBoosters.Returns(activeBoosters);
-            _boosterService.QueuedBoosters.Returns(queuedBoosters);
-            _boosterService.AvailableSlots.Returns(availableSlots);
-
             _dbContext.ConfigureMockDbSet(x => x.XPActiveBoosters);
             _dbContext.ConfigureMockDbSet(x => x.XPQueuedBoosters);
             _dbContext.ConfigureMockDbSet(x => x.XPAvailableSlots);
 
             await _appFixture.SendAsync(new PopulateBoosterServiceCommand());
 
-            activeBoosters.Should().NotBeNull().And.BeEmpty();
-            queuedBoosters.Should().NotBeNull().And.BeEmpty();
-            availableSlots.Should().NotBeNull().And.BeEmpty();
+            _activeBoosters.Should().NotBeNull().And.BeEmpty();
+            _queuedBoosters.Should().NotBeNull().And.BeEmpty();
+            _availableSlots.Should().NotBeNull().And.BeEmpty();
         }
 
-        [Test]
-        public async Task OtherCollectionsShouldNotBeEmpty_WhenSlotExists()
+        [Theory]
+        [TestCase(true)]
+        [TestCase(false)]
+        public async Task OtherCollectionsShouldNotBeEmpty_WhenGuildExists(bool withSlot)
         {
             ulong guildId = 6;
             ulong channelId = 7;
@@ -73,30 +76,33 @@ namespace GarbageCan.Application.UnitTests.Boosters.Commands
                 ChannelId = channelId
             };
 
-            Dictionary<ulong, List<ActiveBooster>> activeBoosters = null;
-            Dictionary<ulong, Queue<QueuedBooster>> queuedBoosters = null;
-            Dictionary<ulong, List<AvailableSlot>> availableSlots = null;
-            _boosterService.ActiveBoosters = Arg.Do<Dictionary<ulong, List<ActiveBooster>>>(x => activeBoosters = x);
-            _boosterService.QueuedBoosters = Arg.Do<Dictionary<ulong, Queue<QueuedBooster>>>(x => queuedBoosters = x);
-            _boosterService.AvailableSlots = Arg.Do<Dictionary<ulong, List<AvailableSlot>>>(x => availableSlots = x);
-            _boosterService.ActiveBoosters.Returns(activeBoosters);
-            _boosterService.QueuedBoosters.Returns(queuedBoosters);
-            _boosterService.AvailableSlots.Returns(availableSlots);
-
             _dbContext.ConfigureMockDbSet(x => x.XPActiveBoosters);
             _dbContext.ConfigureMockDbSet(x => x.XPQueuedBoosters);
-            _dbContext.ConfigureMockDbSet(x => x.XPAvailableSlots, slot);
+            if (withSlot)
+                _dbContext.ConfigureMockDbSet(x => x.XPAvailableSlots, slot);
+            else
+                _dbContext.ConfigureMockDbSet(x => x.XPAvailableSlots);
+
+            _discordGuildService.GetAllCurrentGuilds().Returns(new[] { guildId });
 
             await _appFixture.SendAsync(new PopulateBoosterServiceCommand());
 
-            activeBoosters.Should().NotBeNull();
-            queuedBoosters.Should().NotBeNull();
-            availableSlots.Should().NotBeNull();
+            _activeBoosters.Should().NotBeNull();
+            _queuedBoosters.Should().NotBeNull();
+            _availableSlots.Should().NotBeNull();
 
-            availableSlots[guildId].First().GuildId.Should().Be(guildId);
-            availableSlots[guildId].First().ChannelId.Should().Be(channelId);
-            activeBoosters[guildId].Should().NotBeNull().And.BeEmpty();
-            queuedBoosters[guildId].Should().NotBeNull().And.BeEmpty();
+            if (withSlot)
+            {
+                _availableSlots[guildId].First().GuildId.Should().Be(guildId);
+                _availableSlots[guildId].First().ChannelId.Should().Be(channelId);
+            }
+            else
+            {
+                _availableSlots[guildId].Should().NotBeNull().And.BeEmpty();
+            }
+
+            _activeBoosters[guildId].Should().NotBeNull().And.BeEmpty();
+            _queuedBoosters[guildId].Should().NotBeNull().And.BeEmpty();
         }
 
         [Test]
@@ -115,22 +121,12 @@ namespace GarbageCan.Application.UnitTests.Boosters.Commands
             for (uint i = 0; i < count; i++)
                 boosters.Add(new QueuedBooster
                 {
-                    Id = (int)i,
+                    Id = (int) i,
                     GuildId = guildId,
                     Position = i,
-                    Multiplier = (float)random.NextDouble() * 3f,
+                    Multiplier = (float) random.NextDouble() * 3f,
                     DurationInSeconds = random.Next(5, 500)
                 });
-
-            Dictionary<ulong, List<ActiveBooster>> activeBoosters = null;
-            Dictionary<ulong, Queue<QueuedBooster>> queuedBoosters = null;
-            Dictionary<ulong, List<AvailableSlot>> availableSlots = null;
-            _boosterService.ActiveBoosters = Arg.Do<Dictionary<ulong, List<ActiveBooster>>>(x => activeBoosters = x);
-            _boosterService.QueuedBoosters = Arg.Do<Dictionary<ulong, Queue<QueuedBooster>>>(x => queuedBoosters = x);
-            _boosterService.AvailableSlots = Arg.Do<Dictionary<ulong, List<AvailableSlot>>>(x => availableSlots = x);
-            _boosterService.ActiveBoosters.Returns(activeBoosters);
-            _boosterService.QueuedBoosters.Returns(queuedBoosters);
-            _boosterService.AvailableSlots.Returns(availableSlots);
 
             _dbContext.ConfigureMockDbSet(x => x.XPActiveBoosters);
             _dbContext.ConfigureMockDbSet(x => x.XPQueuedBoosters, boosters);
@@ -138,15 +134,15 @@ namespace GarbageCan.Application.UnitTests.Boosters.Commands
 
             await _appFixture.SendAsync(new PopulateBoosterServiceCommand());
 
-            activeBoosters.Should().NotBeNull();
-            queuedBoosters.Should().NotBeNull();
-            availableSlots.Should().NotBeNull();
+            _activeBoosters.Should().NotBeNull();
+            _queuedBoosters.Should().NotBeNull();
+            _availableSlots.Should().NotBeNull();
 
-            queuedBoosters[guildId].Count.Should().Be(boosters.Count);
+            _queuedBoosters[guildId].Count.Should().Be(boosters.Count);
 
             foreach (var ogBooster in boosters)
             {
-                var compareAgainstBooster = queuedBoosters[guildId].Dequeue();
+                var compareAgainstBooster = _queuedBoosters[guildId].Dequeue();
 
                 CompareQueuedBoosters(ogBooster, compareAgainstBooster);
             }
@@ -176,31 +172,21 @@ namespace GarbageCan.Application.UnitTests.Boosters.Commands
             for (uint i = 0; i < count; i++)
                 boosters.Add(new QueuedBooster
                 {
-                    Id = (int)i,
+                    Id = (int) i,
                     GuildId = guildId,
                     Position = i,
-                    Multiplier = (float)random.NextDouble() * 3f,
+                    Multiplier = (float) random.NextDouble() * 3f,
                     DurationInSeconds = random.Next(5, 500)
                 });
             for (uint i = 0; i < count + random.Next(-10, 10); i++)
                 otherBoosters.Add(new QueuedBooster
                 {
-                    Id = (int)i,
+                    Id = (int) i,
                     GuildId = otherGuildId,
                     Position = i,
-                    Multiplier = (float)random.NextDouble() * 3f,
+                    Multiplier = (float) random.NextDouble() * 3f,
                     DurationInSeconds = random.Next(5, 500)
                 });
-
-            Dictionary<ulong, List<ActiveBooster>> activeBoosters = null;
-            Dictionary<ulong, Queue<QueuedBooster>> queuedBoosters = null;
-            Dictionary<ulong, List<AvailableSlot>> availableSlots = null;
-            _boosterService.ActiveBoosters = Arg.Do<Dictionary<ulong, List<ActiveBooster>>>(x => activeBoosters = x);
-            _boosterService.QueuedBoosters = Arg.Do<Dictionary<ulong, Queue<QueuedBooster>>>(x => queuedBoosters = x);
-            _boosterService.AvailableSlots = Arg.Do<Dictionary<ulong, List<AvailableSlot>>>(x => availableSlots = x);
-            _boosterService.ActiveBoosters.Returns(activeBoosters);
-            _boosterService.QueuedBoosters.Returns(queuedBoosters);
-            _boosterService.AvailableSlots.Returns(availableSlots);
 
             _dbContext.ConfigureMockDbSet(x => x.XPActiveBoosters);
             _dbContext.ConfigureMockDbSet(x => x.XPQueuedBoosters, boosters.Union(otherBoosters));
@@ -210,23 +196,23 @@ namespace GarbageCan.Application.UnitTests.Boosters.Commands
 
             await _appFixture.SendAsync(new PopulateBoosterServiceCommand());
 
-            activeBoosters.Should().NotBeNull();
-            queuedBoosters.Should().NotBeNull();
-            availableSlots.Should().NotBeNull();
+            _activeBoosters.Should().NotBeNull();
+            _queuedBoosters.Should().NotBeNull();
+            _availableSlots.Should().NotBeNull();
 
-            queuedBoosters[guildId].Count.Should().Be(boosters.Count);
-            queuedBoosters[otherGuildId].Count.Should().Be(otherBoosters.Count);
+            _queuedBoosters[guildId].Count.Should().Be(boosters.Count);
+            _queuedBoosters[otherGuildId].Count.Should().Be(otherBoosters.Count);
 
             foreach (var ogBooster in boosters)
             {
-                var compareAgainstBooster = queuedBoosters[guildId].Dequeue();
+                var compareAgainstBooster = _queuedBoosters[guildId].Dequeue();
 
                 CompareQueuedBoosters(ogBooster, compareAgainstBooster);
             }
 
             foreach (var ogBooster in otherBoosters)
             {
-                var compareAgainstBooster = queuedBoosters[otherGuildId].Dequeue();
+                var compareAgainstBooster = _queuedBoosters[otherGuildId].Dequeue();
 
                 CompareQueuedBoosters(ogBooster, compareAgainstBooster);
             }
@@ -261,27 +247,17 @@ namespace GarbageCan.Application.UnitTests.Boosters.Commands
                 ExpirationDate = expirationDate
             };
 
-            Dictionary<ulong, List<ActiveBooster>> activeBoosters = null;
-            Dictionary<ulong, Queue<QueuedBooster>> queuedBoosters = null;
-            Dictionary<ulong, List<AvailableSlot>> availableSlots = null;
-            _boosterService.ActiveBoosters = Arg.Do<Dictionary<ulong, List<ActiveBooster>>>(x => activeBoosters = x);
-            _boosterService.QueuedBoosters = Arg.Do<Dictionary<ulong, Queue<QueuedBooster>>>(x => queuedBoosters = x);
-            _boosterService.AvailableSlots = Arg.Do<Dictionary<ulong, List<AvailableSlot>>>(x => availableSlots = x);
-            _boosterService.ActiveBoosters.Returns(activeBoosters);
-            _boosterService.QueuedBoosters.Returns(queuedBoosters);
-            _boosterService.AvailableSlots.Returns(availableSlots);
-
             _dbContext.ConfigureMockDbSet(x => x.XPActiveBoosters, booster);
             _dbContext.ConfigureMockDbSet(x => x.XPQueuedBoosters);
             _dbContext.ConfigureMockDbSet(x => x.XPAvailableSlots, new[] { slot, otherSlot });
 
             await _appFixture.SendAsync(new PopulateBoosterServiceCommand());
 
-            activeBoosters.Should().NotBeNull().And.NotBeEmpty();
-            queuedBoosters.Should().NotBeNull();
-            availableSlots.Should().NotBeNull();
+            _activeBoosters.Should().NotBeNull().And.NotBeEmpty();
+            _queuedBoosters.Should().NotBeNull();
+            _availableSlots.Should().NotBeNull();
 
-            var boosterToCheck = activeBoosters[guildId].First();
+            var boosterToCheck = _activeBoosters[guildId].First();
             CheckActiveBooster(boosterToCheck, slot, guildId, multiplier, expirationDate);
         }
 
@@ -335,33 +311,23 @@ namespace GarbageCan.Application.UnitTests.Boosters.Commands
                 ExpirationDate = expirationDate
             };
 
-            Dictionary<ulong, List<ActiveBooster>> activeBoosters = null;
-            Dictionary<ulong, Queue<QueuedBooster>> queuedBoosters = null;
-            Dictionary<ulong, List<AvailableSlot>> availableSlots = null;
-            _boosterService.ActiveBoosters = Arg.Do<Dictionary<ulong, List<ActiveBooster>>>(x => activeBoosters = x);
-            _boosterService.QueuedBoosters = Arg.Do<Dictionary<ulong, Queue<QueuedBooster>>>(x => queuedBoosters = x);
-            _boosterService.AvailableSlots = Arg.Do<Dictionary<ulong, List<AvailableSlot>>>(x => availableSlots = x);
-            _boosterService.ActiveBoosters.Returns(activeBoosters);
-            _boosterService.QueuedBoosters.Returns(queuedBoosters);
-            _boosterService.AvailableSlots.Returns(availableSlots);
-
             _dbContext.ConfigureMockDbSet(x => x.XPActiveBoosters, new[] { booster, otherBooster, otherGuildBooster });
             _dbContext.ConfigureMockDbSet(x => x.XPQueuedBoosters);
             _dbContext.ConfigureMockDbSet(x => x.XPAvailableSlots, new[] { slot, otherSlot, otherGuildSlot });
 
             await _appFixture.SendAsync(new PopulateBoosterServiceCommand());
 
-            activeBoosters.Should().NotBeNull().And.NotBeEmpty();
-            queuedBoosters.Should().NotBeNull();
-            availableSlots.Should().NotBeNull();
+            _activeBoosters.Should().NotBeNull().And.NotBeEmpty();
+            _queuedBoosters.Should().NotBeNull();
+            _availableSlots.Should().NotBeNull();
 
-            var boosterToCheck = activeBoosters[guildId].First();
+            var boosterToCheck = _activeBoosters[guildId].First();
             CheckActiveBooster(boosterToCheck, slot, guildId, multiplier, expirationDate);
 
-            var otherBoosterToCheck = activeBoosters[guildId].Last();
+            var otherBoosterToCheck = _activeBoosters[guildId].Last();
             CheckActiveBooster(otherBoosterToCheck, otherSlot, guildId, multiplier, expirationDate);
 
-            var otherGuildBoosterToCheck = activeBoosters[otherGuildId].First();
+            var otherGuildBoosterToCheck = _activeBoosters[otherGuildId].First();
             CheckActiveBooster(otherGuildBoosterToCheck, otherGuildSlot, otherGuildId, multiplier, expirationDate);
         }
 
