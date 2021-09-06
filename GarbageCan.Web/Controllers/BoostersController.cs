@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using GarbageCan.Application.Boosters.ActiveBoosters.Queries;
 using GarbageCan.Application.Boosters.QueuedBoosters.Queries;
-using GarbageCan.Domain.Entities.Boosters;
 using GarbageCan.Web.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
