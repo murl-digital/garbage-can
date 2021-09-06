@@ -5,20 +5,20 @@ using MediatR;
 
 namespace GarbageCan.Application.Boosters.ActiveBoosters.Queries
 {
-    public class GetActiveBoostersQuery : IRequest<ActiveBooster[]>
+    public class GetAllActiveBoostersQuery : IRequest<ActiveBooster[]>
     {
     }
 
-    public class GetActiveBoostersQueryHandler : RequestHandler<GetActiveBoostersQuery, ActiveBooster[]>
+    public class GetAllActiveBoostersQueryHandler : RequestHandler<GetAllActiveBoostersQuery, ActiveBooster[]>
     {
         private readonly IBoosterService _boosterService;
 
-        public GetActiveBoostersQueryHandler(IBoosterService boosterService)
+        public GetAllActiveBoostersQueryHandler(IBoosterService boosterService)
         {
             _boosterService = boosterService;
         }
 
-        protected override ActiveBooster[] Handle(GetActiveBoostersQuery request)
+        protected override ActiveBooster[] Handle(GetAllActiveBoostersQuery request)
         {
             return _boosterService.ActiveBoosters.SelectMany(x => x.Value).ToArray();
         }

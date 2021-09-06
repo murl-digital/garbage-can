@@ -25,7 +25,7 @@ namespace GarbageCan.Web.Controllers
         [SwaggerOperation("Gets all current active boosters")]
         public async Task<List<Booster>> Get()
         {
-            var boosters = await _mediator.Send(new GetActiveBoostersQuery());
+            var boosters = await _mediator.Send(new GetAllActiveBoostersQuery());
             return boosters.Select(b => new Booster
             {
                 Multiplier = b.Multiplier,
