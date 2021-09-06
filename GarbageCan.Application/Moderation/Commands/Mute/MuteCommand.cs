@@ -25,12 +25,10 @@ namespace GarbageCan.Application.Moderation.Commands.Mute
         private readonly IDateTime _dateTime;
         private readonly IApplicationDbContext _dbContext;
         private readonly IDiscordDirectMessageService _directMessageService;
-        private readonly IDiscordResponseService _responseService;
         private readonly IRoleConfiguration _roleConfiguration;
         private readonly IDiscordGuildRoleService _roleService;
 
         public MuteCommandHandler(IDiscordGuildRoleService roleService,
-            IDiscordResponseService responseService,
             IDateTime dateTime,
             IApplicationDbContext dbContext,
             IRoleConfiguration roleConfiguration,
@@ -38,7 +36,6 @@ namespace GarbageCan.Application.Moderation.Commands.Mute
             ICurrentUserService currentUserService)
         {
             _roleService = roleService;
-            _responseService = responseService;
             _dateTime = dateTime;
             _dbContext = dbContext;
             _roleConfiguration = roleConfiguration;
@@ -57,8 +54,6 @@ namespace GarbageCan.Application.Moderation.Commands.Mute
             await _directMessageService.SendMessageAsync(request.UserId, message);
 
             await _dbContext.SaveChangesAsync(cancellationToken);
-
-            await _responseService.RespondAsync($"{request.UserDisplayName} has been muted", true);
 
             return Unit.Value;
         }

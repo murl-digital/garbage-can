@@ -1,12 +1,13 @@
-﻿using GarbageCan.Application.Common.Interfaces;
+﻿using System;
+using System.Threading.Tasks;
+using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Infrastructure.Discord;
 using GarbageCan.Infrastructure.Persistence;
 using GarbageCan.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Threading.Tasks;
+using Z.EntityFramework.Extensions;
 
 namespace GarbageCan.Infrastructure
 {
@@ -17,6 +18,12 @@ namespace GarbageCan.Infrastructure
             if (configuration.GetValue<bool>("UseInMemoryDatabase"))
             {
                 services.AddDbContext<ApplicationDbContext>(options => options.UseInMemoryDatabase("GarbageCanDbContext"));
+                EntityFrameworkManager.ContextFactory = _ =>
+                {
+                    var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
+                    builder.UseInMemoryDatabase("GarbageCanDbContext");
+                    return new ApplicationDbContext(builder.Options);
+                };
             }
             else
             {
@@ -32,13 +39,15 @@ namespace GarbageCan.Infrastructure
             services.AddTransient<IDomainEventService, DomainEventService>();
             services.AddTransient<IDateTime, DateTimeService>();
             services.AddTransient<ICurrentUserService, DiscordContextUserService>();
+            services.AddSingleton<IBoosterService, BoosterService>();
 
             services.AddTransient<IDiscordGuildService, DiscordGuildService>();
-            services.AddTransient<IDiscordResponseService, DiscordResponseService>();
             services.AddTransient<IDiscordGuildRoleService, DiscordGuildRoleService>();
+            services.AddTransient<IDiscordGuildChannelService, DiscordGuildChannelService>();
             services.AddTransient<IDiscordModerationService, DiscordModerationService>();
             services.AddTransient<IDiscordDirectMessageService, DiscordDirectMessageService>();
             services.AddTransient<IDiscordMessageService, DiscordMessageService>();
+            services.AddTransient<IDiscordWebhookService, DiscordWebhookService>();
             services.AddScoped<DiscordCommandContextService>();
             services.AddSingleton<DiscordEmojiProviderService>();
 

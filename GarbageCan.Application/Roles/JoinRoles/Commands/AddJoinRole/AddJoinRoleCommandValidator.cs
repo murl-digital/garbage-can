@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace GarbageCan.Application.Roles.Commands.AddJoinRole
+namespace GarbageCan.Application.Roles.JoinRoles.Commands.AddJoinRole
 {
     public class AddJoinRoleCommandValidator : AbstractValidator<AddJoinRoleCommand>
     {

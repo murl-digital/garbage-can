@@ -4,7 +4,7 @@ using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Domain.Entities.Roles;
 using MediatR;
 
-namespace GarbageCan.Application.Roles.Commands.AddJoinRole
+namespace GarbageCan.Application.Roles.JoinRoles.Commands.AddJoinRole
 {
     public class AddJoinRoleCommand : IRequest
     {
@@ -15,12 +15,9 @@ namespace GarbageCan.Application.Roles.Commands.AddJoinRole
     public class AddJoinRoleCommandHandler : IRequestHandler<AddJoinRoleCommand>
     {
         private readonly IApplicationDbContext _context;
-        private readonly IDiscordResponseService _responseService;
-
-        public AddJoinRoleCommandHandler(IApplicationDbContext context, IDiscordResponseService responseService)
+        public AddJoinRoleCommandHandler(IApplicationDbContext context)
         {
             _context = context;
-            _responseService = responseService;
         }
 
         public async Task<Unit> Handle(AddJoinRoleCommand request, CancellationToken cancellationToken)
@@ -32,7 +29,6 @@ namespace GarbageCan.Application.Roles.Commands.AddJoinRole
             }, cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
-            await _responseService.RespondAsync("Role added successfully", true);
             return Unit.Value;
         }
     }

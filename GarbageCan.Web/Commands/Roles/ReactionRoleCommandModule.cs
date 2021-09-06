@@ -1,11 +1,13 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using GarbageCan.Application.Roles.Commands.AddReactionRole;
-using GarbageCan.Application.Roles.Commands.PrintReactionRoles;
-using GarbageCan.Application.Roles.Commands.RemoveReactionRole;
+using GarbageCan.Application.Roles.ReactionRoles.Commands.AddReactionRole;
+using GarbageCan.Application.Roles.ReactionRoles.Commands.RemoveReactionRole;
+using GarbageCan.Application.Roles.ReactionRoles.Queries.GetGuildReactionRoles;
 using GarbageCan.Domain.Entities;
 
 namespace GarbageCan.Web.Commands.Roles
@@ -30,16 +32,30 @@ namespace GarbageCan.Web.Commands.Roles
                     Name = emote.Name
                 }
             }, ctx);
+
+            await Mediator.RespondAsync(ctx, "Role added successfully", true);
         }
 
         [Command("list")]
         [RequirePermissions(Permissions.Administrator)]
         public async Task List(CommandContext ctx)
         {
-            await Mediator.Send(new PrintReactionRolesCommand
+            var reactionRoles = await Mediator.Send(new GetGuildReactionRolesQuery
             {
                 GuildId = ctx.Guild.Id
             }, ctx);
+
+            if (!reactionRoles.Any())
+            {
+                await Mediator.RespondAsync(ctx, "No reaction roles found!", formatAsBlock: true);
+                return;
+            }
+
+            var lines = reactionRoles
+                .Select(x =>
+                    $"{x.Id} :: msg {x.MessageId} in #{GetChannelName(ctx.Guild, x.ChannelId)} | {GetRoleName(ctx.Guild, x.RoleId)}")
+                .ToList();
+            await Mediator.RespondAsync(ctx, string.Join(Environment.NewLine, lines), formatAsBlock: true);
         }
 
         [Command("remove")]
@@ -47,7 +63,8 @@ namespace GarbageCan.Web.Commands.Roles
         public async Task RemoveReactionRole(CommandContext ctx, int id)
         {
             // TODO: its possible to remove EVERY reaction role, even roles that you shouldn't have access to. whoops!
-            await Mediator.Send(new RemoveReactionRoleCommand {Id = id}, ctx);
+            await Mediator.Send(new RemoveReactionRoleCommand { Id = id }, ctx);
+            await Mediator.RespondAsync(ctx, "Role removed successfully", true);
         }
     }
 }

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using FluentAssertions;
 using GarbageCan.Application.Common.Interfaces;
-using GarbageCan.Application.Roles.Commands.AlterRole;
+using GarbageCan.Application.Roles.ReactionRoles.Commands.ApplyReactionRoles;
 using GarbageCan.Application.UnitTests.Shared;
 using GarbageCan.Application.UnitTests.Shared.Logging;
 using GarbageCan.Domain.Entities;

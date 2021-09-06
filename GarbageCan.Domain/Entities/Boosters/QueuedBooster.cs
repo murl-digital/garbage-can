@@ -2,9 +2,10 @@
 {
     public class QueuedBooster
     {
-        public int position { get; set; }
-
-        public float multiplier { get; set; }
-        public long durationInSeconds { get; set; }
+        public int Id { get; set; }
+        public ulong GuildId { get; set; }
+        public uint Position { get; set; }
+        public float Multiplier { get; set; }
+        public long DurationInSeconds { get; set; }
     }
 }

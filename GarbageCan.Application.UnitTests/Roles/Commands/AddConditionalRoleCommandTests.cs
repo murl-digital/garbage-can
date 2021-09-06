@@ -2,7 +2,7 @@
 using FluentAssertions;
 using GarbageCan.Application.Common.Exceptions;
 using GarbageCan.Application.Common.Interfaces;
-using GarbageCan.Application.Roles.Commands.AddConditionalRole;
+using GarbageCan.Application.Roles.ConditionalRoles.Commands.AddConditionalRole;
 using GarbageCan.Application.UnitTests.Shared;
 using GarbageCan.Domain.Entities.Roles;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,18 +15,15 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
     {
         private ApplicationFixture _appFixture;
         private IApplicationDbContext _dbContext;
-        private IDiscordResponseService _responseService;
 
         [SetUp]
         public void Setup()
         {
             _appFixture = new ApplicationFixture();
             _dbContext = Substitute.For<IApplicationDbContext>();
-            _responseService = Substitute.For<IDiscordResponseService>();
             _appFixture.OnConfigureServices += (_, services) =>
             {
                 services.AddSingleton(_dbContext);
-                services.AddSingleton(_responseService);
             };
         }
 
@@ -54,22 +51,6 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
             addedRole.RequiredRoleId.Should().Be(requiredRoleId);
             addedRole.ResultRoleId.Should().Be(resultingRoleId);
             addedRole.Remain.Should().BeTrue();
-        }
-
-        [Test]
-        public async Task ShouldRespondWithMessage_WhenAddedSuccessfully()
-        {
-            _dbContext.ConfigureMockDbSet(x => x.ConditionalRoles);
-
-            await _appFixture.SendAsync(new AddConditionalRoleCommand
-            {
-                RequiredRoleId = 5,
-                ResultRoleId = 15615,
-                Remain = false
-            });
-
-            await _responseService.Received(1).RespondAsync("Role added successfully", true);
-            await _responseService.Received(1).RespondAsync(Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<bool>());
         }
 
         [Theory]

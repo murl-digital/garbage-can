@@ -22,11 +22,17 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.Property<int>("id")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("expirationDate")
-                        .HasColumnType("datetime");
+                    b.Property<DateTime>("ExpirationDate")
+                        .HasColumnType("datetime")
+                        .HasColumnName("expirationDate");
 
-                    b.Property<float>("multipler")
-                        .HasColumnType("float");
+                    b.Property<ulong>("GuildId")
+                        .HasColumnType("bigint unsigned")
+                        .HasColumnName("guildId");
+
+                    b.Property<float>("Multiplier")
+                        .HasColumnType("float")
+                        .HasColumnName("multiplier");
 
                     b.HasKey("id");
 
@@ -35,50 +41,77 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("GarbageCan.Domain.Entities.Boosters.AvailableSlot", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
-                    b.Property<ulong>("channelId")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<ulong>("ChannelId")
+                        .HasColumnType("bigint unsigned")
+                        .HasColumnName("channelId");
 
-                    b.HasKey("id");
+                    b.Property<ulong>("GuildId")
+                        .HasColumnType("bigint unsigned")
+                        .HasColumnName("guildId");
+
+                    b.HasKey("Id");
 
                     b.ToTable("xpAvailableSlots");
                 });
 
             modelBuilder.Entity("GarbageCan.Domain.Entities.Boosters.QueuedBooster", b =>
                 {
-                    b.Property<int>("position")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<long>("durationInSeconds")
-                        .HasColumnType("bigint");
+                    b.Property<long>("DurationInSeconds")
+                        .HasColumnType("bigint")
+                        .HasColumnName("durationInSeconds");
 
-                    b.Property<float>("multiplier")
-                        .HasColumnType("float");
+                    b.Property<ulong>("GuildId")
+                        .HasColumnType("bigint unsigned")
+                        .HasColumnName("guildId");
 
-                    b.HasKey("position");
+                    b.Property<float>("Multiplier")
+                        .HasColumnType("float")
+                        .HasColumnName("multiplier");
+
+                    b.Property<uint>("Position")
+                        .HasColumnType("int unsigned")
+                        .HasColumnName("position");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuildId");
 
                     b.ToTable("xpQueuedBoosters");
                 });
 
             modelBuilder.Entity("GarbageCan.Domain.Entities.Boosters.UserBooster", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
-                    b.Property<long>("durationInSeconds")
-                        .HasColumnType("bigint");
+                    b.Property<ulong>("DurationInSeconds")
+                        .HasColumnType("bigint unsigned")
+                        .HasColumnName("durationInSeconds");
 
-                    b.Property<float>("multiplier")
-                        .HasColumnType("float");
+                    b.Property<ulong>("GuildId")
+                        .HasColumnType("bigint unsigned")
+                        .HasColumnName("guildId");
 
-                    b.Property<ulong>("userId")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<float>("Multiplier")
+                        .HasColumnType("float")
+                        .HasColumnName("multiplier");
 
-                    b.HasKey("id");
+                    b.Property<ulong>("UserId")
+                        .HasColumnType("bigint unsigned")
+                        .HasColumnName("userId");
+
+                    b.HasKey("Id");
 
                     b.ToTable("xpUserBoosters");
                 });
@@ -325,13 +358,13 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("GarbageCan.Domain.Entities.Boosters.ActiveBooster", b =>
                 {
-                    b.HasOne("GarbageCan.Domain.Entities.Boosters.AvailableSlot", "slot")
+                    b.HasOne("GarbageCan.Domain.Entities.Boosters.AvailableSlot", "Slot")
                         .WithMany()
                         .HasForeignKey("id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("slot");
+                    b.Navigation("Slot");
                 });
 #pragma warning restore 612, 618
         }

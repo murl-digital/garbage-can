@@ -24,14 +24,12 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
         private IDateTime _dateTime;
         private IApplicationDbContext _dbContext;
         private IDiscordDirectMessageService _directMessageService;
-        private IDiscordResponseService _responseService;
         private IDiscordModerationService _moderationService;
 
         [SetUp]
         public void Setup()
         {
             _appFixture = new ApplicationFixture();
-            _responseService = Substitute.For<IDiscordResponseService>();
             _dateTime = Substitute.For<IDateTime>();
             _moderationService = Substitute.For<IDiscordModerationService>();
             _directMessageService = Substitute.For<IDiscordDirectMessageService>();
@@ -47,7 +45,6 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
             _appFixture.OnConfigureServices += (_, services) =>
             {
                 services.AddSingleton(_dbContext);
-                services.AddSingleton(_responseService);
                 services.AddSingleton(_dateTime);
                 services.AddSingleton(_currentUserService);
                 services.AddSingleton(_moderationService);
@@ -125,17 +122,6 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
             await _directMessageService.Received(1).SendMessageAsync(command.UserId, expectedMessage);
         }
 
-        [Test]
-        public async Task ShouldSendResponseMessage_WhenValidRequestCalled()
-        {
-            var command = GenerateCommand();
-
-            await _appFixture.SendAsync(command);
-
-            await _responseService.ReceivedWithAnyArgs(1).RespondAsync(default);
-            await _responseService.Received(1).RespondAsync($"{command.UserDisplayName}'s access to {command.ChannelMention} has been restricted for {command.TimeSpan.Humanize()}", true, false);
-        }
-
         private static RestrictChannelCommand GenerateCommand()
         {
             return new RestrictChannelCommand
@@ -144,9 +130,7 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
                 UserId = 90,
                 ChannelId = 4590,
                 ChannelName = "Channel1",
-                ChannelMention = "@Channel1",
                 Comments = "You're Annoying",
-                UserDisplayName = "TestUser",
                 TimeSpan = TimeSpan.FromHours(2)
             };
         }

@@ -11,7 +11,6 @@ namespace GarbageCan.Application.XP.Queries.GetTopUsersByXP
         }
 
         public int Place { get; set; }
-        public string DisplayName { get; set; }
         public User User { get; set; }
     }
 }

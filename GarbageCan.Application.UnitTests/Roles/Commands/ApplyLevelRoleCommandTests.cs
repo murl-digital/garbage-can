@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using GarbageCan.Application.Common.Interfaces;
-using GarbageCan.Application.Roles.Commands.ApplyLevelRoles;
+using GarbageCan.Application.Roles.LevelRoles.Commands.ApplyLevelRoles;
 using GarbageCan.Application.UnitTests.Shared;
 using GarbageCan.Domain.Entities.Roles;
 using Microsoft.Extensions.DependencyInjection;

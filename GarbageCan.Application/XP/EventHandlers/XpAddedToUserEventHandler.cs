@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Application.Common.Models;
@@ -24,13 +23,12 @@ namespace GarbageCan.Application.XP.EventHandlers
 
         public async Task Handle(DomainEventNotification<XpAddedToUserEvent> notification, CancellationToken cancellationToken)
         {
-            var user = await _context.XPUsers.FirstOrDefaultAsync(u => u.UserId == notification.DomainEvent.UserId, cancellationToken);
+            var user = await _context.XPUsers.FirstOrDefaultAsync(u => u.UserId == notification.DomainEvent.MessageDetails.UserId, cancellationToken);
 
             var oldLevel = user.Lvl;
             while (user.XP > _calculator.TotalXpRequired(user.Lvl))
             {
                 user.Lvl++;
-                // may implement a ghost level up event in the future
             }
 
             if (oldLevel < user.Lvl)
@@ -39,8 +37,7 @@ namespace GarbageCan.Application.XP.EventHandlers
 
                 await _provider.Publish(new UserLevelUpEvent
                 {
-                    GuildId = notification.DomainEvent.GuildId,
-                    UserId = notification.DomainEvent.UserId,
+                    MessageDetails = notification.DomainEvent.MessageDetails,
                     OldLvl = oldLevel,
                     NewLvl = user.Lvl
                 });

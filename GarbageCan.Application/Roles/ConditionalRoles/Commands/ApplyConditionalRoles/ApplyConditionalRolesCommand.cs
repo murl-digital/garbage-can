@@ -6,7 +6,7 @@ using GarbageCan.Application.Common.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace GarbageCan.Application.Roles.Commands.ApplyConiditionalRoles
+namespace GarbageCan.Application.Roles.ConditionalRoles.Commands.ApplyConditionalRoles
 {
     public class ApplyConditionalRolesCommand : IRequest
     {

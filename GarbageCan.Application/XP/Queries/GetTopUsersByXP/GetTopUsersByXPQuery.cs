@@ -1,6 +1,5 @@
 ﻿using GarbageCan.Application.Common.Interfaces;
 using MediatR;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading;
@@ -17,16 +16,10 @@ namespace GarbageCan.Application.XP.Queries.GetTopUsersByXP
     public class GetTopUsersByXPQueryHandler : IRequestHandler<GetTopUsersByXPQuery, GetTopUsersByXPQueryVm>
     {
         private readonly IApplicationDbContext _context;
-        private readonly IDiscordGuildService _discordGuildService;
-        private readonly ILogger<GetTopUsersByXPQueryHandler> _logger;
 
-        public GetTopUsersByXPQueryHandler(IApplicationDbContext context,
-            IDiscordGuildService discordGuildService,
-            ILogger<GetTopUsersByXPQueryHandler> logger)
+        public GetTopUsersByXPQueryHandler(IApplicationDbContext context)
         {
             _context = context;
-            _discordGuildService = discordGuildService;
-            _logger = logger;
         }
 
         public async Task<GetTopUsersByXPQueryVm> Handle(GetTopUsersByXPQuery request, CancellationToken cancellationToken)
@@ -39,11 +32,6 @@ namespace GarbageCan.Application.XP.Queries.GetTopUsersByXP
 
             var topUsers = users.Take(request.Count).ToList();
 
-            foreach (var user in topUsers)
-            {
-                user.DisplayName = await GetMemberDisplayNameAsync(user.User.UserId);
-            }
-
             var contextUser = users.First(x => x.User.UserId == request.CurrentUserId);
 
             return new GetTopUsersByXPQueryVm
@@ -51,19 +39,6 @@ namespace GarbageCan.Application.XP.Queries.GetTopUsersByXP
                 TopTenUsers = topUsers,
                 ContextUser = contextUser
             };
-        }
-
-        private async Task<string> GetMemberDisplayNameAsync(ulong userId)
-        {
-            try
-            {
-                return await _discordGuildService.GetMemberDisplayNameAsync(userId);
-            }
-            catch (Exception exception)
-            {
-                _logger.LogWarning(exception, "Failed to get display name for user: {userId}", userId);
-                return userId.ToString();
-            }
         }
     }
 }

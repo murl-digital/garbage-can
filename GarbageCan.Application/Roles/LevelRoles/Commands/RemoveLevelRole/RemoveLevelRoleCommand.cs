@@ -5,7 +5,7 @@ using GarbageCan.Application.Common.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace GarbageCan.Application.Roles.Commands.RemoveLevelRole
+namespace GarbageCan.Application.Roles.LevelRoles.Commands.RemoveLevelRole
 {
     public class RemoveLevelRoleCommand : IRequest
     {
@@ -15,12 +15,10 @@ namespace GarbageCan.Application.Roles.Commands.RemoveLevelRole
     public class RemoveLevelRoleCommandHandler : IRequestHandler<RemoveLevelRoleCommand>
     {
         private readonly IApplicationDbContext _context;
-        private readonly IDiscordResponseService _responseService;
 
-        public RemoveLevelRoleCommandHandler(IApplicationDbContext context, IDiscordResponseService responseService)
+        public RemoveLevelRoleCommandHandler(IApplicationDbContext context)
         {
             _context = context;
-            _responseService = responseService;
         }
 
         public async Task<Unit> Handle(RemoveLevelRoleCommand request, CancellationToken cancellationToken)
@@ -30,8 +28,6 @@ namespace GarbageCan.Application.Roles.Commands.RemoveLevelRole
 
             _context.LevelRoles.Remove(role);
             await _context.SaveChangesAsync(cancellationToken);
-
-            await _responseService.RespondAsync("Role removed successfully", true);
             return Unit.Value;
         }
     }

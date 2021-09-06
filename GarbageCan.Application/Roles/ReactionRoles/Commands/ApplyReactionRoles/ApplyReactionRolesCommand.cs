@@ -8,7 +8,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace GarbageCan.Application.Roles.Commands.AlterRole
+namespace GarbageCan.Application.Roles.ReactionRoles.Commands.ApplyReactionRoles
 {
     public class ApplyReactionRolesCommand : IRequest<bool>
     {

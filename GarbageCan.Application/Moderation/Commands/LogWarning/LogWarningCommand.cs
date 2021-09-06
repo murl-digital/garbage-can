@@ -7,28 +7,26 @@ using System.Threading.Tasks;
 
 namespace GarbageCan.Application.Moderation.Commands.LogWarning
 {
-    public class LogWarningCommand : IRequest<bool>
+    public class LogWarningCommand : IRequest<int>
     {
         public ulong UserId { get; set; }
         public string Comments { get; set; }
     }
 
-    public class LogWarningCommandHandler : IRequestHandler<LogWarningCommand, bool>
+    public class LogWarningCommandHandler : IRequestHandler<LogWarningCommand, int>
     {
-        private readonly IDiscordResponseService _responseService;
         private readonly ICurrentUserService _currentUserService;
         private readonly IApplicationDbContext _context;
         private readonly IDateTime _dateTime;
 
-        public LogWarningCommandHandler(IDiscordResponseService responseService, ICurrentUserService currentUserService, IApplicationDbContext context, IDateTime dateTime)
+        public LogWarningCommandHandler(ICurrentUserService currentUserService, IApplicationDbContext context, IDateTime dateTime)
         {
-            _responseService = responseService;
             _currentUserService = currentUserService;
             _context = context;
             _dateTime = dateTime;
         }
 
-        public async Task<bool> Handle(LogWarningCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(LogWarningCommand request, CancellationToken cancellationToken)
         {
             var now = _dateTime.Now.ToUniversalTime();
             var tryParse = ulong.TryParse(_currentUserService.UserId, out ulong test);
@@ -42,8 +40,7 @@ namespace GarbageCan.Application.Moderation.Commands.LogWarning
             };
             await _context.ModerationActionLogs.AddAsync(log, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
-            await _responseService.RespondAsync($"Verbal warning logged with id {log.id}", true);
-            return true;
+            return log.id;
         }
     }
 }

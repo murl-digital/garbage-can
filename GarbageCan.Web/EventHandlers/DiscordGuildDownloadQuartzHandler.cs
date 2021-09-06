@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Application.Common.Models;
@@ -30,6 +29,8 @@ namespace GarbageCan.Web.EventHandlers
         public async Task Handle(DomainEventNotification<DiscordGuildDownloadCompleteEvent> notification, CancellationToken cancellationToken)
         {
             _scheduler.ConfigureJobWithCronSchedule<ApplyConditionalRolesJob>(_logger, _configuration, "BackgroundTasks:ApplyConditionalRolesCronExpression");
+            _scheduler.ConfigureJobWithCronSchedule<BoosterCycleJob>(_logger, _configuration,
+                "BackgroundTasks:BoosterCycleCronExpression");
         }
     }
 }

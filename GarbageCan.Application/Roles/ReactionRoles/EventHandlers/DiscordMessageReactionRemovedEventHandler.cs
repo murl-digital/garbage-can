@@ -1,11 +1,11 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using GarbageCan.Application.Common.Models;
-using GarbageCan.Application.Roles.Commands.AlterRole;
+using GarbageCan.Application.Roles.ReactionRoles.Commands.ApplyReactionRoles;
 using GarbageCan.Domain.Events;
 using MediatR;
 
-namespace GarbageCan.Application.Roles.EventHandlers
+namespace GarbageCan.Application.Roles.ReactionRoles.EventHandlers
 {
     public class
         DiscordMessageReactionRemovedEventHandler : INotificationHandler<

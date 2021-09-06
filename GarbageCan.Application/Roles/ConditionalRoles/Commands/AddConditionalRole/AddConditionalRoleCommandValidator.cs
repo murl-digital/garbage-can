@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace GarbageCan.Application.Roles.Commands.AddConditionalRole
+namespace GarbageCan.Application.Roles.ConditionalRoles.Commands.AddConditionalRole
 {
     public class AddConditionalRoleCommandValidator : AbstractValidator<AddConditionalRoleCommand>
     {

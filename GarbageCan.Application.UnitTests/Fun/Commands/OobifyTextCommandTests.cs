@@ -12,19 +12,11 @@ namespace GarbageCan.Application.UnitTests.Fun.Commands
     public class OobifyTextCommandTests
     {
         private ApplicationFixture _fixture;
-        private IDiscordResponseService _mock;
 
         [SetUp]
         public void Setup()
         {
-            _mock = Substitute.For<IDiscordResponseService>();
-
             _fixture = new ApplicationFixture();
-
-            _fixture.OnConfigureServices += (_, services) =>
-            {
-                services.AddSingleton(_mock);
-            };
         }
 
         [Theory]
@@ -61,10 +53,7 @@ namespace GarbageCan.Application.UnitTests.Fun.Commands
         {
             var result = await _fixture.SendAsync(new OobifyTextCommand { Text = text });
 
-            result.Should().BeTrue();
-
-            await _mock.Received(1).RespondAsync(expected, false, false);
-            await _mock.DidNotReceive().RespondAsync(Arg.Is<string>(x => x != expected), Arg.Any<bool>(), Arg.Any<bool>());
+            result.Should().Be(expected);
         }
     }
 }

@@ -5,7 +5,7 @@ using GarbageCan.Domain.Entities;
 using GarbageCan.Domain.Entities.Roles;
 using MediatR;
 
-namespace GarbageCan.Application.Roles.Commands.AddReactionRole
+namespace GarbageCan.Application.Roles.ReactionRoles.Commands.AddReactionRole
 {
     public class AddReactionRoleCommand : IRequest
     {
@@ -20,13 +20,10 @@ namespace GarbageCan.Application.Roles.Commands.AddReactionRole
     {
         private readonly IApplicationDbContext _context;
         private readonly IDiscordMessageService _messageService;
-        private readonly IDiscordResponseService _responseService;
 
-        public AddReactionRoleCommandHandler(IApplicationDbContext context, IDiscordResponseService responseService,
-            IDiscordMessageService messageService)
+        public AddReactionRoleCommandHandler(IApplicationDbContext context, IDiscordMessageService messageService)
         {
             _context = context;
-            _responseService = responseService;
             _messageService = messageService;
         }
 
@@ -43,7 +40,6 @@ namespace GarbageCan.Application.Roles.Commands.AddReactionRole
 
             await _context.SaveChangesAsync(cancellationToken);
             await _messageService.CreateReactionAsync(request.ChannelId, request.MessageId, request.Emoji);
-            await _responseService.RespondAsync("Role added successfully", true);
             return Unit.Value;
         }
 

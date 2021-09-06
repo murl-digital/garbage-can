@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Application.Common.Models;
 using GarbageCan.Application.XP.Commands.AddXpToUser;
@@ -10,15 +9,13 @@ using System.Threading.Tasks;
 
 namespace GarbageCan.Application.XP.EventHandlers
 {
-    public class
-        DiscordMessageCreatedEventHandler : INotificationHandler<DomainEventNotification<DiscordMessageCreatedEvent>>
+    public class DiscordMessageCreatedEventHandler : INotificationHandler<DomainEventNotification<DiscordMessageCreatedEvent>>
     {
         private readonly IMediator _mediator;
         private readonly IDiscordConfiguration _configuration;
         private readonly IApplicationDbContext _context;
 
-        public DiscordMessageCreatedEventHandler(IMediator mediator, IDiscordConfiguration configuration,
-            IApplicationDbContext context)
+        public DiscordMessageCreatedEventHandler(IMediator mediator, IDiscordConfiguration configuration, IApplicationDbContext context)
         {
             _mediator = mediator;
             _configuration = configuration;
@@ -40,8 +37,11 @@ namespace GarbageCan.Application.XP.EventHandlers
             await _mediator.Send(new AddXpToUserCommand
             {
                 GuildId = notification.DomainEvent.GuildId,
+                ChannelId = notification.DomainEvent.ChannelId,
                 UserId = notification.DomainEvent.AuthorId,
-                Message = notification.DomainEvent.Content
+                Message = notification.DomainEvent.Content,
+                UserAvatarUrl = notification.DomainEvent.AuthorAvatarUrl,
+                UserDisplayName = notification.DomainEvent.AuthorDisplayName,
             }, cancellationToken);
         }
     }

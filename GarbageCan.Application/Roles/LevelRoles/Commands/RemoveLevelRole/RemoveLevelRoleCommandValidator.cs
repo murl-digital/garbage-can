@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace GarbageCan.Application.Roles.Commands.RemoveLevelRole
+namespace GarbageCan.Application.Roles.LevelRoles.Commands.RemoveLevelRole
 {
     public class RemoveLevelRoleCommandValidator : AbstractValidator<RemoveLevelRoleCommand>
     {

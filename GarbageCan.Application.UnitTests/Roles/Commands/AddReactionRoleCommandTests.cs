@@ -2,7 +2,7 @@
 using FluentAssertions;
 using GarbageCan.Application.Common.Exceptions;
 using GarbageCan.Application.Common.Interfaces;
-using GarbageCan.Application.Roles.Commands.AddReactionRole;
+using GarbageCan.Application.Roles.ReactionRoles.Commands.AddReactionRole;
 using GarbageCan.Application.UnitTests.Shared;
 using GarbageCan.Domain.Entities;
 using GarbageCan.Domain.Entities.Roles;
@@ -17,19 +17,16 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
         private ApplicationFixture _appFixture;
         private IApplicationDbContext _dbContext;
         private IDiscordMessageService _messageService;
-        private IDiscordResponseService _responseService;
 
         [SetUp]
         public void Setup()
         {
             _appFixture = new ApplicationFixture();
             _dbContext = Substitute.For<IApplicationDbContext>();
-            _responseService = Substitute.For<IDiscordResponseService>();
             _messageService = Substitute.For<IDiscordMessageService>();
             _appFixture.OnConfigureServices += (_, services) =>
             {
                 services.AddSingleton(_dbContext);
-                services.AddSingleton(_responseService);
                 services.AddSingleton(_messageService);
             };
         }
@@ -119,27 +116,6 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
 
             addedRole.Should().NotBeNull();
             addedRole.EmoteId.Should().Be(expected);
-        }
-
-        [Test]
-        public async Task ShouldRespondWithMessage_WhenAddedSuccessfully()
-        {
-            _dbContext.ConfigureMockDbSet(x => x.ReactionRoles);
-
-            await _appFixture.SendAsync(new AddReactionRoleCommand
-            {
-                RoleId = 5,
-                ChannelId = 4504,
-                MessageId = 5404,
-                Emoji = new Emoji
-                {
-                    Id = 4126u,
-                    Name = "TEST"
-                }
-            });
-
-            await _responseService.Received(1).RespondAsync("Role added successfully", true);
-            await _responseService.Received(1).RespondAsync(Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<bool>());
         }
 
         [Test]
