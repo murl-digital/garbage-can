@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Quartz;
 using System;
 using System.Threading.Tasks;
+using GarbageCan.Application.Common.Interfaces;
 
 namespace GarbageCan.Web.Jobs
 {
@@ -12,22 +13,32 @@ namespace GarbageCan.Web.Jobs
     {
         private readonly ILogger _logger;
         private readonly IMediator _mediator;
+        private readonly IDiscordGuildService _guildService;
 
-        public UnRestrictExpiredChannelRestrictionsJob(IMediator mediator, ILogger<UnRestrictExpiredChannelRestrictionsJob> logger)
+        public UnRestrictExpiredChannelRestrictionsJob(IMediator mediator,
+            IDiscordGuildService guildService,
+            ILogger<UnRestrictExpiredChannelRestrictionsJob> logger)
         {
             _logger = logger;
             _mediator = mediator;
+            _guildService = guildService;
         }
 
         public async Task Execute(IJobExecutionContext context)
         {
-            try
+            foreach (var guildId in _guildService.GetAllCurrentGuildIds())
             {
-                await _mediator.Send(new UnRestrictExpiredChannelsCommand());
-            }
-            catch (Exception exception)
-            {
-                _logger.LogError(exception, "An error occurred during a un-restricting channels job");
+                try
+                {
+                    await _mediator.Send(new UnRestrictExpiredChannelsCommand
+                    {
+                        GuildId = guildId
+                    });
+                }
+                catch (Exception exception)
+                {
+                    _logger.LogError(exception, "An error occurred during a un-restricting channels job");
+                }
             }
         }
     }

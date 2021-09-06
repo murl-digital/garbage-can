@@ -11,7 +11,7 @@ namespace GarbageCan.Application.Moderation.Commands.Mute
 {
     public class UnMuteExpiredMutesCommand : IRequest
     {
-        public ulong? GuildId { get; set; }
+        public ulong GuildId { get; set; }
     }
 
     public class UnMuteExpiredMutesCommandHandler : IRequestHandler<UnMuteExpiredMutesCommand>

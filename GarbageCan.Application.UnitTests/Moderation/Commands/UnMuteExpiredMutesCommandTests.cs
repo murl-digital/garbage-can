@@ -114,10 +114,14 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
             var activeMute = GenerateActiveMute(now.AddSeconds(secondsInFuture));
             _dbContext.ConfigureMockDbSet(x => x.ModerationActiveMutes, activeMute);
 
-            await _appFixture.SendAsync(new UnMuteExpiredMutesCommand());
+            ulong guildId = 45;
+            await _appFixture.SendAsync(new UnMuteExpiredMutesCommand
+            {
+                GuildId = guildId
+            });
 
             await _roleService.ReceivedWithAnyArgs(1).RevokeRoleAsync(default, default, default);
-            await _roleService.Received(1).RevokeRoleAsync(null, _roleId, activeMute.uId, "mute expired");
+            await _roleService.Received(1).RevokeRoleAsync(guildId, _roleId, activeMute.uId, "mute expired");
         }
 
         [Theory]
@@ -131,13 +135,17 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
             var mutes = secondsFromNowArray.Select(x => GenerateActiveMute(now.AddSeconds(x))).ToList();
             _dbContext.ConfigureMockDbSet(x => x.ModerationActiveMutes, mutes);
 
-            await _appFixture.SendAsync(new UnMuteExpiredMutesCommand());
+            ulong guildId = 45;
+            await _appFixture.SendAsync(new UnMuteExpiredMutesCommand
+            {
+                GuildId = guildId
+            });
 
             await _roleService.ReceivedWithAnyArgs(secondsFromNowArray.Count(x => x <= 0)).RevokeRoleAsync(default, default, default);
 
             foreach (var restrict in mutes.Where(x => x.expirationDate <= now.ToUniversalTime()))
             {
-                await _roleService.Received(1).RevokeRoleAsync(null, _roleId, restrict.uId, "mute expired");
+                await _roleService.Received(1).RevokeRoleAsync(guildId, _roleId, restrict.uId, "mute expired");
             }
         }
 

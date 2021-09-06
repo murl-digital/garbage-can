@@ -10,7 +10,7 @@ namespace GarbageCan.Application.Moderation.Commands.Restrict
 {
     public class UnRestrictExpiredChannelsCommand : IRequest
     {
-        public ulong? GuildId { get; set; }
+        public ulong GuildId { get; set; }
     }
 
     public class UnRestrictExpiredChannelsCommandHandler : IRequestHandler<UnRestrictExpiredChannelsCommand>
