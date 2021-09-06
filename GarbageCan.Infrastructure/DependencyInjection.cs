@@ -42,6 +42,7 @@ namespace GarbageCan.Infrastructure
             services.AddSingleton<IBoosterService, BoosterService>();
             services.AddSingleton<IRngService, RngService>();
 
+            services.AddTransient<DiscordGuildService>();
             services.AddTransient<IDiscordGuildService, DiscordGuildService>();
             services.AddTransient<IDiscordGuildMemberService, DiscordGuildMemberService>();
             services.AddTransient<IDiscordGuildRoleService, DiscordGuildRoleService>();
@@ -51,7 +52,6 @@ namespace GarbageCan.Infrastructure
             services.AddTransient<IDiscordMessageService, DiscordMessageService>();
             services.AddTransient<IDiscordWebhookService, DiscordWebhookService>();
             services.AddScoped<DiscordCommandContextService>();
-            services.AddSingleton<DiscordEmojiProviderService>();
 
             services.AddSingleton<ITemplateFileProvider>(new TemplateFileProvider());
             services.AddSingleton<IFontProvider>(new FontProvider());

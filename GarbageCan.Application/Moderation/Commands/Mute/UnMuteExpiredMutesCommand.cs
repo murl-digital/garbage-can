@@ -11,6 +11,7 @@ namespace GarbageCan.Application.Moderation.Commands.Mute
 {
     public class UnMuteExpiredMutesCommand : IRequest
     {
+        public ulong GuildId { get; set; }
     }
 
     public class UnMuteExpiredMutesCommandHandler : IRequestHandler<UnMuteExpiredMutesCommand>
@@ -55,7 +56,7 @@ namespace GarbageCan.Application.Moderation.Commands.Mute
 
             foreach (var restrict in expiredMutes)
             {
-                await _roleService.RevokeRoleAsync(_discordConfiguration.GuildId,
+                await _roleService.RevokeRoleAsync(request.GuildId,
                    _roleConfiguration.MuteRoleId,
                     restrict.uId,
                     "mute expired");

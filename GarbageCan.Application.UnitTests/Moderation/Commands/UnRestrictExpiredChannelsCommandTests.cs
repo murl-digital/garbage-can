@@ -16,7 +16,6 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
 {
     public class UnRestrictExpiredChannelsCommandTests
     {
-        private readonly ulong _guildId = 151;
         private ApplicationFixture _appFixture;
         private IDateTime _dateTime;
         private IApplicationDbContext _dbContext;
@@ -31,8 +30,6 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
             _dbContext = Substitute.For<IApplicationDbContext>();
             _moderationService = Substitute.For<IDiscordModerationService>();
             _discordConfiguration = Substitute.For<IDiscordConfiguration>();
-
-            _discordConfiguration.GuildId.Returns(_guildId);
 
             _appFixture.OnConfigureServices += (_, services) =>
             {
@@ -108,13 +105,17 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
             var channelRestricts = secondsFromNowArray.Select(x => GenerateActiveChannelRestrict(now.AddSeconds(x))).ToList();
             _dbContext.ConfigureMockDbSet(x => x.ModerationActiveChannelRestricts, channelRestricts);
 
-            await _appFixture.SendAsync(new UnRestrictExpiredChannelsCommand());
+            ulong guildId = 45;
+            await _appFixture.SendAsync(new UnRestrictExpiredChannelsCommand
+            {
+                GuildId = guildId
+            });
 
             await _moderationService.ReceivedWithAnyArgs(secondsFromNowArray.Count(x => x <= 0)).RestoreChannelAccess(default, default, default);
 
             foreach (var restrict in channelRestricts.Where(x => x.expirationDate <= now.ToUniversalTime()))
             {
-                await _moderationService.Received(1).RestoreChannelAccess(_guildId, restrict.uId, restrict.channelId, "channel restrict expired");
+                await _moderationService.Received(1).RestoreChannelAccess(guildId, restrict.uId, restrict.channelId, "channel restrict expired");
             }
         }
 
@@ -131,10 +132,14 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
             var activeRestriction = GenerateActiveChannelRestrict(now.AddSeconds(secondsInFuture));
             _dbContext.ConfigureMockDbSet(x => x.ModerationActiveChannelRestricts, activeRestriction);
 
-            await _appFixture.SendAsync(new UnRestrictExpiredChannelsCommand());
+            ulong guildId = 45;
+            await _appFixture.SendAsync(new UnRestrictExpiredChannelsCommand
+            {
+                GuildId = guildId
+            });
 
             await _moderationService.ReceivedWithAnyArgs(1).RestoreChannelAccess(default, default, default);
-            await _moderationService.Received(1).RestoreChannelAccess(_guildId, activeRestriction.uId, activeRestriction.channelId, "channel restrict expired");
+            await _moderationService.Received(1).RestoreChannelAccess(guildId, activeRestriction.uId, activeRestriction.channelId, "channel restrict expired");
         }
 
         private static ActiveChannelRestrict GenerateActiveChannelRestrict(DateTime expirationDateTime)

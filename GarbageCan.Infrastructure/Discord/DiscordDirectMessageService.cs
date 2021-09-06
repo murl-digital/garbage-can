@@ -10,24 +10,22 @@ namespace GarbageCan.Infrastructure.Discord
 {
     public class DiscordDirectMessageService : IDiscordDirectMessageService
     {
-        private readonly DiscordClient _contextService;
-        private readonly IDiscordConfiguration _discordConfiguration;
+        private readonly DiscordGuildService _guildService;
         private readonly ILogger<DiscordDirectMessageService> _logger;
 
-        public DiscordDirectMessageService(DiscordClient contextService,
-            IDiscordConfiguration discordConfiguration,
+        public DiscordDirectMessageService(DiscordGuildService guildService,
             ILogger<DiscordDirectMessageService> logger)
         {
-            _contextService = contextService;
-            _discordConfiguration = discordConfiguration;
+            _guildService = guildService;
             _logger = logger;
         }
 
-        public async Task SendMessageAsync(ulong userId, string message)
+        public async Task SendMessageAsync(ulong? guildId, ulong userId, string message)
         {
             try
             {
-                var member = await _contextService.Guilds[_discordConfiguration.GuildId].GetMemberAsync(userId);
+                var guild = await _guildService.GetGuild(guildId);
+                var member = await guild.GetMemberAsync(userId);
                 try
                 {
                     var channel = await member.CreateDmChannelAsync();

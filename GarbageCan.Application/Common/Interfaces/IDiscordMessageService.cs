@@ -5,6 +5,6 @@ namespace GarbageCan.Application.Common.Interfaces
 {
     public interface IDiscordMessageService
     {
-        Task CreateReactionAsync(ulong channelId, ulong messageId, Emoji emoji);
+        Task CreateReactionAsync(ulong? guildId, ulong channelId, ulong messageId, Emoji emoji);
     }
 }

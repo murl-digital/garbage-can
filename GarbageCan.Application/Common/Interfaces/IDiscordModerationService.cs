@@ -6,7 +6,7 @@ namespace GarbageCan.Application.Common.Interfaces
     {
         Task BanAsync(ulong guildId, ulong userId, string reason = null);
 
-        Task RestoreChannelAccess(ulong guildId, ulong userId, ulong channelId, string reason = null);
+        Task RestoreChannelAccess(ulong? guildId, ulong userId, ulong channelId, string reason = null);
 
         Task RestrictChannelAccess(ulong guildId, ulong userId, ulong channelId);
     }

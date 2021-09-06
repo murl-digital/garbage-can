@@ -83,7 +83,7 @@ namespace GarbageCan.Application.UnitTests.Boosters.Commands
             else
                 _dbContext.ConfigureMockDbSet(x => x.XPAvailableSlots);
 
-            _discordGuildService.GetAllCurrentGuilds().Returns(new[] { guildId });
+            _discordGuildService.GetAllCurrentGuildIds().Returns(new[] { guildId });
 
             await _appFixture.SendAsync(new PopulateBoosterServiceCommand());
 
@@ -192,7 +192,7 @@ namespace GarbageCan.Application.UnitTests.Boosters.Commands
             _dbContext.ConfigureMockDbSet(x => x.XPQueuedBoosters, boosters.Union(otherBoosters));
             _dbContext.ConfigureMockDbSet(x => x.XPAvailableSlots, new[] { slot, otherSlot });
 
-            _discordGuildService.GetAllCurrentGuilds().Returns(new[] { guildId, otherGuildId });
+            _discordGuildService.GetAllCurrentGuildIds().Returns(new[] { guildId, otherGuildId });
 
             await _appFixture.SendAsync(new PopulateBoosterServiceCommand());
 
