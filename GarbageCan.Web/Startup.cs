@@ -54,7 +54,7 @@ namespace GarbageCan.Web
             services.Configure<IDiscordConfiguration, DiscordConfiguration>(
                 Configuration.GetSection("Discord"));
             services.Configure<IRoleConfiguration, RoleConfiguration>(Configuration.GetSection("Roles"));
-            services.Configure<IAuthConfiguration, AuthConfiguration>(Configuration.GetSection("Authorization"));
+            services.Configure<IAuthConfiguration, AuthConfiguration>(Configuration.GetSection("Authentication"));
 
             services.AddTransient<CommandMediator>();
 
@@ -194,7 +194,7 @@ namespace GarbageCan.Web
             });
 
             
-            var authConfig = Configuration.GetSection("Authorization").Get<AuthConfiguration>();
+            var authConfig = Configuration.GetSection("Authentication").Get<AuthConfiguration>();
             if (authConfig.Enabled)
             {
                 services.AddCors(options =>
@@ -237,7 +237,7 @@ namespace GarbageCan.Web
 
             app.UseRouting();
 
-            var authConfig = Configuration.GetSection("Authorization").Get<AuthConfiguration>();
+            var authConfig = Configuration.GetSection("Authentication").Get<AuthConfiguration>();
             if (authConfig.Enabled)
             {
                 app.UseCors(authConfig.Audience);
