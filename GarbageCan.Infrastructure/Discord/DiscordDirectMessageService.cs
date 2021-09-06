@@ -20,11 +20,11 @@ namespace GarbageCan.Infrastructure.Discord
             _logger = logger;
         }
 
-        public async Task SendMessageAsync(ulong userId, string message)
+        public async Task SendMessageAsync(ulong? guildId, ulong userId, string message)
         {
             try
             {
-                var guild = await _guildService.GetGuild(null);
+                var guild = await _guildService.GetGuild(guildId);
                 var member = await guild.GetMemberAsync(userId);
                 try
                 {

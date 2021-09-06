@@ -51,7 +51,7 @@ namespace GarbageCan.Application.Moderation.Commands.Mute
             await AddActionLog(request, cancellationToken);
 
             var message = $"You have been muted for {request.TimeSpan.Humanize()}.\n\nAdditional comments: {request.Comments}";
-            await _directMessageService.SendMessageAsync(request.UserId, message);
+            await _directMessageService.SendMessageAsync(request.GuildId, request.UserId, message);
 
             await _dbContext.SaveChangesAsync(cancellationToken);
 

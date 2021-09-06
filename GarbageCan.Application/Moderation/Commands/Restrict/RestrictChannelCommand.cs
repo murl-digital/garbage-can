@@ -48,7 +48,7 @@ namespace GarbageCan.Application.Moderation.Commands.Restrict
             await AddActionLog(request, cancellationToken);
 
             var message = $"Your access to the {request.ChannelName} channel has been restricted for {request.TimeSpan.Humanize()}.\n\nAdditional comments: {request.Comments}";
-            await _directMessageService.SendMessageAsync(request.UserId, message);
+            await _directMessageService.SendMessageAsync(request.GuildId, request.UserId, message);
 
             await _dbContext.SaveChangesAsync(cancellationToken);
 

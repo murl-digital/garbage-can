@@ -4,6 +4,6 @@ namespace GarbageCan.Application.Common.Interfaces
 {
     public interface IDiscordDirectMessageService
     {
-        Task SendMessageAsync(ulong userId, string message);
+        Task SendMessageAsync(ulong? guildId, ulong userId, string message);
     }
 }

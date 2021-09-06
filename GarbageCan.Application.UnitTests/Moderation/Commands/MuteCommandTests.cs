@@ -125,8 +125,8 @@ namespace GarbageCan.Application.UnitTests.Moderation.Commands
 
             await _appFixture.SendAsync(command);
 
-            await _directMessageService.ReceivedWithAnyArgs(1).SendMessageAsync(default, default);
-            await _directMessageService.Received(1).SendMessageAsync(command.UserId, expectedMessage);
+            await _directMessageService.ReceivedWithAnyArgs(1).SendMessageAsync(default, default, default);
+            await _directMessageService.Received(1).SendMessageAsync(command.GuildId, command.UserId, expectedMessage);
         }
 
         private static MuteCommand GenerateCommand()
