@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using AspNetCoreRateLimit;
 using DSharpPlus;
@@ -17,14 +16,12 @@ using GarbageCan.Infrastructure;
 using GarbageCan.Web.Commands;
 using GarbageCan.Web.Configurations;
 using GarbageCan.Web.Extensions;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using DiscordConfiguration = GarbageCan.Web.Configurations.DiscordConfiguration;
 
@@ -54,7 +51,6 @@ namespace GarbageCan.Web
             services.Configure<IDiscordConfiguration, DiscordConfiguration>(
                 Configuration.GetSection("Discord"));
             services.Configure<IRoleConfiguration, RoleConfiguration>(Configuration.GetSection("Roles"));
-            services.Configure<IAuthConfiguration, AuthConfiguration>(Configuration.GetSection("Authentication"));
 
             services.AddTransient<CommandMediator>();
 
@@ -193,31 +189,16 @@ namespace GarbageCan.Web
                 });
             });
 
-            
-            var authConfig = Configuration.GetSection("Authentication").Get<AuthConfiguration>();
-            if (authConfig.Enabled)
+            services.AddCors(options =>
             {
-                services.AddCors(options =>
-                {
-                    options.AddPolicy(authConfig.Audience,
-                        builder => builder
-                            .AllowAnyOrigin()
-                            .AllowAnyMethod()
-                            .AllowAnyHeader()
-                            .Build()
-                    );
-                });
-
-                services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-                {
-                    options.Authority = authConfig.Authority;
-                    options.Audience = authConfig.Audience;
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        NameClaimType = ClaimTypes.NameIdentifier
-                    };
-                });
-            }
+                options.AddPolicy("gbc",
+                    builder => builder
+                        .AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .Build()
+                );
+            });
 
             AddRateLimiting(services);
         }
@@ -237,11 +218,7 @@ namespace GarbageCan.Web
 
             app.UseRouting();
 
-            var authConfig = Configuration.GetSection("Authentication").Get<AuthConfiguration>();
-            if (authConfig.Enabled)
-            {
-                app.UseCors(authConfig.Audience);
-            }
+            app.UseCors("gbc");
 
             app.UseAuthorization();
 
