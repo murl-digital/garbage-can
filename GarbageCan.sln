@@ -17,6 +17,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{17F180BA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GarbageCan.Web", "GarbageCan.Web\GarbageCan.Web.csproj", "{961236D2-1C0E-4D56-BB36-2B6AB99BEB05}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{1051B70E-39BD-4F85-A82B-40D91423445A}"
+ProjectSection(SolutionItems) = preProject
+	LICENSE = LICENSE
+	README.md = README.md
+EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{1F2EC02B-E944-44D4-82A3-9550B6201A7E}"
+ProjectSection(SolutionItems) = preProject
+	.github\workflows\main.yml = .github\workflows\main.yml
+	.github\workflows\verify.yml = .github\workflows\verify.yml
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +65,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{3F9BD180-305A-4A01-B33A-1C57C29814D4} = {17F180BA-DF97-476D-9A6B-9ABA4C842A84}
+		{1F2EC02B-E944-44D4-82A3-9550B6201A7E} = {1051B70E-39BD-4F85-A82B-40D91423445A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3E9DF8FD-8FDE-44CB-B789-B21C8967910E}
