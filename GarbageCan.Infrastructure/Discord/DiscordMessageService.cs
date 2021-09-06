@@ -2,7 +2,6 @@
 using DSharpPlus.Entities;
 using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Domain.Entities;
-using GarbageCan.Infrastructure.Discord.Exceptions;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
