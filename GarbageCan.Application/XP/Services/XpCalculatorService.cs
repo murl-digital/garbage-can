@@ -10,11 +10,13 @@ namespace GarbageCan.Application.XP.Services
     public class XpCalculatorService : IXpCalculatorService
     {
         private readonly IMediator _mediator;
+        private readonly IRngService _rngService;
         private readonly ILogger<XpCalculatorService> _logger;
 
-        public XpCalculatorService(IMediator mediator, ILogger<XpCalculatorService> logger)
+        public XpCalculatorService(IMediator mediator, IRngService rngService, ILogger<XpCalculatorService> logger)
         {
             _mediator = mediator;
+            _rngService = rngService;
             _logger = logger;
         }
 
@@ -22,12 +24,11 @@ namespace GarbageCan.Application.XP.Services
         {
             var length = Math.Sqrt(message.Replace(" ", "").Length);
             length = Math.Min(10, length);
-
-            // TODO: INCOMPLETE - need to implement rng
-            // var result = length * (Math.Abs(Random.Sample()) * 0.5 + 1) * BoosterManager.GetMultiplier();
+            
             var multiplier = await _mediator.Send(new GetBoosterMultiplierCommand { GuildId = guildId });
             _logger.LogDebug("Current multiplier for {GuildId} is {Multiplier}x", guildId, multiplier);
-            return length * multiplier;
+
+            return length * (Math.Abs(_rngService.NormalSample) * 0.5 + 1) * multiplier;
         }
 
         public double XpRequired(int level)
