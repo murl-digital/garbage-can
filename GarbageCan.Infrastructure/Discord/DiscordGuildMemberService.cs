@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using DSharpPlus;
+using DSharpPlus.Entities;
 using DSharpPlus.Exceptions;
 using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Application.Common.Models;
@@ -10,18 +11,17 @@ namespace GarbageCan.Infrastructure.Discord
 {
     public class DiscordGuildMemberService : IDiscordGuildMemberService
     {
-        private readonly IDiscordConfiguration _configuration;
         private readonly DiscordClient _client;
 
-        public DiscordGuildMemberService(IDiscordConfiguration configuration, DiscordClient client)
+        public DiscordGuildMemberService(DiscordClient client)
         {
-            _configuration = configuration;
             _client = client;
         }
 
-        public List<Member> GetGuildMembers()
+        public List<Member> GetGuildMembers(ulong? guildId)
         {
-            return _client.Guilds[_configuration.GuildId].Members.Select(x => new Member
+            var guild = GetGuild(guildId);
+            return guild?.Members.Select(x => new Member
             {
                 Id = x.Key,
                 DisplayName = x.Value.DisplayName,
@@ -29,14 +29,15 @@ namespace GarbageCan.Infrastructure.Discord
             }).ToList();
         }
 
-        public Task<Member> GetMemberAsync(ulong id)
+        public Task<Member> GetMemberAsync(ulong? guildId, ulong id)
         {
             try
             {
-                var dictionary = _client.Guilds[_configuration.GuildId].Members;
+                var guild = GetGuild(guildId);
+                var dictionary = guild.Members;
                 if (!dictionary.ContainsKey(id))
                 {
-                    return Task.FromResult((Member)null);
+                    return Task.FromResult((Member) null);
                 }
 
                 var member = dictionary[id];
@@ -49,8 +50,14 @@ namespace GarbageCan.Infrastructure.Discord
             }
             catch (NotFoundException)
             {
-                return Task.FromResult((Member)null);
+                return Task.FromResult((Member) null);
             }
+        }
+
+        private DiscordGuild GetGuild(ulong? guildId)
+        {
+            var guild = guildId.HasValue ? _client.Guilds[guildId.Value] : _client.Guilds.Values.FirstOrDefault();
+            return guild;
         }
     }
 }

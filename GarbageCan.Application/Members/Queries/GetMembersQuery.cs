@@ -10,6 +10,7 @@ namespace GarbageCan.Application.Members.Queries
 {
     public class GetMembersQuery : IRequest<List<MemberVm>>
     {
+        public ulong? GuildId { get; set; }
         public int PageNumber { get; init; }
         public int PageSize { get; init; }
     }
@@ -31,7 +32,7 @@ namespace GarbageCan.Application.Members.Queries
             var pageNumber = request.PageNumber;
 
             var result = new List<MemberVm>();
-            var members = _service.GetGuildMembers()
+            var members = _service.GetGuildMembers(request.GuildId)
                 .Where(m => !m.IsBot)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)

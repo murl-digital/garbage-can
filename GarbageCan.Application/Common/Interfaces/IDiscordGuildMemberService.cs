@@ -6,7 +6,7 @@ namespace GarbageCan.Application.Common.Interfaces
 {
     public interface IDiscordGuildMemberService
     {
-        List<Member> GetGuildMembers();
-        Task<Member> GetMemberAsync(ulong id);
+        List<Member> GetGuildMembers(ulong? guildId);
+        Task<Member> GetMemberAsync(ulong? guildId, ulong id);
     }
 }

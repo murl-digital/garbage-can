@@ -8,6 +8,7 @@ namespace GarbageCan.Application.Members.Queries
 {
     public class GetMemberByIdQuery : IRequest<MemberVm>
     {
+        public ulong? GuildId { get; init; }
         public ulong Id { get; init; }
     }
 
@@ -24,7 +25,7 @@ namespace GarbageCan.Application.Members.Queries
 
         public async Task<MemberVm> Handle(GetMemberByIdQuery request, CancellationToken cancellationToken)
         {
-            var member = await _service.GetMemberAsync(request.Id);
+            var member = await _service.GetMemberAsync(request.GuildId, request.Id);
 
             if (member == null)
             {
