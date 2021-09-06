@@ -1,4 +1,6 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
@@ -7,32 +9,56 @@ using DSharpPlus.Entities;
 
 namespace GarbageCan.Commands.Fun
 {
-    public class AboutCommandModule : BaseCommandModule
+    public class AboutCommandModule : MediatorCommandModule
     {
         [Command("about")]
         public async Task About(CommandContext ctx)
         {
+            var packageStrings = Packages.Select(x => $"- {MaskUrl(x.Key, x.Value)}");
+            var combinedPackageStrings = string.Join(Environment.NewLine, packageStrings);
+
             var builder = new DiscordEmbedBuilder();
-            builder.WithThumbnail(ctx.Client.CurrentUser.AvatarUrl)
-                .WithTitle("Garbage Can")
-                .WithDescription(
-                    $"{Formatter.Italic("A general purpose bot written for the DRACONIUM discord server")} | {Formatter.MaskedUrl("Github", new Uri("https://github.com/murl-digital/garbage-can"))}");
-
-            builder.AddField("Data Collection",
-                $"Garbage Can collects numerical user ids for xp and logging purposes. To see exactly how your data is used, you can check the bot's {Formatter.MaskedUrl("source code", new Uri("https://github.com/SorenNeedsCoffee/garbage-can-csharp"))}");
-
-            builder.AddField("Attributions",
-                $"- {Formatter.MaskedUrl(".NET Core 5", new Uri("https://github.com/dotnet/core"))} \n" +
-                $"- {Formatter.MaskedUrl("EntityFramework Core", new Uri("https://github.com/dotnet/efcore"))} \n" +
-                $"- {Formatter.MaskedUrl("Pomelo.EntityFrameworkCore.MySql", new Uri("https://github.com/PomeloFoundation/Pomelo.EntityFrameworkCore.MySql"))} \n" +
-                $"- {Formatter.MaskedUrl("DSharpPlus", new Uri("https://github.com/DSharpPlus/DSharpPlus"))} \n" +
-                $"- {Formatter.MaskedUrl("ImageSharp", new Uri("https://github.com/SixLabors/ImageSharp"))} \n" +
-                $"- {Formatter.MaskedUrl("Serilog", new Uri("https://github.com/serilog/serilog"))} \n" +
-                $"- {Formatter.MaskedUrl("Config.Net", new Uri("https://github.com/aloneguid/config"))} \n" +
-                $"- {Formatter.MaskedUrl("Humanizer", new Uri("https://github.com/Humanizr/Humanizer"))} \n" +
-                $"- {Formatter.MaskedUrl("MathNet Numerics", new Uri("https://numerics.mathdotnet.com/"))} \n");
+            builder.WithThumbnail(ctx.Client.CurrentUser.AvatarUrl).WithTitle("Garbage Can")
+                .WithDescription(Description);
+            builder.AddField("Data Collection", DataCollection);
+            builder.AddField("Attributions", combinedPackageStrings);
 
             await ctx.RespondAsync(builder.Build());
         }
+
+        private static string MaskUrl(string name, string uriString)
+        {
+            return Formatter.MaskedUrl(name, new Uri(uriString));
+        }
+
+        #region Text
+
+        private static readonly string DataCollection =
+            $"Garbage Can collects numerical user ids for xp and logging purposes. To see exactly how your data is used, you can check the bot's {MaskUrl("source code", "https://github.com/SorenNeedsCoffee/garbage-can-csharp")}";
+
+        private static readonly string Description =
+            $"{Formatter.Italic("A general purpose bot written for the DRACONIUM discord server")} | {MaskUrl("Github", "https://github.com/murl-digital/garbage-can")}";
+
+        private static readonly Dictionary<string, string> Packages = new()
+        {
+            { ".NET Core 5", "https://github.com/dotnet/core" },
+            { "EntityFramework Core", "https://github.com/dotnet/efcore" },
+            {
+                "Pomelo.EntityFrameworkCore.MySql",
+                "https://github.com/PomeloFoundation/Pomelo.EntityFrameworkCore.MySql"
+            },
+            { "DSharpPlus", "https://github.com/DSharpPlus/DSharpPlus" },
+            { "MediatR", "https://github.com/jbogard/MediatR" },
+            { "FluentValidation", "https://github.com/FluentValidation/FluentValidation" },
+            { "AutoMapper", "https://github.com/AutoMapper/AutoMapper" },
+            { "ImageSharp", "https://github.com/SixLabors/ImageSharp" },
+            { "Serilog", "https://github.com/serilog/serilog" },
+            { "Config.Net", "https://github.com/aloneguid/config" },
+            { "Humanizer", "https://github.com/Humanizr/Humanizer" },
+            { "MathNet Numerics", "https://numerics.mathdotnet.com/" },
+            { "Quartz", "https://github.com/quartznet/quartznet" }
+        };
+
+        #endregion Text
     }
 }

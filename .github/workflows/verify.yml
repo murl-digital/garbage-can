@@ -19,10 +19,10 @@ jobs:
         with:
           dotnet-version: "5.0"
       - name: Restore dependencies
-        working-directory: GarbageCan.Web
+        working-directory: GarbageCan
         run: dotnet restore
       - name: Build
-        working-directory: GarbageCan.Web
+        working-directory: GarbageCan
         run: dotnet build --no-restore
       - name: Test
         run: dotnet test
@@ -39,4 +39,4 @@ jobs:
           heroku_email: ${{secrets.HEROKU_EMAIL}}
           usedocker: true
           docker_heroku_process_type: web
-          appdir: GarbageCan.Web
+          appdir: GarbageCan
