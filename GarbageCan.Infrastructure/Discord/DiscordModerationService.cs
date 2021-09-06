@@ -9,10 +9,12 @@ namespace GarbageCan.Infrastructure.Discord
     public class DiscordModerationService : IDiscordModerationService
     {
         private readonly DiscordClient _client;
+        private readonly DiscordGuildService _guildService;
 
-        public DiscordModerationService(DiscordClient client)
+        public DiscordModerationService(DiscordClient client, DiscordGuildService guildService)
         {
             _client = client;
+            _guildService = guildService;
         }
 
         public async Task BanAsync(ulong guildId, ulong userId, string reason = null)
@@ -21,7 +23,7 @@ namespace GarbageCan.Infrastructure.Discord
             await member.BanAsync(reason: reason);
         }
 
-        public async Task RestoreChannelAccess(ulong guildId, ulong userId, ulong channelId, string reason = null)
+        public async Task RestoreChannelAccess(ulong? guildId, ulong userId, ulong channelId, string reason = null)
         {
             var member = await GetMember(guildId, userId);
             var channel = await _client.GetChannelAsync(channelId);
@@ -40,9 +42,9 @@ namespace GarbageCan.Infrastructure.Discord
             await channel.AddOverwriteAsync(member, Permissions.None, Permissions.AccessChannels);
         }
 
-        private async Task<DiscordMember> GetMember(ulong guildId, ulong userId)
+        private async Task<DiscordMember> GetMember(ulong? guildId, ulong userId)
         {
-            var guild = await _client.GetGuildAsync(guildId);
+            var guild = await _guildService.GetGuild(guildId);
             var member = await guild.GetMemberAsync(userId);
             return member;
         }

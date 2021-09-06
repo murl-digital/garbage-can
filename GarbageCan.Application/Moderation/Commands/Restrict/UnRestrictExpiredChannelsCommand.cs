@@ -10,6 +10,7 @@ namespace GarbageCan.Application.Moderation.Commands.Restrict
 {
     public class UnRestrictExpiredChannelsCommand : IRequest
     {
+        public ulong? GuildId { get; set; }
     }
 
     public class UnRestrictExpiredChannelsCommandHandler : IRequestHandler<UnRestrictExpiredChannelsCommand>
@@ -51,7 +52,7 @@ namespace GarbageCan.Application.Moderation.Commands.Restrict
 
             foreach (var restrict in expired)
             {
-                await _moderationService.RestoreChannelAccess(_discordConfiguration.GuildId,
+                await _moderationService.RestoreChannelAccess(request.GuildId,
                     restrict.uId,
                     restrict.channelId,
                     "channel restrict expired");
