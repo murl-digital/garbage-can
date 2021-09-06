@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using AspNetCoreRateLimit;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using GarbageCan.Application;
@@ -14,12 +17,14 @@ using GarbageCan.Infrastructure;
 using GarbageCan.Web.Commands;
 using GarbageCan.Web.Configurations;
 using GarbageCan.Web.Extensions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using DiscordConfiguration = GarbageCan.Web.Configurations.DiscordConfiguration;
 
@@ -38,10 +43,6 @@ namespace GarbageCan.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo {Title = "GarbageCan.Web", Version = "v1"});
-            });
 
             services.AddApplication(typeof(Startup).Assembly);
             services.AddInfrastructure(Configuration);
@@ -53,6 +54,7 @@ namespace GarbageCan.Web
             services.Configure<IDiscordConfiguration, DiscordConfiguration>(
                 Configuration.GetSection("Discord"));
             services.Configure<IRoleConfiguration, RoleConfiguration>(Configuration.GetSection("Roles"));
+            services.Configure<IAuthConfiguration, AuthConfiguration>(Configuration.GetSection("Authorization"));
 
             services.AddTransient<CommandMediator>();
 
@@ -72,7 +74,7 @@ namespace GarbageCan.Web
 
                 var commands = client.UseCommandsNext(new CommandsNextConfiguration
                 {
-                    StringPrefixes = new[] {configuration.CommandPrefix},
+                    StringPrefixes = new[] { configuration.CommandPrefix },
                     Services = provider
                 });
 
@@ -173,6 +175,51 @@ namespace GarbageCan.Web
 
                 return client;
             });
+
+            services.AddSwaggerGen(c =>
+            {
+                c.EnableAnnotations();
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Garbage Can",
+                    Description = "REST api to interact with the Garbage Can Discord Bot",
+                    Version = "v1",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Joe Sorensen",
+                        Email = "no peeking",
+                        Url = new Uri("https://github.com/murl-digital")
+                    }
+                });
+            });
+
+            
+            var authConfig = Configuration.GetSection("Authorization").Get<AuthConfiguration>();
+            if (authConfig.Enabled)
+            {
+                services.AddCors(options =>
+                {
+                    options.AddPolicy(authConfig.Audience,
+                        builder => builder
+                            .AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader()
+                            .Build()
+                    );
+                });
+
+                services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+                {
+                    options.Authority = authConfig.Authority;
+                    options.Audience = authConfig.Audience;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        NameClaimType = ClaimTypes.NameIdentifier
+                    };
+                });
+            }
+
+            AddRateLimiting(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -190,6 +237,12 @@ namespace GarbageCan.Web
 
             app.UseRouting();
 
+            var authConfig = Configuration.GetSection("Authorization").Get<AuthConfiguration>();
+            if (authConfig.Enabled)
+            {
+                app.UseCors(authConfig.Audience);
+            }
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
@@ -200,7 +253,7 @@ namespace GarbageCan.Web
                 var logger = app.ApplicationServices.GetService<ILogger<Startup>>();
 
                 logger.LogInformation("SHUTTING DOWN");
-                service?.Publish(new DiscordConnectionChangeEvent {Status = DiscordConnectionStatus.Shutdown})
+                service?.Publish(new DiscordConnectionChangeEvent { Status = DiscordConnectionStatus.Shutdown })
                     .GetAwaiter().GetResult();
 
                 var client = app.ApplicationServices.GetService<DiscordClient>();
@@ -223,6 +276,30 @@ namespace GarbageCan.Web
             {
                 logger.LogError(exception, "Error On Scoped event publish. Event: {@Event}", notification);
             }
+        }
+
+        private static void AddRateLimiting(IServiceCollection services)
+        {
+            services.AddMemoryCache();
+            services.Configure<IpRateLimitOptions>(options =>
+            {
+                options.EnableEndpointRateLimiting = true;
+                options.StackBlockedRequests = true;
+                options.GeneralRules = new List<RateLimitRule>
+                {
+                    new()
+                    {
+                        Endpoint = "*",
+                        Period = "30s",
+                        Limit = 20
+                    }
+                };
+            });
+            services.Configure<IpRateLimitPolicies>(_ => { });
+            services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+            services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+            services.AddHttpContextAccessor();
         }
     }
 }
