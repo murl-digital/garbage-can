@@ -158,7 +158,7 @@ namespace GarbageCan.Application.UnitTests.Boosters.Commands
         {
             ulong guildId = 6;
             ulong channelId = 7;
-            var now = DateTime.Now;
+            var now = DateTime.Now.ToUniversalTime();
             var slot = new AvailableSlot
             {
                 GuildId = guildId,
@@ -169,7 +169,7 @@ namespace GarbageCan.Application.UnitTests.Boosters.Commands
                 new()
                 {
                     GuildId = guildId,
-                    ExpirationDate = now.Add(TimeSpan.FromSeconds(5)),
+                    ExpirationDate = now.Subtract(TimeSpan.FromSeconds(5)),
                     Multiplier = 6.9f,
                     Slot = slot
                 }

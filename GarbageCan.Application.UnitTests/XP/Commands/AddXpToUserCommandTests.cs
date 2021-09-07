@@ -63,7 +63,7 @@ namespace GarbageCan.Application.UnitTests.XP.Commands
             await _dbContext.Received(1).SaveChangesAsync(default);
 
             _dbContext.XPUsers.First().XP.Should().Be(20);
-            _calculator.Received(1).XpEarned(message, guildId);
+            await _calculator.Received(1).XpEarned(message, guildId);
         }
 
         [Test]
