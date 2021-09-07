@@ -1,84 +1,68 @@
-using System;
+﻿using System;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using GarbageCan.Data;
-using GarbageCan.Data.Entities.Roles;
-using Serilog;
-using Z.EntityFramework.Plus;
+using GarbageCan.Application.Roles.ConditionalRoles.Commands.AddConditionalRole;
+using GarbageCan.Application.Roles.ConditionalRoles.Commands.RemoveConditionalRole;
+using GarbageCan.Application.Roles.ConditionalRoles.Queries.GetGuildConditionalRoles;
 
 namespace GarbageCan.Commands.Roles
 {
     [Group("conditionalRoles")]
     [Aliases("conditionalRole", "cr")]
-    public class ConditionalRoleCommandModule : BaseCommandModule
+    public class ConditionalRoleCommandModule : MediatorCommandModule
     {
         [Command("add")]
         [RequirePermissions(Permissions.Administrator)]
         public async Task AddConditionalRole(CommandContext ctx, DiscordRole required, DiscordRole result, bool remain)
         {
-            try
+            await Mediator.Send(new AddConditionalRoleCommand
             {
-                await using var context = new Context();
-                context.conditionalRoles.Add(new EntityConditionalRole
-                {
-                    requiredRoleId = required.Id,
-                    resultRoleId = result.Id,
-                    remain = remain
-                });
-                await context.SaveChangesAsync();
-                await ctx.RespondAsync($"{GarbageCan.Check} Role added successfully");
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "Couldn't add conditional role");
-                await ctx.RespondAsync("An error occured");
-            }
-        }
+                GuildId = ctx.Guild.Id,
+                RequiredRoleId = required.Id,
+                ResultRoleId = result.Id,
+                Remain = remain
+            }, ctx);
 
-        [Command("remove")]
-        [RequirePermissions(Permissions.Administrator)]
-        public async Task RemoveConditionalRole(CommandContext ctx, int id)
-        {
-            try
-            {
-                using var context = new Context();
-                await context.conditionalRoles.Where(r => r.id == id).DeleteAsync();
-                await ctx.RespondAsync($"{GarbageCan.Check} Role removed successfully");
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "Couldn't remove conditional role");
-                await ctx.RespondAsync("An error occured");
-            }
+            await Mediator.RespondAsync(ctx, "Role added successfully", true);
         }
 
         [Command("list")]
         [RequirePermissions(Permissions.Administrator)]
         public async Task List(CommandContext ctx)
         {
-            var builder = new StringBuilder();
-            try
+            var conditionalRoles = await Mediator.Send(new GetGuildConditionalRolesQuery
             {
-                using var context = new Context();
-                foreach (var role in context.conditionalRoles)
-                {
-                    var resultRole = ctx.Guild.GetRole(role.resultRoleId);
-                    var requiredRole = ctx.Guild.GetRole(role.requiredRoleId);
-                    builder.AppendLine($"{role.id} :: {requiredRole.Name} | {resultRole.Name}");
-                }
+                GuildId = ctx.Guild.Id
+            }, ctx);
 
-                await ctx.RespondAsync(Formatter.BlockCode(builder.ToString()));
-            }
-            catch (Exception e)
+            if (!conditionalRoles.Any())
             {
-                Log.Error(e, "Couldn't list reaction roles");
-                await ctx.RespondAsync("An error occured");
+                await Mediator.RespondAsync(ctx, "No conditional roles found!", formatAsBlock: true);
+                return;
             }
+
+            var roleIds = conditionalRoles.Select(x => x.ResultRoleId)
+                .Concat(conditionalRoles.Select(x => x.RequiredRoleId));
+
+            var lines = conditionalRoles
+                .Select(x =>
+                    $"{x.Id} :: {GetRoleName(ctx.Guild, x.RequiredRoleId)} | {GetRoleName(ctx.Guild, x.ResultRoleId)}")
+                .ToList();
+
+            await Mediator.RespondAsync(ctx, string.Join(Environment.NewLine, lines), formatAsBlock: true);
+        }
+
+
+        [Command("remove")]
+        [RequirePermissions(Permissions.Administrator)]
+        public async Task RemoveConditionalRole(CommandContext ctx, int id)
+        {
+            await Mediator.Send(new RemoveConditionalRoleCommand { Id = id }, ctx);
+            await Mediator.RespondAsync(ctx, "Role removed successfully", true);
         }
     }
 }

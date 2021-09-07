@@ -6,25 +6,29 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using GarbageCan.Data;
-using GarbageCan.Data.Entities.Boosters;
-using GarbageCan.XP.Boosters;
+using GarbageCan.Application.Boosters.ActiveBoosters.Queries;
+using GarbageCan.Application.Boosters.AvailableSlots.Commands;
+using GarbageCan.Application.Boosters.AvailableSlots.Queries;
+using GarbageCan.Application.Boosters.Commands;
+using GarbageCan.Application.Boosters.QueuedBoosters.Queries;
+using GarbageCan.Application.Boosters.UserBoosters.Commands;
+using GarbageCan.Application.Boosters.UserBoosters.Queries;
+using GarbageCan.Domain.Enums;
 using Humanizer;
-using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 namespace GarbageCan.Commands.Boosters
 {
     [Group("boosters")]
     [Aliases("booster")]
-    public class BoosterCommandModule : BaseCommandModule
+    public class BoosterCommandModule : MediatorCommandModule
     {
         [GroupCommand]
         public async Task GetBoosters(CommandContext ctx)
         {
             try
             {
-                var boosters = await GetBoostersString(ctx.User.Id);
+                var boosters = await GetBoostersString(ctx, ctx.Guild.Id, ctx.User.Id);
                 await ctx.RespondAsync(Formatter.BlockCode(boosters));
             }
             catch (Exception e)
@@ -39,30 +43,38 @@ namespace GarbageCan.Commands.Boosters
         {
             try
             {
-                await using var context = new Context();
-                var booster = await context.xpUserBoosters.FirstOrDefaultAsync(b => b.id == id);
-                if (booster == null || booster.userId != ctx.User.Id)
+                var booster = (await Mediator.Send(new GetUserBoostersQuery
+                {
+                    GuildId = ctx.Guild.Id,
+                    UserId = ctx.User.Id
+                }, ctx)).FirstOrDefault();
+
+                if (booster == null)
                 {
                     await ctx.RespondAsync("No booster exists with that id");
                     return;
                 }
 
-                var result = BoosterManager.AddBooster(booster.multiplier,
-                    TimeSpan.FromSeconds(booster.durationInSeconds), true);
+                var result = await Mediator.Send(new AddBoosterCommand
+                {
+                    GuildId = ctx.Guild.Id,
+                    Multiplier = booster.Multiplier,
+                    Duration = TimeSpan.FromSeconds(booster.DurationInSeconds),
+                    Queue = true
+                }, ctx);
                 switch (result)
                 {
                     case BoosterResult.Active:
-                        await ctx.RespondAsync($"{GarbageCan.Check} Your booster has been activated!");
+                        await ctx.RespondAsync("Your booster has been activated!");
                         break;
                     case BoosterResult.Queued:
-                        await ctx.RespondAsync($"{GarbageCan.Check} Your booster has been queued!");
+                        await ctx.RespondAsync("Your booster has been queued!");
                         break;
-                    case BoosterResult.SlotsFull:
-                        break;
+                    default:
+                        throw new InvalidOperationException($"AddBooster returned unexpected result: {result}");
                 }
 
-                context.xpUserBoosters.Remove(booster);
-                await context.SaveChangesAsync();
+                await Mediator.Send(new RemoveUserBoosterCommand { Id = booster.Id }, ctx);
             }
             catch (Exception e)
             {
@@ -79,23 +91,26 @@ namespace GarbageCan.Commands.Boosters
                 var builder = new StringBuilder();
 
                 var activeBuilder = new StringBuilder();
-                foreach (var booster in BoosterManager.activeBoosters)
+                foreach (var booster in await Mediator.Send(new GetGuildActiveBoostersQuery { GuildId = ctx.Guild.Id },
+                    ctx))
                     activeBuilder.AppendLine(
-                        $"slot {booster.slot.id} :: {booster.multiplier}x expiring {booster.expirationDate.Humanize()}");
+                        $"slot {booster.Slot.Id} :: {booster.Multiplier}x expiring {booster.ExpirationDate.Humanize()}");
                 if (activeBuilder.Length == 0) activeBuilder.AppendLine("No boosters");
 
                 var queuedBuilder = new StringBuilder();
-                var queue = BoosterManager.queuedBoosters;
+                var queue = (await Mediator.Send(new GetGuildQueuedBoostersQuery { GuildId = ctx.Guild.Id }, ctx))
+                    .ToList();
                 foreach (var booster in queue)
                     queuedBuilder.AppendLine(
-                        $"{queue.IndexOf(booster)} :: {booster.multiplier}x for {TimeSpan.FromSeconds(booster.durationInSeconds).Humanize()}");
+                        $"{queue.IndexOf(booster)} :: {booster.Multiplier}x for {TimeSpan.FromSeconds(booster.DurationInSeconds).Humanize()}");
                 if (queuedBuilder.Length == 0) queuedBuilder.AppendLine("No boosters");
 
                 builder.AppendLine("-- Active Boosters --");
                 builder.AppendLine(activeBuilder.ToString());
                 builder.AppendLine("-- Queued Boosters --");
                 builder.AppendLine(queuedBuilder.ToString());
-                builder.AppendLine($"Current active multiplier: {BoosterManager.GetMultiplier()}");
+                builder.AppendLine(
+                    $"Current active multiplier: {await Mediator.Send(new GetBoosterMultiplierCommand { GuildId = ctx.Guild.Id }, ctx)}");
 
                 await ctx.RespondAsync(Formatter.BlockCode(builder.ToString()));
             }
@@ -112,7 +127,7 @@ namespace GarbageCan.Commands.Boosters
         {
             try
             {
-                var boosters = await GetBoostersString(user.Id);
+                var boosters = await GetBoostersString(ctx, ctx.Guild.Id, user.Id);
                 await ctx.RespondAsync(Formatter.BlockCode(boosters));
             }
             catch (Exception e)
@@ -128,14 +143,20 @@ namespace GarbageCan.Commands.Boosters
         {
             try
             {
-                var result = BoosterManager.AddBooster(multiplier, span, queue);
+                var result = await Mediator.Send(new AddBoosterCommand
+                {
+                    GuildId = ctx.Guild.Id,
+                    Duration = span,
+                    Multiplier = multiplier,
+                    Queue = queue
+                }, ctx);
                 switch (result)
                 {
                     case BoosterResult.Active:
-                        await ctx.RespondAsync($"{GarbageCan.Check} Booster has been activated!");
+                        await ctx.RespondAsync("Booster has been activated!");
                         break;
                     case BoosterResult.Queued:
-                        await ctx.RespondAsync($"{GarbageCan.Check} Booster has been queued");
+                        await ctx.RespondAsync("Booster has been queued");
                         break;
                     case BoosterResult.SlotsFull:
                         break;
@@ -152,19 +173,18 @@ namespace GarbageCan.Commands.Boosters
 
         [Command("give")]
         [RequirePermissions(Permissions.Administrator)]
-        public async Task GiveBooster(CommandContext ctx, DiscordUser user, float multiplier, TimeSpan span)
+        public async Task GiveBooster(CommandContext ctx, DiscordMember user, float multiplier, TimeSpan span)
         {
             try
             {
-                using var context = new Context();
-                context.xpUserBoosters.Add(new EntityUserBooster
+                await Mediator.Send(new AddUserBoosterCommand
                 {
-                    userId = user.Id,
-                    multiplier = multiplier,
-                    durationInSeconds = (long) span.TotalSeconds
-                });
-                await context.SaveChangesAsync();
-                await ctx.RespondAsync($"{GarbageCan.Check} Booster has been given");
+                    GuildId = ctx.Guild.Id,
+                    UserId = user.Id,
+                    Multiplier = multiplier,
+                    Duration = span
+                }, ctx);
+                await ctx.RespondAsync("Booster has been given");
             }
             catch (Exception e)
             {
@@ -173,17 +193,20 @@ namespace GarbageCan.Commands.Boosters
             }
         }
 
-        private async Task<string> GetBoostersString(ulong uId)
+        private async Task<string> GetBoostersString(CommandContext ctx, ulong guildId, ulong userId)
         {
             try
             {
                 var builder = new StringBuilder();
-                using var context = new Context();
-                await context.xpUserBoosters
-                    .Where(b => b.userId == uId)
-                    .ForEachAsync(b =>
-                        builder.AppendLine(
-                            $"{b.id} :: {b.multiplier}x for {TimeSpan.FromSeconds(b.durationInSeconds).Humanize()}"));
+                (await Mediator.Send(new GetUserBoostersQuery
+                    {
+                        GuildId = guildId,
+                        UserId = userId
+                    }, ctx)).Select(b =>
+                        $"{b.Id} :: {b.Multiplier}x for {TimeSpan.FromSeconds(b.DurationInSeconds).Humanize()}")
+                    .ToList()
+                    .ForEach(s => builder.AppendLine(s));
+
                 if (builder.Length == 0) builder.AppendLine("-- No boosters --");
 
                 return builder.ToString();
@@ -197,7 +220,7 @@ namespace GarbageCan.Commands.Boosters
 
         [Group("slots")]
         [Aliases("slot")]
-        public class SlotCommandModule : BaseCommandModule
+        public class SlotCommandModule : MediatorCommandModule
         {
             [GroupCommand]
             [RequirePermissions(Permissions.Administrator)]
@@ -206,9 +229,10 @@ namespace GarbageCan.Commands.Boosters
                 try
                 {
                     var builder = new StringBuilder();
-                    foreach (var slot in BoosterManager.availableSlots)
+                    foreach (var slot in await Mediator.Send(new GetAvailableSlotsQuery { GuildId = ctx.Guild.Id },
+                        ctx))
                         builder.AppendLine(
-                            $"{slot.id} :: {slot.channelId}");
+                            $"{slot.Id} :: {slot.ChannelId}");
 
                     if (builder.Length == 0) builder.AppendLine("No slots");
 
@@ -227,8 +251,8 @@ namespace GarbageCan.Commands.Boosters
             {
                 try
                 {
-                    BoosterManager.AddSlot(channel);
-                    await ctx.RespondAsync($"{GarbageCan.Check} Slot successfully added");
+                    await Mediator.Send(new AddSlotCommand { GuildId = ctx.Guild.Id, ChannelId = channel.Id }, ctx);
+                    await ctx.RespondAsync("Slot successfully added");
                 }
                 catch (Exception e)
                 {
@@ -237,19 +261,24 @@ namespace GarbageCan.Commands.Boosters
                 }
             }
 
+            [Command("remove")]
+            [RequirePermissions(Permissions.Administrator)]
             public async Task RemoveSlot(CommandContext ctx, int id)
             {
                 try
                 {
-                    await using var context = new Context();
-                    if (context.xpAvailableSlots.Any(s => s.id == id))
+                    try
+                    {
+                        await Mediator.Send(new RemoveSlotCommand { GuildId = ctx.Guild.Id, Id = id }, ctx);
+                    }
+                    catch (ArgumentException)
+
                     {
                         await ctx.RespondAsync("No slot found");
                         return;
                     }
 
-                    BoosterManager.RemoveSlot(id);
-                    await ctx.RespondAsync($"{GarbageCan.Check} Slot has been removed");
+                    await ctx.RespondAsync("Slot has been removed");
                 }
                 catch (Exception e)
                 {

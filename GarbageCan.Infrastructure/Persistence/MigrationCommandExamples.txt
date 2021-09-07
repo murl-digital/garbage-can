@@ -1,0 +1,5 @@
+﻿Example Migrations commands to run from the root directory
+
+dotnet ef migrations add "ModelAdd" --project GarbageCan.Infrastructure --startup-project GarbageCan --output-dir Persistence/Migrations --context ApplicationDbContext
+
+dotnet ef migrations remove --project GarbageCan.Infrastructure --startup-project GarbageCan --context ApplicationDbContext

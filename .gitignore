@@ -1,4 +1,4 @@
-﻿# Common IntelliJ Platform excludes
+# Common IntelliJ Platform excludes
 
 # User specific
 **/.idea/**/workspace.xml
@@ -34,3 +34,4 @@ Desktop.ini
 .DS_Store
 
 dev.json
+.idea/.idea.GarbageCan/.idea/aws.xml

@@ -1,81 +1,60 @@
-using System;
+﻿using System;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using GarbageCan.Data;
-using GarbageCan.Data.Entities.Roles;
-using Serilog;
-using Z.EntityFramework.Plus;
+using GarbageCan.Application.Roles.JoinRoles.Commands.AddJoinRole;
+using GarbageCan.Application.Roles.JoinRoles.Commands.RemoveJoinRole;
+using GarbageCan.Application.Roles.JoinRoles.Queries.GetGuildJoinRoles;
 
 namespace GarbageCan.Commands.Roles
 {
     [Group("joinRoles")]
     [Aliases("joinRole", "jr")]
-    public class JoinRoleCommandModule : BaseCommandModule
+    public class JoinRoleCommandModule : MediatorCommandModule
     {
         [Command("add")]
         [RequirePermissions(Permissions.Administrator)]
         public async Task AddJoinRole(CommandContext ctx, DiscordRole role)
         {
-            try
+            await Mediator.Send(new AddJoinRoleCommand
             {
-                using var context = new Context();
-                context.joinRoles.Add(new EntityJoinRole
-                {
-                    roleId = role.Id
-                });
-                await context.SaveChangesAsync();
-                await ctx.RespondAsync($"{GarbageCan.Check} Role added successfully");
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "Couldn't add join role");
-                await ctx.RespondAsync("An error occured");
-            }
-        }
+                GuildId = ctx.Guild.Id,
+                RoleId = role.Id
+            }, ctx);
 
-        [Command("remove")]
-        [RequirePermissions(Permissions.Administrator)]
-        public async Task RemoveJoinRole(CommandContext ctx, int id)
-        {
-            try
-            {
-                using var context = new Context();
-                await context.joinRoles.Where(r => r.id == id).DeleteAsync();
-                await ctx.RespondAsync($"{GarbageCan.Check} Role removed successfully");
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "Couldn't remove join role");
-                await ctx.RespondAsync("An error occured");
-            }
+            await Mediator.RespondAsync(ctx, "Role added successfully", true);
         }
 
         [Command("list")]
         [RequirePermissions(Permissions.Administrator)]
         public async Task List(CommandContext ctx)
         {
-            var builder = new StringBuilder();
-            try
+            var joinRoles = await Mediator.Send(new GetGuildJoinRolesQuery
             {
-                using var context = new Context();
-                foreach (var r in context.joinRoles)
-                {
-                    var role = ctx.Guild.GetRole(r.roleId);
-                    builder.AppendLine($"{r.id} :: {role.Name}");
-                }
+                GuildId = ctx.Guild.Id
+            }, ctx);
 
-                await ctx.RespondAsync(Formatter.BlockCode(builder.ToString()));
-            }
-            catch (Exception e)
+            if (!joinRoles.Any())
             {
-                Log.Error(e, "Couldn't list reaction roles");
-                await ctx.RespondAsync("An error occured");
+                await Mediator.RespondAsync(ctx, "No join roles found!", formatAsBlock: true);
+                return;
             }
+
+            var lines = joinRoles
+                .Select(x => $"{x.Id} :: {GetRoleName(ctx.Guild, x.RoleId)}")
+                .ToList();
+            await Mediator.RespondAsync(ctx, string.Join(Environment.NewLine, lines), formatAsBlock: true);
+        }
+
+        [Command("remove")]
+        [RequirePermissions(Permissions.Administrator)]
+        public async Task RemoveJoinRole(CommandContext ctx, int id)
+        {
+            await Mediator.Send(new RemoveJoinRoleCommand { Id = id }, ctx);
+            await Mediator.RespondAsync(ctx, "Role removed successfully", true);
         }
     }
 }
