@@ -65,7 +65,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
                 Level = level
             };
 
-            FluentActions.Invoking(() => _appFixture.SendAsync(command)).Should().Throw<ValidationException>();
+            FluentActions.Invoking(() => _appFixture.SendAsync(command)).Should().ThrowAsync<ValidationException>();
         }
 
         [Theory]
@@ -78,7 +78,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
                 RoleId = roleId
             };
 
-            FluentActions.Invoking(() => _appFixture.SendAsync(command)).Should().Throw<ValidationException>();
+            FluentActions.Invoking(() => _appFixture.SendAsync(command)).Should().ThrowAsync<ValidationException>();
         }
     }
 }

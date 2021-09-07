@@ -57,7 +57,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
                 RoleId = roleId
             };
 
-            FluentActions.Invoking(() => _appFixture.SendAsync(command)).Should().Throw<ValidationException>();
+            FluentActions.Invoking(() => _appFixture.SendAsync(command)).Should().ThrowAsync<ValidationException>();
         }
     }
 }

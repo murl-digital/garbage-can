@@ -58,7 +58,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
                 Id = 50
             };
 
-            FluentActions.Invoking(() => _appFixture.SendAsync(command)).Should().Throw<NotFoundException>()
+            FluentActions.Invoking(() => _appFixture.SendAsync(command)).Should().ThrowAsync<NotFoundException>()
                 .WithMessage("Couldn't find Level Role");
         }
 
@@ -73,7 +73,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
                 Id = roleId
             };
 
-            FluentActions.Invoking(() => _appFixture.SendAsync(command)).Should().Throw<ValidationException>();
+            FluentActions.Invoking(() => _appFixture.SendAsync(command)).Should().ThrowAsync<ValidationException>();
         }
     }
 }

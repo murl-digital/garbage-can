@@ -120,7 +120,8 @@ namespace GarbageCan.Application.UnitTests.Boosters.Commands
 
             Func<Task> act = async () => await _appFixture.SendAsync(command);
 
-            act.Should().Throw<InvalidOperationException>().WithMessage("Specified guild has no available slots");
+            await act.Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("Specified guild has no available slots");
         }
 
         [Test]
@@ -161,7 +162,8 @@ namespace GarbageCan.Application.UnitTests.Boosters.Commands
 
             Func<Task> act = async () => await _appFixture.SendAsync(command);
 
-            act.Should().Throw<InvalidOperationException>().WithMessage("Specified slot doesn't exist in guild");
+            await act.Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("Specified slot doesn't exist in guild");
         }
     }
 }

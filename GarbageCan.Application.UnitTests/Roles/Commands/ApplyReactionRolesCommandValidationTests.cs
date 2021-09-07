@@ -28,7 +28,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
                 Emoji = null
             };
 
-            FluentActions.Invoking(() => _fixture.SendAsync(command)).Should().Throw<ValidationException>();
+            FluentActions.Invoking(() => _fixture.SendAsync(command)).Should().ThrowAsync<ValidationException>();
         }
 
         [Theory]
@@ -55,7 +55,7 @@ namespace GarbageCan.Application.UnitTests.Roles.Commands
                 }
             };
 
-            FluentActions.Invoking(() => _fixture.SendAsync(command)).Should().Throw<ValidationException>();
+            FluentActions.Invoking(() => _fixture.SendAsync(command)).Should().ThrowAsync<ValidationException>();
         }
     }
 }

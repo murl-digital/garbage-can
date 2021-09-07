@@ -25,7 +25,7 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
                 Count = 10
             };
 
-            FluentActions.Invoking(() => _fixture.SendAsync(command)).Should().Throw<ValidationException>();
+            FluentActions.Invoking(() => _fixture.SendAsync(command)).Should().ThrowAsync<ValidationException>();
         }
 
         [Theory]
@@ -40,7 +40,7 @@ namespace GarbageCan.Application.UnitTests.XP.Queries
                 Count = count
             };
 
-            FluentActions.Invoking(() => _fixture.SendAsync(command)).Should().Throw<ValidationException>();
+            FluentActions.Invoking(() => _fixture.SendAsync(command)).Should().ThrowAsync<ValidationException>();
         }
     }
 }
