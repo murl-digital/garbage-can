@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Remove="Assets\LvlCommandFont.ttf" />
+	  <None Remove="Assets\LvlCommandFontBold.ttf" />
+	  <None Remove="Assets\LvlCommandTemplate.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="Assets\LvlCommandFont.ttf" />
+	  <EmbeddedResource Include="Assets\LvlCommandFontBold.ttf" />
+	  <EmbeddedResource Include="Assets\LvlCommandTemplate.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="DSharpPlus" Version="4.1.0"/>
+		<PackageReference Include="DSharpPlus.CommandsNext" Version="4.1.0"/>
+		<PackageReference Include="MathNet.Numerics" Version="4.15.0"/>
+		<PackageReference Include="MediatR" Version="9.0.0"/>
+		<PackageReference Include="Microsoft.AspNetCore.ApiAuthorization.IdentityServer" Version="5.0.9"/>
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.9"/>
+		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.9"/>
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.9"/>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.9">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.9"/>
+		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.1"/>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.9"/>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\GarbageCan.Application\GarbageCan.Application.csproj" />
+	</ItemGroup>
+</Project>

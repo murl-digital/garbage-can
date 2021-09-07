@@ -1,44 +1,35 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
-    <PropertyGroup>
-        <OutputType>Exe</OutputType>
-        <TargetFramework>netcoreapp5.0</TargetFramework>
-    </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
+		<UserSecretsId>e29a5939-c235-47f0-ba05-bc109449f1e5</UserSecretsId>
+		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+		<RootNamespace>GarbageCan</RootNamespace>
+	</PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="AspNetCoreRateLimit" Version="3.2.2" />
-      <PackageReference Include="Config.Net" Version="4.15.0" />
-      <PackageReference Include="Config.Net.Json" Version="4.15.0" />
-      <PackageReference Include="DSharpPlus" Version="4.0.0-rc3" />
-      <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-rc3" />
-      <PackageReference Include="Humanizer.Core" Version="2.8.26" />
-      <PackageReference Include="MathNet.Numerics" Version="4.15.0" />
-      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.4" />
-      <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="5.0.4" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.4" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.4">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.4" />
-      <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-      <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.0-alpha.2" />
-      <PackageReference Include="Serilog" Version="2.10.0" />
-      <PackageReference Include="Serilog.AspNetCore" Version="4.0.0" />
-      <PackageReference Include="Serilog.Exceptions" Version="6.1.0" />
-      <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
-      <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
-      <PackageReference Include="SixLabors.Fonts" Version="1.0.0-beta0013" />
-      <PackageReference Include="SixLabors.ImageSharp" Version="1.0.3" />
-      <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta11" />
-      <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.1" />
-      <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.1.1" />
-      <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="5.1.25" />
-    </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="AspNetCoreRateLimit" Version="4.0.1"/>
+		<PackageReference Include="DSharpPlus" Version="4.1.0"/>
+		<PackageReference Include="DSharpPlus.CommandsNext" Version="4.1.0"/>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.9">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.9"/>
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.1"/>
+		<PackageReference Include="Quartz" Version="3.3.3"/>
+		<PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.3.3"/>
+		<PackageReference Include="Quartz.Extensions.Hosting" Version="3.3.3"/>
+		<PackageReference Include="Scrutor" Version="3.3.0"/>
+		<PackageReference Include="Serilog.AspNetCore" Version="4.1.0"/>
+		<PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0"/>
+		<PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0"/>
+		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.2.1"/>
+	</ItemGroup>
 
-    <ItemGroup>
-      <EmbeddedResource Include="Assets\LvlCommandFont.ttf" />
-        <EmbeddedResource Include="Assets\LvlCommandFontBold.ttf" />
-      <EmbeddedResource Include="Assets\LvlCommandTemplate.png" />
-    </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\GarbageCan.Application\GarbageCan.Application.csproj"/>
+		<ProjectReference Include="..\GarbageCan.Infrastructure\GarbageCan.Infrastructure.csproj"/>
+	</ItemGroup>
+
 </Project>
