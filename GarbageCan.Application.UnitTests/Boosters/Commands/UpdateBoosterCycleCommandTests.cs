@@ -169,7 +169,7 @@ namespace GarbageCan.Application.UnitTests.Boosters.Commands
                 new()
                 {
                     GuildId = guildId,
-                    ExpirationDate = now.Add(TimeSpan.FromSeconds(5)),
+                    ExpirationDate = now.ToUniversalTime().Subtract(TimeSpan.FromSeconds(5)),
                     Multiplier = 6.9f,
                     Slot = slot
                 }
