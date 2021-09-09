@@ -32,6 +32,8 @@ namespace GarbageCan.EventHandlers
                 _logger.LogInformation("Starting scheduled jobs");
                 _scheduler.ConfigureJobWithCronSchedule<UnRestrictExpiredChannelRestrictionsJob>(_logger, _configuration, "BackgroundTasks:UnRestrictChannelsCronExpression");
                 _scheduler.ConfigureJobWithCronSchedule<UnMuteExpiredMutesJob>(_logger, _configuration, "BackgroundTasks:UnMuteCronExpression");
+                _scheduler.ConfigureJobWithCronSchedule<RandomizeStatusJob>(_logger, _configuration,
+                    "BackgroundTasks:RandomizeStatusCronExpression");
             }
 
             return Task.CompletedTask;
