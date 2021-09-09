@@ -51,6 +51,7 @@ namespace GarbageCan.Infrastructure
             services.AddTransient<IDiscordDirectMessageService, DiscordDirectMessageService>();
             services.AddTransient<IDiscordMessageService, DiscordMessageService>();
             services.AddTransient<IDiscordWebhookService, DiscordWebhookService>();
+            services.AddTransient<IDiscordPresenceService, DiscordPresenceService>();
             services.AddScoped<DiscordCommandContextService>();
 
             services.AddSingleton<ITemplateFileProvider>(new TemplateFileProvider());
