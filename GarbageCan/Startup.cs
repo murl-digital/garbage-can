@@ -9,6 +9,7 @@ using GarbageCan.Application;
 using GarbageCan.Application.Common.Configuration;
 using GarbageCan.Application.Common.Interfaces;
 using GarbageCan.Commands;
+using GarbageCan.Commands.Fun;
 using GarbageCan.Configurations;
 using GarbageCan.Domain.Common;
 using GarbageCan.Domain.Entities;
@@ -75,6 +76,7 @@ namespace GarbageCan
                 });
 
                 commands.RegisterCommands(Assembly.GetExecutingAssembly());
+                commands.RegisterConverter(new ActivityConverter());
 
                 client.Ready += async (_, _) =>
                 {
