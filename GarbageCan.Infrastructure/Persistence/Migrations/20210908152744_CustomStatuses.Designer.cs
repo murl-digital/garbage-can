@@ -3,14 +3,16 @@ using System;
 using GarbageCan.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GarbageCan.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20210908152744_CustomStatuses")]
+    partial class CustomStatuses
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -194,10 +196,6 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("GarbageCan.Domain.Entities.Presence.CustomStatus", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
                     b.Property<int>("Activity")
                         .HasColumnType("int")
                         .HasColumnName("activity");
@@ -205,8 +203,6 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("longtext")
                         .HasColumnName("name");
-
-                    b.HasKey("Id");
 
                     b.ToTable("customStatuses");
                 });

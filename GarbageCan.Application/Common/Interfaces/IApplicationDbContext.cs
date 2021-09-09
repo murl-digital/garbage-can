@@ -1,11 +1,12 @@
-﻿using GarbageCan.Domain.Entities.Boosters;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using GarbageCan.Domain.Entities.Boosters;
 using GarbageCan.Domain.Entities.Config;
 using GarbageCan.Domain.Entities.Moderation;
+using GarbageCan.Domain.Entities.Presence;
 using GarbageCan.Domain.Entities.Roles;
 using GarbageCan.Domain.Entities.XP;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace GarbageCan.Application.Common.Interfaces
 {
@@ -26,6 +27,7 @@ namespace GarbageCan.Application.Common.Interfaces
         public DbSet<QueuedBooster> XPQueuedBoosters { get; set; }
         public DbSet<UserBooster> XPUserBoosters { get; set; }
         public DbSet<User> XPUsers { get; set; }
+        public DbSet<CustomStatus> CustomStatuses { get; set; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }
