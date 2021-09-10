@@ -37,7 +37,10 @@ namespace GarbageCan
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    var port = Environment.GetEnvironmentVariable("PORT");
+
+                    webBuilder.UseStartup<Startup>()
+                        .UseUrls("http://*:" + port);
                 });
 
         private static async Task ConnectToDiscord(IServiceProvider services, ILogger<Program> logger)
