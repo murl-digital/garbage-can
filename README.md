@@ -1,11 +1,13 @@
 # Garbage Can
 
-![Deploy](https://github.com/SorenNeedsCoffee/garbage-can-csharp/workflows/Deploy/badge.svg) ![Verify](https://github.com/SorenNeedsCoffee/garbage-can-csharp/workflows/Verify/badge.svg)
+![Verify](https://github.com/SorenNeedsCoffee/garbage-can-csharp/workflows/Verify/badge.svg)
 
 Garbage Can is a general purpose custom bot for the [DRACONIUM Discord Server](https://draconium.productions/discord)
 
 ## Contributing
-I'm not accepting contributions at this time. If you have a have a feature idea for the bot, get in touch!
+
+If you want to be involved in the development of Garbage can, feel free to join
+the [discord](https://draconium.productions/discord)!
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

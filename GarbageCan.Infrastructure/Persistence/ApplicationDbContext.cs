@@ -2,6 +2,7 @@
 using GarbageCan.Domain.Entities.Boosters;
 using GarbageCan.Domain.Entities.Config;
 using GarbageCan.Domain.Entities.Moderation;
+using GarbageCan.Domain.Entities.Presence;
 using GarbageCan.Domain.Entities.Roles;
 using GarbageCan.Domain.Entities.XP;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +30,7 @@ namespace GarbageCan.Infrastructure.Persistence
         public DbSet<QueuedBooster> XPQueuedBoosters { get; set; }
         public DbSet<UserBooster> XPUserBoosters { get; set; }
         public DbSet<User> XPUsers { get; set; }
+        public DbSet<CustomStatus> CustomStatuses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

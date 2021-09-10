@@ -15,5 +15,10 @@ namespace GarbageCan.Infrastructure.Services
         {
             return (float)(_random.NextDouble() * (higher - lower + 1) + lower);
         }
+
+        public int IntFromRange(int lower, int higher)
+        {
+            return _random.Next(lower, higher + 1);
+        }
     }
 }

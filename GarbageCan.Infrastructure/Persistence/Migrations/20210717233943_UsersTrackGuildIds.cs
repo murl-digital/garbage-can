@@ -15,6 +15,7 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                 defaultValue: 0ul);
 
             migrationBuilder.Sql("UPDATE xpUsers SET userId = id");
+            migrationBuilder.Sql("UPDATE xpUsers SET id = round(1+rand()*10000)");
             
             migrationBuilder.AlterColumn<int>(
                 name: "id",
