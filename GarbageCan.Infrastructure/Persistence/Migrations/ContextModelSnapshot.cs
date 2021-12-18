@@ -319,21 +319,6 @@ namespace GarbageCan.Infrastructure.Persistence.Migrations
                     b.ToTable("reactionRoles");
                 });
 
-            modelBuilder.Entity("GarbageCan.Domain.Entities.Roles.WatchedUser", b =>
-                {
-                    b.Property<ulong>("GuildId")
-                        .HasColumnType("bigint unsigned")
-                        .HasColumnName("guildId");
-
-                    b.Property<ulong>("UserId")
-                        .HasColumnType("bigint unsigned")
-                        .HasColumnName("userId");
-
-                    b.HasIndex("GuildId");
-
-                    b.ToTable("joinWatchlist");
-                });
-
             modelBuilder.Entity("GarbageCan.Domain.Entities.XP.ExcludedChannel", b =>
                 {
                     b.Property<ulong>("ChannelId")

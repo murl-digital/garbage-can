@@ -25,7 +25,8 @@ namespace GarbageCan.Infrastructure.Discord
             {
                 Id = x.Key,
                 DisplayName = x.Value.DisplayName,
-                IsBot = x.Value.IsBot
+                IsBot = x.Value.IsBot,
+                IsPending = x.Value.IsPending ?? true
             }).ToList();
         }
 

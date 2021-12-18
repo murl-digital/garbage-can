@@ -29,6 +29,8 @@ namespace GarbageCan.EventHandlers
         public async Task Handle(DomainEventNotification<DiscordGuildDownloadCompleteEvent> notification, CancellationToken cancellationToken)
         {
             _scheduler.ConfigureJobWithCronSchedule<ApplyConditionalRolesJob>(_logger, _configuration, "BackgroundTasks:ApplyConditionalRolesCronExpression");
+            _scheduler.ConfigureJobWithCronSchedule<ApplyJoinRolesJob>(_logger, _configuration,
+                "BackgroundTasks:ApplyJoinRolesCronExpression");
             _scheduler.ConfigureJobWithCronSchedule<BoosterCycleJob>(_logger, _configuration,
                 "BackgroundTasks:BoosterCycleCronExpression");
         }

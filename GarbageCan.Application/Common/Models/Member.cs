@@ -5,5 +5,6 @@
         public bool IsBot { get; set; }
         public string DisplayName { get; set; }
         public ulong Id { get; set; }
+        public bool IsPending { get; set; }
     }
 }

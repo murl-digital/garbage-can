@@ -18,7 +18,6 @@ namespace GarbageCan.Infrastructure.Persistence
         public DbSet<ConditionalRole> ConditionalRoles { get; set; }
         public DbSet<Config> Config { get; set; }
         public DbSet<JoinRole> JoinRoles { get; set; }
-        public DbSet<WatchedUser> JoinWatchlist { get; set; }
         public DbSet<LevelRole> LevelRoles { get; set; }
         public DbSet<ActionLog> ModerationActionLogs { get; set; }
         public DbSet<ActiveChannelRestrict> ModerationActiveChannelRestricts { get; set; }
